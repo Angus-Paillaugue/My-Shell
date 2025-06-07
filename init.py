@@ -178,6 +178,7 @@ bind = $mainMod, COMMA, exec, $fabricSend 'wallpaper_manager.toggle()'
 bind = $mainMod SHIFT, V, exec, $fabricSend 'clipboard_manager.toggle()'
 
 exec = ~/.config/my-shell/run.sh
+exec = ~/.config/my-shell/workflows/update.sh
 """
     location = os.path.expanduser(
         f"~/.config/{APP_NAME}/config/hypr/overrides.conf")
