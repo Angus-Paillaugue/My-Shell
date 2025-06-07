@@ -1,0 +1,9 @@
+#corner-container {
+  min-width: 20px;
+  min-height: 20px;
+}
+
+#corner {
+  background-color: var(--shadow);
+  border-radius: 0;
+}

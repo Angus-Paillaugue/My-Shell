@@ -1,0 +1,7 @@
+#bar-inner {
+  padding: 4px 4px 4px 4px;
+  border-radius: 0;
+}
+.bar-item {
+  border: 1px solid var(--surface-bright);
+}

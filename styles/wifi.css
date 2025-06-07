@@ -1,0 +1,82 @@
+#wifi-left-button {
+  border-radius: 12px 2px 2px 12px;
+}
+
+#wifi-left-button.disabled {
+  background-color: var(--surface);
+}
+
+#wifi-left-button.disabled #wifi-left-button-childs label {
+  color: var(--foreground);
+}
+
+#wifi-networks-expand-button {
+  border-radius: 2px 12px 12px 2px;
+  background-color: var(--surface);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#wifi-networks-expand-button label {
+  font-size: 20px;
+  color: var(--foreground);
+  transition: all 0.25s ease;
+}
+
+#wifi-networks-expand-button:hover {
+  background-color: var(--primary);
+  padding: 0 4px;
+}
+
+#wifi-networks-expand-button:hover label {
+  color: var(--shadow);
+}
+
+#wifi-connections-box {
+  margin-top: 12px;
+  background-color: var(--surface);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#wifi-networks-header {
+  font-size: 16px;
+  color: var(--foreground);
+}
+
+#wifi-scan {
+  padding: 8px;
+  border-radius: 8px;
+  background-color: var(--surface-bright);
+  transition: all 0.1s ease;
+}
+
+#wifi-scan:hover {
+  border-radius: 20px;
+  background-color: var(--primary);
+}
+
+#wifi-scan:hover label {
+  color: var(--on-primary);
+}
+
+#wifi-scan label {
+  color: var(--foreground);
+  font-size: 18px;
+  transition: all 0.1s ease;
+}
+
+#wifi-scan label.scanning {
+  color: var(--on-primary);
+}
+
+#wifi-scan label.scanning {
+  color: var(--on-primary);
+}
+
+#wifi-scan label.scanning {
+  background-color: var(--primary);
+}
+
+#wifi-scan.scanning {
+  background-color: var(--primary);
+}

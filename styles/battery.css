@@ -1,0 +1,34 @@
+#battery-container {
+  padding: 8px;
+  background-color: var(--surface);
+}
+
+#battery-circle {
+  color: var(--surface-bright);
+  border: 3px solid var(--primary);
+}
+
+#battery-circle.bat {
+  border: 3px solid var(--green);
+}
+
+#battery-circle.alert {
+  border: 3px solid var(--red-dim);
+}
+#battery-icon {
+  font-size: 20px;
+}
+#battery-icon.alert {
+  color: var(--red-dim);
+}
+#battery-circle.warning {
+  border: 3px solid var(--yellow-dim);
+}
+#battery-icon.warning {
+  color: var(--yellow-dim);
+}
+
+#battery-level {
+  font-weight: bold;
+  margin: 0 4px 0 8px;
+}

@@ -1,0 +1,20 @@
+#wallpaper-manager-container {
+  padding: 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--surface-bright);
+}
+#wallpaper-manager-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--foreground);
+  margin-bottom: 10px;
+}
+
+#no-wallpapers-label {
+  font-size: 20px;
+  color: var(--foreground);
+}
+.wallpaper-placeholder {
+  background-color: rgba(100, 100, 100, 0.3);
+  border-radius: 4px;
+}

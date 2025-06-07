@@ -1,0 +1,13 @@
+#metrics-main-box {
+  background-color: var(--surface);
+  padding: 0 12px 0 12px;
+  min-height: 40px;
+  font-size: 16px;
+}
+
+#cpu-label,
+#memory-label,
+#temp-label {
+  font-weight: bold;
+  font-size: 20px;
+}

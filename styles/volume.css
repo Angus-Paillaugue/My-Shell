@@ -1,0 +1,57 @@
+#mic-outputs-open-button,
+#volume-outputs-open-button {
+  background-color: var(--surface);
+  padding: 4px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 8px;
+}
+#mic-outputs-open-button label,
+#volume-outputs-open-button label {
+  color: var(--foreground);
+  font-size: 16px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#mic-outputs-open-button:hover,
+#volume-outputs-open-button:hover {
+  background-color: var(--primary);
+  border-radius: 20px;
+}
+#mic-outputs-open-button:hover label,
+#volume-outputs-open-button:hover label {
+  color: var(--on-primary);
+}
+.bt-output-item {
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bt-output-item:hover {
+  background-color: var(--on-secondary);
+  padding-left: 12px;
+}
+.bt-output-item label {
+  color: var(--foreground);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bt-output-item:hover label {
+  color: var(--on-foreground);
+}
+.bt-output-item.selected-output {
+  background-color: var(--primary);
+  padding-left: 12px;
+  border-radius: 8px;
+}
+
+.bt-output-item.selected-output label {
+  color: var(--on-primary);
+}
+
+#mic-inputs-container-box,
+#outputs-container-box {
+  background-color: var(--surface);
+}
+#outputs-container,
+#mic-inputs-container {
+  margin-top: 10px;
+}

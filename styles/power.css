@@ -1,0 +1,131 @@
+#power-options-container {
+  margin-top: 12px;
+  background-color: var(--surface);
+}
+
+#power-menu-main-button {
+  min-width: 40px;
+  min-height: 40px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background-color: var(--surface);
+}
+
+#power-menu-main-button label {
+  font-size: 24px;
+  color: var(--foreground);
+}
+
+#power-menu-main-button:hover,
+#power-menu-main-button:focus {
+  border-radius: 20px;
+  background-color: var(--surface-bright);
+}
+
+#power-menu-main-button:hover label,
+#power-menu-main-button:focus label {
+  color: var(--primary);
+}
+
+#power-menu-main-button:active {
+  background-color: var(--primary);
+}
+
+#power-menu-main-button:active label {
+  color: var(--shadow);
+}
+
+/* Power menu dropdown styling */
+#power-menu-dropdown {
+  background-color: var(--shadow);
+  border: 1px solid var(--surface-bright);
+  padding: 4px;
+}
+
+#power-option-button {
+  border-radius: 8px;
+  padding: 8px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#power-option-button:hover {
+  background-color: var(--surface-bright);
+}
+
+#power-option-button:active {
+  background-color: var(--primary);
+}
+
+#option-icon {
+  font-size: 18px;
+  min-width: 24px;
+}
+
+#option-label {
+  font-size: 14px;
+}
+
+#power-option-button:hover #option-icon,
+#power-option-button:hover #option-label {
+  color: var(--primary);
+}
+
+#power-option-button:active #option-icon,
+#power-option-button:active #option-label {
+  color: var(--shadow);
+}
+
+#setting-buttons-grid {
+  margin-top: 12px;
+}
+
+/* power-confirm.css */
+#power-confirm-dialog {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#power-confirm-box {
+  background-color: var(--surface);
+  min-width: 320px;
+  padding: 16px;
+}
+
+#confirm-icon {
+  font-size: 48px;
+  color: var(--primary);
+}
+
+#confirm-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#confirm-message {
+  color: var(--on-surface-variant);
+}
+
+#confirm-cancel-button {
+  background-color: var(--surface-bright);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+#confirm-cancel-button label {
+  color: var(--foreground);
+}
+#confirm-ok-button {
+  background-color: var(--primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+#confirm-ok-button label {
+  color: var(--on-primary);
+}
+
+#confirm-cancel-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--foreground);
+}
+
+#confirm-ok-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--foreground);
+}

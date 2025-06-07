@@ -1,0 +1,93 @@
+#time {
+  background-color: var(--surface);
+  padding: 0 12px;
+  min-height: 40px;
+  font-weight: bold;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#time:hover,
+#time:focus {
+  border-radius: 20px;
+  background-color: var(--surface-bright);
+}
+#time:hover label,
+#time:focus label {
+  color: var(--primary);
+}
+#time:active {
+  background-color: var(--primary);
+}
+#time:active label {
+  color: var(--shadow);
+}
+
+#calendar-container {
+  background-color: var(--shadow);
+  color: var(--foreground);
+  border: 1px solid var(--surface-bright);
+  padding: 20px;
+}
+
+#month-navigation {
+  margin-bottom: 8px;
+}
+
+#month-year-label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#day-label {
+  font-size: 12px;
+  color: var(--foreground);
+  font-weight: bold;
+}
+
+/* Calendar navigation */
+#calendar-nav-button {
+  min-height: 20px;
+  min-width: 20px;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: var(--surface-bright);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#calendar-nav-button label {
+  color: var(--foreground);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#calendar-nav-button:hover {
+  border-radius: 15px;
+}
+#calendar-nav-button:hover label {
+  color: var(--primary);
+}
+
+/* Days buttons/labels */
+#day-button,
+#today-button,
+#empty-day {
+  min-height: 30px;
+  min-width: 30px;
+  padding: 2px;
+  margin: 1px;
+  border-radius: 4px;
+}
+#day-button {
+  background-color: var(--surface-bright);
+}
+#day-button label {
+  color: var(--foreground);
+}
+#today-button {
+  background-color: var(--primary);
+  font-weight: bold;
+}
+#today-button label {
+  color: var(--on-primary);
+}
+#empty-day {
+  background-color: transparent;
+  border: none;
+}

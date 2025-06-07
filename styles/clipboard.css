@@ -1,0 +1,31 @@
+#clipboard-manager-container {
+  padding: 12px;
+  background-color: var(--shadow);
+  border: 1px solid var(--surface-bright);
+  min-height: 420px;
+  min-width: 978px;
+}
+
+#clipboard-manager-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--foreground);
+  margin-bottom: 10px;
+}
+
+.clipboard-item-button {
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.clipboard-item-button label {
+  font-size: 16px;
+  color: var(--foreground);
+}
+.clipboard-item-button:hover {
+  padding-left: 12px;
+  background-color: var(--surface);
+}
+.clipboard-item-button:hover label {
+  color: var(--primary);
+}
