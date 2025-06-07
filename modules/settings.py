@@ -18,6 +18,7 @@ from modules.screen_record import ScreenRecordButton
 
 
 class SettingsMenuDropdown(WaylandWindow):
+
     def __init__(self, parent_button, **kwargs):
         super().__init__(
             layer="overlay",
@@ -42,14 +43,16 @@ class SettingsMenuDropdown(WaylandWindow):
         self.wired_networks_dropdown_slot = Box()
         self.mic_module = MicRow(slot=self.mic_inputs_dropdown_slot)
         self.volume_module = VolumeRow(slot=self.audio_outputs_dropdown_slot)
-        self.bluetooth = BluetoothButton(slot=self.bluetooth_devices_dropdown_slot)
-        self.power_menu_button = PowerMenuButton(power_actions=self.power_menu_actions)
+        self.bluetooth = BluetoothButton(
+            slot=self.bluetooth_devices_dropdown_slot)
+        self.power_menu_button = PowerMenuButton(
+            power_actions=self.power_menu_actions)
         self.wifi_module = WifiModule(slot=self.wifi_networks_dropdown_slot)
         self.network_module = Wired(slot=self.wired_networks_dropdown_slot)
-        self.screenshot_button = ScreenshotButton(close_settings=self.toggle_visibility)
+        self.screenshot_button = ScreenshotButton(
+            close_settings=self.toggle_visibility)
         self.screen_record_button = ScreenRecordButton(
-            close_settings=self.toggle_visibility
-        )
+            close_settings=self.toggle_visibility)
 
         self.buttons_grid = Gtk.Grid(
             column_homogeneous=True,
@@ -116,12 +119,8 @@ class SettingsMenuDropdown(WaylandWindow):
         parent_alloc = self.parent_box.get_allocation()
 
         # Move the window to position it right below the button
-        x = (
-            parent_alloc.x
-            + button_alloc.x
-            + button_alloc.width
-            - self.get_allocated_width()
-        )
+        x = (parent_alloc.x + button_alloc.x + button_alloc.width -
+             self.get_allocated_width())
         y = parent_alloc.y + button_alloc.y + button_alloc.height + 8
 
         self.move(x, y)
@@ -147,6 +146,7 @@ class SettingsMenuDropdown(WaylandWindow):
 
 
 class Settings(Box):
+
     def __init__(self, **kwargs):
         super().__init__(
             name="settings-menu-container",

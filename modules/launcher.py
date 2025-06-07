@@ -18,10 +18,10 @@ from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import Gdk, GLib
 from services.logger import logger
 import modules.icons as icons
-from services.conversion import Conversion
 
 
 class AppLauncher(WaylandWindow):
+
     def __init__(self, **kwargs):
         super().__init__(
             anchor="center center",
@@ -36,7 +36,6 @@ class AppLauncher(WaylandWindow):
         self._arranger_handler: int = 0
         self._all_apps = get_desktop_applications()
 
-        self.converter = Conversion()
         CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config.APP_NAME}"
         self.calc_history_path = f"{CACHE_DIR}/calc.json"
         if not os.path.exists(CACHE_DIR):
@@ -47,13 +46,6 @@ class AppLauncher(WaylandWindow):
         else:
             self.calc_history = []
 
-        self.conversion_history_path = f"{CACHE_DIR}/conversion.json"
-        if os.path.exists(self.conversion_history_path):
-            with open(self.conversion_history_path, "r") as f:
-                self.conversion_history = json.load(f)
-        else:
-            self.conversion_history = []
-
         self.viewport = Box(name="viewport", spacing=4, orientation="v")
         self.search_entry = Entry(
             name="search-entry",
@@ -62,8 +54,7 @@ class AppLauncher(WaylandWindow):
             h_align="fill",
             notify_text=self.notify_text,
             on_activate=lambda entry, *_: self.on_search_entry_activate(
-                entry.get_text()
-            ),
+                entry.get_text()),
             on_key_press_event=self.on_search_entry_key_press,
         )
         self.search_entry.props.xalign = 0.5
@@ -141,37 +132,28 @@ class AppLauncher(WaylandWindow):
 
     def arrange_viewport(self, query: str = ""):
         if query.startswith("="):
-
             self.update_calculator_viewport()
             return
-        if query.startswith(";"):
-            # In conversion mode, update history view once (not per keystroke)
-            self.update_conversion_viewport()
-            return
-        remove_handler(self._arranger_handler) if self._arranger_handler else None
+        remove_handler(
+            self._arranger_handler) if self._arranger_handler else None
         self.viewport.children = []
         self.selected_index = -1
 
         filtered_apps_iter = iter(
             sorted(
                 [
-                    app
-                    for app in self._all_apps
-                    if query.casefold()
-                    in (
-                        (app.display_name or "")
-                        + (" " + app.name + " ")
-                        + (app.generic_name or "")
-                    ).casefold()
+                    app for app in self._all_apps if query.casefold() in (
+                        (app.display_name or "") + (" " + app.name + " ") +
+                        (app.generic_name or "")).casefold()
                 ],
                 key=lambda app: (app.display_name or "").casefold(),
-            )
-        )
-        should_resize = operator.length_hint(filtered_apps_iter) == len(self._all_apps)
+            ))
+        should_resize = operator.length_hint(filtered_apps_iter) == len(
+            self._all_apps)
 
         self._arranger_handler = idle_add(
-            lambda apps_iter: self.add_next_application(apps_iter)
-            or self.handle_arrange_complete(should_resize, query),
+            lambda apps_iter: self.add_next_application(apps_iter) or self.
+            handle_arrange_complete(should_resize, query),
             filtered_apps_iter,
             pin=True,
         )
@@ -191,7 +173,8 @@ class AppLauncher(WaylandWindow):
         return True
 
     def resize_viewport(self):
-        self.scrolled_window.set_min_content_width(self.viewport.get_allocation().width)
+        self.scrolled_window.set_min_content_width(
+            self.viewport.get_allocation().width)
         return False
 
     def bake_application_slot(self, app: DesktopApp, **kwargs) -> Button:
@@ -232,8 +215,7 @@ class AppLauncher(WaylandWindow):
     def update_selection(self, new_index: int):
 
         if self.selected_index != -1 and self.selected_index < len(
-            self.viewport.get_children()
-        ):
+                self.viewport.get_children()):
             current_button = self.viewport.get_children()[self.selected_index]
             current_button.get_style_context().remove_class("selected")
 
@@ -246,6 +228,7 @@ class AppLauncher(WaylandWindow):
             self.selected_index = -1
 
     def scroll_to_selected(self, button):
+
         def scroll():
             adj = self.scrolled_window.get_vadjustment()
             alloc = button.get_allocation()
@@ -290,9 +273,8 @@ class AppLauncher(WaylandWindow):
 
                     if text.strip() == "" and self.selected_index == -1:
                         return
-                    selected_index = (
-                        self.selected_index if self.selected_index != -1 else 0
-                    )
+                    selected_index = (self.selected_index
+                                      if self.selected_index != -1 else 0)
                     if 0 <= selected_index < len(children):
                         children[selected_index].clicked()
 
@@ -309,8 +291,7 @@ class AppLauncher(WaylandWindow):
             elif event.keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
 
                 if self.selected_index != -1 and self.selected_index < len(
-                    self.calc_history
-                ):
+                        self.calc_history):
                     if event.state & Gdk.ModifierType.SHIFT_MASK:
 
                         self.delete_selected_calc_history()
@@ -337,26 +318,6 @@ class AppLauncher(WaylandWindow):
             elif event.keyval == Gdk.KEY_Up:
                 self.move_selection(-1)
                 return True
-            elif event.keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
-                # In conversion mode, if a history item is highlighted:
-                if self.selected_index != -1 and self.selected_index < len(
-                    self.conversion_history
-                ):
-                    if event.state & Gdk.ModifierType.SHIFT_MASK:
-                        # Shift+Enter deletes the selected calculator history item
-                        self.delete_selected_conversion_history()
-                    else:
-                        # Normal Enter copies the result
-                        selected_text = self.conversion_history[self.selected_index]
-                        self.copy_text_to_clipboard(selected_text)
-                        # Clear selection so new expressions are evaluated on further Return presses
-                        self.selected_index = -1
-                else:
-                    # Force reset selection index
-                    self.selected_index = -1
-                    # No item selected, evaluate the expression
-                    self.evaluate_conversion_expression(text)
-                return True
             elif event.keyval == Gdk.KEY_Escape:
                 self.close_launcher()
                 return True
@@ -370,8 +331,7 @@ class AppLauncher(WaylandWindow):
                 self.move_selection(-1)
                 return True
             elif event.keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter) and (
-                event.state & Gdk.ModifierType.SHIFT_MASK
-            ):
+                    event.state & Gdk.ModifierType.SHIFT_MASK):
                 return True
             elif event.keyval == Gdk.KEY_Escape:
                 self.close_launcher()
@@ -384,10 +344,6 @@ class AppLauncher(WaylandWindow):
         if text.startswith("="):
             self.update_calculator_viewport()
 
-            self.selected_index = -1
-        elif text.startswith(";"):
-            self.update_conversion_viewport()
-            # Always reset selection when typing a new expression
             self.selected_index = -1
         else:
             self.arrange_viewport(text)
@@ -407,10 +363,6 @@ class AppLauncher(WaylandWindow):
     def save_calc_history(self):
         with open(self.calc_history_path, "w") as f:
             json.dump(self.calc_history, f)
-
-    def save_conversion_history(self):
-        with open(self.conversion_history_path, "w") as f:
-            json.dump(self.conversion_history, f)
 
     def evaluate_calculator_expression(self, text: str):
 
@@ -477,26 +429,6 @@ class AppLauncher(WaylandWindow):
         self.save_calc_history()
         self.update_calculator_viewport()
 
-    def evaluate_conversion_expression(self, text: str):
-        expr = text.lstrip(";").strip()
-        if not expr:
-            return
-
-        try:
-            result_value, result_type = self.converter.parse_input_and_convert(expr)
-            if result_type is None:
-                result_str = f"{result_value:.2f}"
-            else:
-                result_str = f"{result_value:.2f} {result_type}"
-        except:
-            result_str = "Error: Invalid conversion expression"
-
-        # Format the result based on its type
-
-        self.conversion_history.insert(0, f"{text} => {result_str}")
-        self.save_conversion_history()
-        self.update_conversion_viewport()
-
     def update_calculator_viewport(self):
         self.viewport.children = []
         for item in self.calc_history:
@@ -504,16 +436,6 @@ class AppLauncher(WaylandWindow):
             self.viewport.add(btn)
 
         if self.selected_index >= len(self.calc_history):
-            self.selected_index = -1
-
-    def update_conversion_viewport(self):
-        self.viewport.children = []
-        for item in self.conversion_history:
-            btn = self.create_conversion_history_button(item)
-            self.viewport.add(btn)
-        # Don't reset selection index here automatically
-        # Ensure selection state stays valid
-        if self.selected_index >= len(self.conversion_history):
             self.selected_index = -1
 
     def create_calc_history_button(self, text: str) -> Button:
@@ -569,60 +491,6 @@ class AppLauncher(WaylandWindow):
             )
         return btn
 
-    def create_conversion_history_button(self, text: str) -> Button:
-        # Parse the result to create a more readable display
-        if "=>" in text:
-            parts = text.split("=>")
-            expression = parts[0].strip()
-            result = parts[1].strip()
-
-            # For very long results, truncate for display but keep full in tooltip
-            display_text = text
-            if len(result) > 50:  # Truncate long results
-                display_text = f"{expression} => {result[:47]}..."
-
-            btn = Button(
-                name="slot-button",  # reuse existing CSS styling
-                child=Box(
-                    name="calc-slot-box",
-                    orientation="h",
-                    spacing=10,
-                    children=[
-                        Label(
-                            name="calc-label",
-                            label=display_text,
-                            ellipsization="end",
-                            v_align="center",
-                            h_align="center",
-                        ),
-                    ],
-                ),
-                tooltip_text=text,
-                on_clicked=lambda *_: self.copy_text_to_clipboard(text),
-            )
-        else:
-            # Fallback for non-calculation entries
-            btn = Button(
-                name="slot-button",
-                child=Box(
-                    name="calc-slot-box",
-                    orientation="h",
-                    spacing=10,
-                    children=[
-                        Label(
-                            name="calc-label",
-                            label=text,
-                            ellipsization="end",
-                            v_align="center",
-                            h_align="center",
-                        ),
-                    ],
-                ),
-                tooltip_text=text,
-                on_clicked=lambda *_: self.copy_text_to_clipboard(text),
-            )
-        return btn
-
     def copy_text_to_clipboard(self, text: str):
 
         parts = text.split("=>", 1)
@@ -633,7 +501,8 @@ class AppLauncher(WaylandWindow):
             logger.error(f"Clipboard copy failed: {e}")
 
     def delete_selected_calc_history(self):
-        if self.selected_index != -1 and self.selected_index < len(self.calc_history):
+        if self.selected_index != -1 and self.selected_index < len(
+                self.calc_history):
 
             current_index = self.selected_index
 
@@ -647,30 +516,5 @@ class AppLauncher(WaylandWindow):
             self.update_calculator_viewport()
 
             if len(self.calc_history) > 0:
-                self.update_selection(min(new_index, len(self.calc_history) - 1))
-
-    def delete_selected_conversion_history(self):
-        if self.selected_index != -1 and self.selected_index < len(
-            self.conversion_history
-        ):
-            # Store the current index before deletion
-            current_index = self.selected_index
-
-            # Delete the item
-            del self.conversion_history[current_index]
-            self.save_conversion_history()
-
-            # Determine the new selection index
-            # If we deleted the first item, stay at index 0
-            # Otherwise, move to the previous item
-            new_index = 0 if current_index == 0 else current_index - 1
-
-            # Reset selection before updating viewport
-            self.selected_index = -1
-
-            # Update the viewport
-            self.update_conversion_viewport()
-
-            # If we still have items, select the determined index
-            if len(self.conversion_history) > 0:
-                self.update_selection(min(new_index, len(self.conversion_history) - 1))
+                self.update_selection(min(new_index,
+                                          len(self.calc_history) - 1))

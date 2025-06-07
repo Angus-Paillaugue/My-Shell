@@ -40,13 +40,15 @@ class Brightness(Service):
         self.screen_backlight_path = f"/sys/class/backlight/{screen_device}"
 
         # Initialize maximum brightness level
-        self.max_screen = self.do_read_max_brightness(self.screen_backlight_path)
+        self.max_screen = self.do_read_max_brightness(
+            self.screen_backlight_path)
 
         if screen_device == "":
             return
 
         # Monitor screen brightness file
-        self.screen_monitor = monitor_file(f"{self.screen_backlight_path}/brightness")
+        self.screen_monitor = monitor_file(
+            f"{self.screen_backlight_path}/brightness")
 
         self.screen_monitor.connect(
             "changed",
@@ -81,8 +83,8 @@ class Brightness(Service):
 
         try:
             exec_shell_command_async(
-                f"brightnessctl --device '{screen_device}' set {value}", lambda _: None
-            )
+                f"brightnessctl --device '{screen_device}' set {value}",
+                lambda _: None)
             self.emit("screen", int((value / self.max_screen) * 100))
         except GLib.Error as e:
             logger.error(f"Error setting screen brightness: {e.message}")
@@ -91,6 +93,7 @@ class Brightness(Service):
 
 
 class BrightnessSlider(Scale):
+
     def __init__(self, client, **kwargs):
         super().__init__(
             name="control-slider",
@@ -119,7 +122,8 @@ class BrightnessSlider(Scale):
     def on_scale_move(self, widget, scroll, moved_pos):
         self._pending_value = moved_pos
         if self._update_source_id is None:
-            self._update_source_id = GLib.idle_add(self._update_brightness_callback)
+            self._update_source_id = GLib.idle_add(
+                self._update_brightness_callback)
         return False
 
     def _update_brightness_callback(self):
@@ -135,6 +139,7 @@ class BrightnessSlider(Scale):
 
 
 class BrightnessRow(Box):
+
     def __init__(self, **kwargs):
         super().__init__(
             name="brightness-row",
@@ -155,9 +160,8 @@ class BrightnessRow(Box):
 
         self.brightness_icons = [icons.brightness_low, icons.brightness_high]
 
-        self.brightness_icon = Label(
-            name="brightness-icon", markup=self.brightness_icons[0]
-        )
+        self.brightness_icon = Label(name="brightness-icon",
+                                     markup=self.brightness_icons[0])
         self.add(self.brightness_icon)
 
         self.brightness_slider = BrightnessSlider(client=self.client)
@@ -166,7 +170,8 @@ class BrightnessRow(Box):
         self.set_icon()
 
     def set_icon(self, *args):
-        current = int((self.client.screen_brightness / self.client.max_screen) * 100)
+        current = int(
+            (self.client.screen_brightness / self.client.max_screen) * 100)
         num_icons = len(self.brightness_icons)
         range_per_icon = 100 // num_icons
 

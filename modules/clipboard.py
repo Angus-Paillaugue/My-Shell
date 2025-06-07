@@ -23,9 +23,8 @@ class ClipboardManager(WaylandWindow):
         )
 
         # Make title more visible with markup
-        self.title_label = Label(
-            label="Clipboard Manager", name="clipboard-manager-title"
-        )
+        self.title_label = Label(label="Clipboard Manager",
+                                 name="clipboard-manager-title")
         self.header = CenterBox(
             name="clipboard-manager-header",
             orientation="h",
@@ -55,8 +54,10 @@ class ClipboardManager(WaylandWindow):
             child=self.clipboard_items,
             h_expand=True,
             v_expand=True,
-            h_scroll_policy=Gtk.PolicyType.NEVER,  # Never show horizontal scrollbar
-            v_scroll_policy=Gtk.PolicyType.AUTOMATIC,  # Show vertical scrollbar when needed
+            h_scroll_policy=Gtk.PolicyType.
+            NEVER,  # Never show horizontal scrollbar
+            v_scroll_policy=Gtk.PolicyType.
+            AUTOMATIC,  # Show vertical scrollbar when needed
         )
 
         # Make sure container has explicit minimum size but can grow
@@ -99,7 +100,9 @@ class ClipboardManager(WaylandWindow):
             self.clipboard_items.remove(child)
 
     def _build_list(self, filter_text=""):
-        result = subprocess.run(["cliphist", "list"], capture_output=True, check=True)
+        result = subprocess.run(["cliphist", "list"],
+                                capture_output=True,
+                                check=True)
         # Decode stdout with error handling
         stdout_str = result.stdout.decode("utf-8", errors="replace")
         lines = stdout_str.strip().split("\n")
@@ -121,7 +124,8 @@ class ClipboardManager(WaylandWindow):
             item_id = parts[0] if len(parts) > 1 else "0"
             content = parts[1] if len(parts) > 1 else entry
             button = Button(
-                child=Label(label=content, ellipsization="end", h_align="start"),
+                child=Label(label=content, ellipsization="end",
+                            h_align="start"),
                 on_clicked=lambda btn, e=item_id: self._copy_entry(e),
                 style_classes=["clipboard-item-button"],
                 v_align="fill",
@@ -132,9 +136,10 @@ class ClipboardManager(WaylandWindow):
             self.clipboard_items.add(button)
 
     def _copy_entry(self, id):
-        result = subprocess.run(
-            ["cliphist", "decode", id], capture_output=True, check=True
-        )
+        result = subprocess.run(["cliphist", "decode", id],
+                                capture_output=True,
+                                check=True)
         subprocess.run(["wl-copy"], input=result.stdout, check=True)
-        exec_shell_command_async("notify-send 'Clipboard' 'Copied to clipboard!'")
+        exec_shell_command_async(
+            "notify-send 'Clipboard' 'Copied to clipboard!'")
         self.toggle()  # Close the manager after copying

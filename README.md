@@ -18,14 +18,13 @@ This project is my implementation of a all-in-one wayland shell. It is pretty an
 To install my-shell, first clone the repository:
 
 ```bash
-git clone https://github.com/Angus-Paillaugue/My-Shell.git ~/.config/my-shell \
-cd ~/.config/my-shell
+git clone https://github.com/Angus-Paillaugue/My-Shell.git ~/.config/my-shell && cd ~/.config/my-shell
 ```
 
-Then, install the dependencies (may need to create a virtual environment first `python3 -m venv /venv`):
+Then, create a virtual environment and install the dependencies:
 
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv && pip install -r requirements.txt
 ```
 
 The, run the init script to set up the configuration files:

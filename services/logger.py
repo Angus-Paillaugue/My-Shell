@@ -20,15 +20,15 @@ class Logger:
         Parameters:
           log_file_location (string): Location of the logs directory (relative to the project)
         """
-        self.log_file_location = join(
-            dirname(realpath(__file__)), "../", log_file_location
-        )
+        self.log_file_location = join(dirname(realpath(__file__)), "../",
+                                      log_file_location)
         self.old_logs_location = join(self.log_file_location, "old/")
         self.process = process
         self.log_file_ext = log_file_ext
         self.log_rotate_retention = log_rotate_retention
         self._make_logs_dir()
-        self.current_file_nb_logs = self._get_nb_lines_in_file(self.log_file_location)
+        self.current_file_nb_logs = self._get_nb_lines_in_file(
+            self.log_file_location)
         self.max_log_files_retention = max_log_files_retention
 
     def _make_logs_dir(self):
@@ -67,7 +67,8 @@ class Logger:
                 log_files_numbers.append(int(match.groups()[0]))
         log_files_numbers.sort()
         new_file_name = self._create_file_name().replace(
-            ".", f".{(log_files_numbers[-1] if len(log_files_numbers) > 0 else 0) + 1}."
+            ".",
+            f".{(log_files_numbers[-1] if len(log_files_numbers) > 0 else 0) + 1}."
         )
         new_path = join(self.old_logs_location, new_file_name)
         old_path = join(self.log_file_location, self._create_file_name())

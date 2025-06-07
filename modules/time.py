@@ -16,6 +16,7 @@ from services.logger import logger
 
 
 class CalendarDropdown(WaylandWindow):
+
     def __init__(self, parent_button, **kwargs):
         super().__init__(
             layer="overlay",
@@ -49,7 +50,8 @@ class CalendarDropdown(WaylandWindow):
 
         self.prev_month_btn = Button(
             name="calendar-nav-button",
-            child=Label(name="calendar-nav-button-icon", markup=icons.chevron_left),
+            child=Label(name="calendar-nav-button-icon",
+                        markup=icons.chevron_left),
             on_clicked=self.prev_month,
             h_align="start",  # Align to the left edge
         )
@@ -63,19 +65,19 @@ class CalendarDropdown(WaylandWindow):
 
         self.next_month_btn = Button(
             name="calendar-nav-button",
-            child=Label(name="calendar-nav-button-icon", markup=icons.chevron_right),
+            child=Label(name="calendar-nav-button-icon",
+                        markup=icons.chevron_right),
             on_clicked=self.next_month,
             h_align="end",  # Align to the right edge
         )
 
         # Add elements to the container with appropriate packing
-        self.month_nav.pack_start(
-            self.prev_month_btn, False, False, 0
-        )  # Don't expand or fill
-        self.month_nav.pack_start(self.month_label, True, True, 0)  # Expand and fill
-        self.month_nav.pack_start(
-            self.next_month_btn, False, False, 0
-        )  # Don't expand or fill
+        self.month_nav.pack_start(self.prev_month_btn, False, False,
+                                  0)  # Don't expand or fill
+        self.month_nav.pack_start(self.month_label, True, True,
+                                  0)  # Expand and fill
+        self.month_nav.pack_start(self.next_month_btn, False, False,
+                                  0)  # Don't expand or fill
 
         # Days of week header
         self.days_header = Box(
@@ -91,8 +93,7 @@ class CalendarDropdown(WaylandWindow):
                     label=day,
                     h_align="center",
                     h_expand=True,
-                )
-            )
+                ))
 
         # Calendar grid
         self.calendar_grid = Box(
@@ -120,11 +121,8 @@ class CalendarDropdown(WaylandWindow):
         # Get calendar data
         year = self.current_date.year
         month = self.current_date.month
-        today = (
-            datetime.now().day
-            if datetime.now().year == year and datetime.now().month == month
-            else -1
-        )
+        today = (datetime.now().day if datetime.now().year == year
+                 and datetime.now().month == month else -1)
 
         # Update month label
         self.month_label.set_label(self.current_date.strftime("%B %Y"))
@@ -210,6 +208,7 @@ class CalendarDropdown(WaylandWindow):
 
 
 class Time(Button):
+
     @Property(tuple[str, ...], "read-write")
     def formatters(self):
         return self._formatters
@@ -233,7 +232,8 @@ class Time(Button):
         self._interval = value
         if self._repeater_id:
             GLib.source_remove(self._repeater_id)
-        self._repeater_id = invoke_repeater(self._interval, self.do_update_label)
+        self._repeater_id = invoke_repeater(self._interval,
+                                            self.do_update_label)
         self.do_update_label()
         return
 
@@ -278,7 +278,8 @@ class Time(Button):
         else:
             # If calendar isn't ready yet, create it now
             self.calendar_dropdown = CalendarDropdown(self)
-            GLib.timeout_add(100, lambda: self.calendar_dropdown.toggle_visibility())
+            GLib.timeout_add(100,
+                             lambda: self.calendar_dropdown.toggle_visibility())
 
     def update_time(self):
         current_time = time.strftime("%H:%M:%S", time.localtime())

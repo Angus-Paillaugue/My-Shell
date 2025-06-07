@@ -10,6 +10,7 @@ from services.metrics import shared_provider
 
 
 class Battery(Button):
+
     def __init__(self, **kwargs):
         super().__init__(name="battery-container", **kwargs)
 
@@ -31,7 +32,9 @@ class Battery(Button):
             style_classes="bat",
             child=self.bat_icon,
         )
-        self.bat_level = Label(name="battery-level", style_classes="bat", label="100%")
+        self.bat_level = Label(name="battery-level",
+                               style_classes="bat",
+                               label="100%")
         self.bat_revealer = Revealer(
             name="battery-level-revealer",
             transition_duration=250,

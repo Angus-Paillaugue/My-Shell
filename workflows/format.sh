@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-requiredCommands=("black" "prettier" "shfmt")
+requiredCommands=("yapf" "prettier" "shfmt")
 
 here=$(dirname "$(readlink -f "$0")")
-# Project root is one level up from the script directory
-projectRoot=$(dirname "$here")
+projectRoot=$(realpath "$here/..")
 cd "$projectRoot" || exit 1
 
 checkCommands() {
@@ -18,7 +17,7 @@ checkCommands() {
 
 formatPython() {
 	echo "Formatting Python files..."
-	black .
+	yapf -r -i .
 }
 
 formatCSS() {

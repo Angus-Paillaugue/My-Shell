@@ -10,6 +10,7 @@ from gi.repository import GLib, Gdk
 
 
 class PowerConfirmDialog(WaylandWindow):
+
     def __init__(self, action_name, action_icon, command, **kwargs):
         super().__init__(
             layer="overlay",
@@ -143,18 +144,15 @@ class PowerConfirmDialog(WaylandWindow):
         x, y = event.get_coords()
 
         # If click is outside content area, close dialog
-        if (
-            x < alloc.x
-            or x > alloc.x + alloc.width
-            or y < alloc.y
-            or y > alloc.y + alloc.height
-        ):
+        if (x < alloc.x or x > alloc.x + alloc.width or y < alloc.y
+                or y > alloc.y + alloc.height):
             self.hide()
 
         return False
 
 
 class PowerMenuActions(Revealer):
+
     def __init__(self, **kwargs):
         super().__init__(
             name="power-options-revealer",
@@ -179,7 +177,11 @@ class PowerMenuActions(Revealer):
                 "icon": icons.logout,
                 "command": "hyprctl dispatch exit",
             },
-            {"label": "Reboot", "icon": icons.reboot, "command": "systemctl reboot"},
+            {
+                "label": "Reboot",
+                "icon": icons.reboot,
+                "command": "systemctl reboot"
+            },
             {
                 "label": "Shutdown",
                 "icon": icons.shutdown,
@@ -216,8 +218,7 @@ class PowerMenuActions(Revealer):
         action_key = action["label"].lower()
         if action_key not in self.dialogs:
             self.dialogs[action_key] = PowerConfirmDialog(
-                action["label"], action["icon"], action["command"]
-            )
+                action["label"], action["icon"], action["command"])
 
         # Show the dialog
         dialog = self.dialogs[action_key]
@@ -237,6 +238,7 @@ class PowerMenuActions(Revealer):
 
 
 class PowerMenuButton(Box):
+
     def __init__(self, power_actions=None, **kwargs):
         super().__init__(
             name="power-menu-container",
