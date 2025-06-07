@@ -8,6 +8,7 @@ from gi.repository import GLib
 
 
 class Metrics(Button):
+
     def __init__(self, **kwargs):
         super().__init__(
             visible=True,
@@ -34,7 +35,9 @@ class Metrics(Button):
             spacing=4,
             v_align="center",
             h_align="center",
-            children=[Label(name="cpu-label", markup=icons.cpu), self.cpu_percentage],
+            children=[
+                Label(name="cpu-label", markup=icons.cpu), self.cpu_percentage
+            ],
         )
         self.main_box.add(self.cpu_container)
 
@@ -52,7 +55,8 @@ class Metrics(Button):
             children=[
                 Label(
                     name="memory-label",
-                    markup="<span font-family='JetBrainsMono Nerd Font' font-weight='normal'> </span>",
+                    markup=
+                    "<span font-family='JetBrainsMono Nerd Font' font-weight='normal'> </span>",
                 ),
                 self.mem_percentage,
             ],

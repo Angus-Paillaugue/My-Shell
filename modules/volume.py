@@ -15,6 +15,7 @@ from services.logger import logger
 
 
 class VolumeSlider(Scale):
+
     def __init__(self, audio, notify=None, **kwargs):
         super().__init__(
             name="control-slider",
@@ -56,6 +57,7 @@ class VolumeSlider(Scale):
 
 
 class VolumeIcon(Button):
+
     def __init__(self, audio: Audio, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
         self.audio = audio
@@ -80,7 +82,8 @@ class VolumeIcon(Button):
     def set_icon(self):
         if not self.audio or not self.audio.speaker:
             return
-        percentage = round((self.audio.speaker.volume / self.audio.max_volume) * 100)
+        percentage = round(
+            (self.audio.speaker.volume / self.audio.max_volume) * 100)
         if self.audio.speaker.muted:
             icon = icons.volume_muted
         else:
@@ -96,6 +99,7 @@ class VolumeIcon(Button):
 
 
 class VolumeOutputsRevealer(Revealer):
+
     def __init__(self, **kwargs):
         super().__init__(
             name="outputs-box",
@@ -136,6 +140,7 @@ class VolumeOutputsRevealer(Revealer):
 
 
 class VolumeRow(Box):
+
     def __init__(self, slot=None, **kwargs):
         super().__init__(
             name="volume-row",
@@ -284,11 +289,8 @@ class VolumeRow(Box):
         is_current = self.audio.speaker and output == self.audio.speaker
 
         # Create children list conditionally to avoid None values
-        check_icon = (
-            Label(markup=icons.check, h_expand=False)
-            if is_current
-            else Label(h_expand=False)
-        )
+        check_icon = (Label(markup=icons.check, h_expand=False)
+                      if is_current else Label(h_expand=False))
 
         row = Box(
             children=[
@@ -357,6 +359,7 @@ class VolumeRow(Box):
 
 
 class MicSlider(Scale):
+
     def __init__(self, audio, **kwargs):
         super().__init__(
             name="control-slider",
@@ -395,6 +398,7 @@ class MicSlider(Scale):
 
 
 class MicIcon(Button):
+
     def __init__(self, audio: Audio, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
         self.audio = audio
@@ -426,6 +430,7 @@ class MicIcon(Button):
 
 
 class MicInputsRevealer(Revealer):
+
     def __init__(self, **kwargs):
         super().__init__(
             name="mic-inputs-box",
@@ -467,6 +472,7 @@ class MicInputsRevealer(Revealer):
 
 
 class MicRow(Box):
+
     def __init__(self, slot=None, **kwargs):
         super().__init__(
             name="mic-row",
@@ -486,7 +492,8 @@ class MicRow(Box):
             v_expand=True,
             h_align="center",
             v_align="center",
-            on_clicked=lambda _: (self.inputs_box.toggle(), self.notify_inputs()),
+            on_clicked=lambda _:
+            (self.inputs_box.toggle(), self.notify_inputs()),
         )
 
         self.mic_slider = MicSlider(self.audio)
@@ -512,11 +519,9 @@ class MicRow(Box):
 
             # Optional: check for the specific signal name your Audio class uses
             if hasattr(self.audio.microphone, "stream") and hasattr(
-                self.audio.microphone.stream, "connect"
-            ):
+                    self.audio.microphone.stream, "connect"):
                 self.audio.microphone.stream.connect(
-                    "notify::microphone_changed", self.on_microphone_changed
-                )
+                    "notify::microphone_changed", self.on_microphone_changed)
 
     def on_microphone_changed(self, *_):
         if not self.audio.microphone:
@@ -555,11 +560,10 @@ class MicRow(Box):
             return
 
         for child in self.inputs_box.input_container.get_children():
-            if (
-                hasattr(child, "input_source")
-                and child.input_source == self.audio.microphone
-            ):
-                child.add_style_class("selected-output")  # Reuse the same style class
+            if (hasattr(child, "input_source")
+                    and child.input_source == self.audio.microphone):
+                child.add_style_class(
+                    "selected-output")  # Reuse the same style class
             else:
                 child.remove_style_class("selected-output")
 
@@ -590,7 +594,8 @@ class MicRow(Box):
     def _move_recording_streams_to_source(self, source_id):
         """Move any recording streams to the new source"""
         # Create callback to handle the output
-        callback = lambda output: self._on_source_outputs_received(output, source_id)
+        callback = lambda output: self._on_source_outputs_received(
+            output, source_id)
 
         # Call pactl to list all recording streams
         exec_shell_command_async("pactl list short source-outputs", callback)
@@ -642,11 +647,8 @@ class MicRow(Box):
 
         # Visual indicator for current input
         is_current = self.audio.microphone and input_src == self.audio.microphone
-        check_icon = (
-            Label(markup=icons.check, h_expand=False)
-            if is_current
-            else Label(h_expand=False)
-        )
+        check_icon = (Label(markup=icons.check, h_expand=False)
+                      if is_current else Label(h_expand=False))
 
         row = Box(
             children=[

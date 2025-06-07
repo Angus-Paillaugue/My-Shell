@@ -19,17 +19,16 @@ import modules.icons as icons
 
 
 class Bar(WaylandWindow):
+
     def __init__(self, **kwargs):
-        super().__init__(
-            name="bar",
-            layer="top",
-            anchor="left top right",
-            exclusivity="auto",
-            visible=True,
-            margin="4px 4px 0px 4px",
-            all_visible=True,
-            **kwargs
-        )
+        super().__init__(name="bar",
+                         layer="top",
+                         anchor="left top right",
+                         exclusivity="auto",
+                         visible=True,
+                         margin="4px 4px 0px 4px",
+                         all_visible=True,
+                         **kwargs)
         self.connection = get_hyprland_connection()
 
         self.workspaces = Workspaces(
@@ -47,14 +46,11 @@ class Bar(WaylandWindow):
                     h_align="center",
                     v_align="center",
                     id=i,
-                )
-                for i in range(1, 5)
+                ) for i in range(1, 5)
             ],
         )
 
-        self.lang_label = Label(
-            name="lang-label",
-        )
+        self.lang_label = Label(name="lang-label",)
         self.lang_icon = Label(markup=icons.keyboard, name="keyboard-lang-icon")
         self.language = Button(
             name="language",
@@ -79,39 +75,32 @@ class Bar(WaylandWindow):
             orientation=(Gtk.Orientation.HORIZONTAL),
             h_align="fill",
             v_align="fill",
-            start_children=(
-                Box(
-                    name="start-container",
-                    spacing=8,
-                    orientation=(Gtk.Orientation.HORIZONTAL),
-                    children=self.start_children,
-                )
-            ),
+            start_children=(Box(
+                name="start-container",
+                spacing=8,
+                orientation=(Gtk.Orientation.HORIZONTAL),
+                children=self.start_children,
+            )),
             center_children=Box(
                 name="center-container",
                 spacing=8,
                 orientation=(Gtk.Orientation.HORIZONTAL),
                 children=self.center_children,
             ),
-            end_children=(
-                Box(
-                    name="end-container",
-                    spacing=8,
-                    orientation=(Gtk.Orientation.HORIZONTAL),
-                    children=self.end_children,
-                )
-            ),
+            end_children=(Box(
+                name="end-container",
+                spacing=8,
+                orientation=(Gtk.Orientation.HORIZONTAL),
+                children=self.end_children,
+            )),
         )
 
         self.children = self.bar_inner
 
     def on_language_switch(self, _=None, event: HyprlandEvent = None):
         """Update the language widget based on the active layout."""
-        lang_data = (
-            event.data[1]
-            if event and event.data and len(event.data) > 1
-            else Language().get_label()
-        )
+        lang_data = (event.data[1] if event and event.data
+                     and len(event.data) > 1 else Language().get_label())
         self.language.set_tooltip_text(lang_data)
         self.lang_label.set_label(lang_data[:2].upper())
 

@@ -15,7 +15,8 @@ from services.network import NetworkClient
 
 class WiredConnectionSlot(CenterBox):
 
-    def __init__(self, connection_data, network_service: NetworkClient, **kwargs):
+    def __init__(self, connection_data, network_service: NetworkClient,
+                 **kwargs):
         super().__init__(name="wired-connection-slot", **kwargs)
         self.connection_data = connection_data
         self.network_service = network_service
@@ -24,9 +25,10 @@ class WiredConnectionSlot(CenterBox):
         conn_name = connection_data.get("name", "Unknown connection")
         self.is_active = connection_data.get("active", False)
 
-        self.connection_label = Label(
-            label=conn_name, h_expand=True, h_align="start", ellipsization="end"
-        )
+        self.connection_label = Label(label=conn_name,
+                                      h_expand=True,
+                                      h_align="start",
+                                      ellipsization="end")
 
         self.connect_button = Button(
             name="wired-connect-button",
@@ -36,26 +38,25 @@ class WiredConnectionSlot(CenterBox):
             style_classes=["connected"] if self.is_active else None,
         )
 
-        self.set_start_children(
-            [
-                Box(
-                    spacing=8,
-                    h_expand=True,
-                    h_align="fill",
-                    children=[
-                        Label(name="wired-connection-icon", markup=icons.ethernet),
-                        self.connection_label,
-                    ],
-                )
-            ]
-        )
+        self.set_start_children([
+            Box(
+                spacing=8,
+                h_expand=True,
+                h_align="fill",
+                children=[
+                    Label(name="wired-connection-icon", markup=icons.ethernet),
+                    self.connection_label,
+                ],
+            )
+        ])
         self.set_end_children([self.connect_button])
 
     def _on_connect_clicked(self, _):
         if not self.is_active and self.connection_data.get("uuid"):
             self.connect_button.set_label("Connecting...")
             self.connect_button.set_sensitive(False)
-            self.network_service.activate_connection(self.connection_data["uuid"])
+            self.network_service.activate_connection(
+                self.connection_data["uuid"])
 
     def update_active_status(self, is_active):
         """Update the slot to reflect its current active state"""
@@ -71,6 +72,7 @@ class WiredConnectionSlot(CenterBox):
 
 
 class WiredNetworksDropdown(Revealer):
+
     def __init__(self, labels, **kwargs):
         super().__init__(
             name="wired-connections-dropdown",
@@ -106,7 +108,9 @@ class WiredNetworksDropdown(Revealer):
 
         header_box = CenterBox(
             name="wired-networks-header",
-            start_children=[Label(name="network-title", label="Wired Connections")],
+            start_children=[
+                Label(name="network-title", label="Wired Connections")
+            ],
             end_children=[],
         )
 
@@ -133,11 +137,9 @@ class WiredNetworksDropdown(Revealer):
 
     def toggle_visibility(self):
         """Toggle the visibility of the wired networks dropdown."""
-        if (
-            not self.network_client.ethernet_device
-            or self.network_client.ethernet_device._device.get_state()
-            != NM.DeviceState.ACTIVATED
-        ):
+        if (not self.network_client.ethernet_device
+                or self.network_client.ethernet_device._device.get_state()
+                != NM.DeviceState.ACTIVATED):
             return
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
@@ -147,9 +149,8 @@ class WiredNetworksDropdown(Revealer):
 
     def _on_device_ready(self, _client):
         if self.network_client.ethernet_device:
-            self.network_client.ethernet_device.connect(
-                "changed", self._load_connections
-            )
+            self.network_client.ethernet_device.connect("changed",
+                                                        self._load_connections)
             self._update_wired_status_ui()
             self._load_connections()
             self.wired_button.remove_style_class("disabled")
@@ -166,10 +167,10 @@ class WiredNetworksDropdown(Revealer):
             connection_name = "Ethernet"
             active_connection = None
 
-            if self.network_client.ethernet_device._device.get_active_connection():
-                active_connection = (
-                    self.network_client.ethernet_device._device.get_active_connection()
-                )
+            if self.network_client.ethernet_device._device.get_active_connection(
+            ):
+                active_connection = (self.network_client.ethernet_device.
+                                     _device.get_active_connection())
                 if active_connection:
                     conn = active_connection.get_connection()
                     if conn:
@@ -216,7 +217,8 @@ class WiredNetworksDropdown(Revealer):
                 connections = self.network_client.get_wired_connections()
                 if connections:
                     # Connect to the first available connection
-                    self.network_client.activate_connection(connections[0]["uuid"])
+                    self.network_client.activate_connection(
+                        connections[0]["uuid"])
                     self.wired_status_text.set_label("Connecting...")
                     self.wired_icon.set_markup(icons.ethernet)
                     self.wired_button.remove_style_class("disabled")
@@ -247,8 +249,7 @@ class WiredNetworksDropdown(Revealer):
             self.status_label.set_label("No wired connections available.")
         else:
             self.status_label.set_label(
-                f"{len(connections)} wired connections available:"
-            )
+                f"{len(connections)} wired connections available:")
 
             for conn_data in connections:
                 slot = WiredConnectionSlot(conn_data, self.network_client)
@@ -260,6 +261,7 @@ class WiredNetworksDropdown(Revealer):
 
 
 class Wired(Box):
+
     def __init__(self, slot, **kwargs):
         super().__init__(
             name="network-connections",
@@ -309,17 +311,17 @@ class Wired(Box):
 
         # Connect signals
         self.wired_networks_open_button.connect(
-            "clicked", lambda *_: self.wired_networks_dropdown.toggle_visibility()
-        )
+            "clicked",
+            lambda *_: self.wired_networks_dropdown.toggle_visibility())
 
         # Update left button to toggle ethernet connection
         self.left_button.connect(
-            "clicked", lambda *_: self.wired_networks_dropdown.toggle_wired()
-        )
+            "clicked", lambda *_: self.wired_networks_dropdown.toggle_wired())
 
         # Connect to ethernet-changed signal to update UI when status changes
         # Uncomment this line - it's important for updates
-        self.network_client.connect("ethernet-changed", self._on_ethernet_changed)
+        self.network_client.connect("ethernet-changed",
+                                    self._on_ethernet_changed)
 
         # Connect to device-ready signal to initialize UI immediately
         self.network_client.connect("device-ready", self._on_device_ready)
@@ -336,8 +338,8 @@ class Wired(Box):
         # Connect to connection changes
         if self.network_client._client:
             self.network_client._client.connect(
-                "connection-added", lambda *_: GLib.idle_add(self._refresh_connections)
-            )
+                "connection-added",
+                lambda *_: GLib.idle_add(self._refresh_connections))
             self.network_client._client.connect(
                 "connection-removed",
                 lambda *_: GLib.idle_add(self._refresh_connections),
@@ -366,8 +368,8 @@ class Wired(Box):
             GLib.idle_add(self._update_connection_name)
             # Also connect to state changes directly from the device
             self.network_client.ethernet_device._device.connect(
-                "state-changed", lambda *_: GLib.idle_add(self._update_connection_name)
-            )
+                "state-changed",
+                lambda *_: GLib.idle_add(self._update_connection_name))
             # Monitor active connection property changes
             self.network_client.ethernet_device._device.connect(
                 "notify::active-connection",
@@ -387,9 +389,8 @@ class Wired(Box):
 
         # Get the active connection name
         if self.network_client.ethernet_device._device.get_active_connection():
-            active_connection = (
-                self.network_client.ethernet_device._device.get_active_connection()
-            )
+            active_connection = (self.network_client.ethernet_device._device.
+                                 get_active_connection())
             if active_connection:
                 conn = active_connection.get_connection()
                 if conn:

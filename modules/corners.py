@@ -5,6 +5,7 @@ from fabric.widgets.wayland import WaylandWindow as Window
 
 
 class MyCorner(Box):
+
     def __init__(self, corner):
         super().__init__(
             name="corner-container",
@@ -21,6 +22,7 @@ class MyCorner(Box):
 
 
 class Corners(Window):
+
     def __init__(self):
         super().__init__(
             name="corners",

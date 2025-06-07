@@ -16,16 +16,17 @@ from services.network import NetworkClient
 
 
 class WifiAccessPointSlot(Box):
-    def __init__(
-        self, ap_data: dict, network_service: NetworkClient, wifi_service, **kwargs
-    ):
+
+    def __init__(self, ap_data: dict, network_service: NetworkClient,
+                 wifi_service, **kwargs):
         super().__init__(name="wifi-ap-slot", **kwargs)
         self.ap_data = ap_data
         self.network_service = network_service
         self.wifi_service = wifi_service
 
         ssid = ap_data.get("ssid", "Unknown SSID")
-        icon_name = ap_data.get("icon-name", "network-wireless-signal-none-symbolic")
+        icon_name = ap_data.get("icon-name",
+                                "network-wireless-signal-none-symbolic")
 
         freq = ap_data.get("frequency", 0)
         freq_text = ""
@@ -37,11 +38,8 @@ class WifiAccessPointSlot(Box):
 
         self.is_active = False
         active_ap_details = ap_data.get("active-ap")
-        if (
-            active_ap_details
-            and hasattr(active_ap_details, "get_bssid")
-            and active_ap_details.get_bssid() == ap_data.get("bssid")
-        ):
+        if (active_ap_details and hasattr(active_ap_details, "get_bssid")
+                and active_ap_details.get_bssid() == ap_data.get("bssid")):
             self.is_active = True
 
         self.ap_icon = Image(icon_name=icon_name, size=16)
@@ -100,6 +98,7 @@ class WifiAccessPointSlot(Box):
 
 
 class WifiNetworksDropdown(Revealer):
+
     def __init__(self, labels, **kwargs):
         super().__init__(
             name="network-connections-dropdown",
@@ -131,9 +130,8 @@ class WifiNetworksDropdown(Revealer):
             h_align="center",
         )
 
-        self.refresh_button_icon = Label(
-            name="network-refresh-label", markup=icons.reload
-        )
+        self.refresh_button_icon = Label(name="network-refresh-label",
+                                         markup=icons.reload)
         self.refresh_button = Button(
             name="wifi-scan",
             child=self.refresh_button_icon,
@@ -143,9 +141,13 @@ class WifiNetworksDropdown(Revealer):
 
         header_box = CenterBox(
             name="wifi-networks-header",
-            start_children=[Label(name="network-title", label="Wi-Fi Networks")],
+            start_children=[
+                Label(name="network-title", label="Wi-Fi Networks")
+            ],
             end_children=[
-                Box(orientation="horizontal", spacing=4, children=[self.refresh_button])
+                Box(orientation="horizontal",
+                    spacing=4,
+                    children=[self.refresh_button])
             ],
         )
 
@@ -180,18 +182,16 @@ class WifiNetworksDropdown(Revealer):
         if self.shown:
             self._update_wifi_status_ui()
             # Only try to load APs if WiFi is enabled
-            if (
-                self.network_client.wifi_device
-                and self.network_client.wifi_device.enabled
-            ):
+            if (self.network_client.wifi_device
+                    and self.network_client.wifi_device.enabled):
                 self._load_access_points()
 
     def _on_device_ready(self, _client):
         if self.network_client.wifi_device:
-            self.network_client.wifi_device.connect("changed", self._load_access_points)
-            self.network_client.wifi_device.connect(
-                "notify::enabled", self._update_wifi_status_ui
-            )
+            self.network_client.wifi_device.connect("changed",
+                                                    self._load_access_points)
+            self.network_client.wifi_device.connect("notify::enabled",
+                                                    self._update_wifi_status_ui)
             self._update_wifi_status_ui()
             if self.network_client.wifi_device.enabled:
                 self._load_access_points()
@@ -293,10 +293,8 @@ class WifiNetworksDropdown(Revealer):
             child.destroy()
 
     def _load_access_points(self, *args):
-        if (
-            not self.network_client.wifi_device
-            or not self.network_client.wifi_device.enabled
-        ):
+        if (not self.network_client.wifi_device
+                or not self.network_client.wifi_device.enabled):
             self._clear_ap_list()
             self.status_label.set_label("Wi-Fi disabled.")
             self.wifi_status_text.set_label("Disabled")
@@ -311,19 +309,20 @@ class WifiNetworksDropdown(Revealer):
         if not access_points:
             self.status_label.set_label("No Wi-Fi networks found.")
         else:
-            sorted_aps = sorted(
-                access_points, key=lambda x: x.get("strength", 0), reverse=True
-            )
-            self.status_label.set_label(f"{len(sorted_aps)} Wi-Fi networks found:")
+            sorted_aps = sorted(access_points,
+                                key=lambda x: x.get("strength", 0),
+                                reverse=True)
+            self.status_label.set_label(
+                f"{len(sorted_aps)} Wi-Fi networks found:")
             for ap_data in sorted_aps:
-                slot = WifiAccessPointSlot(
-                    ap_data, self.network_client, self.network_client.wifi_device
-                )
+                slot = WifiAccessPointSlot(ap_data, self.network_client,
+                                           self.network_client.wifi_device)
                 self.ap_list_box.add(slot)
         self.ap_list_box.show_all()
 
 
 class WifiModule(Box):
+
     def __init__(self, slot, **kwargs):
         super().__init__(
             name="wifi-connections",
@@ -414,15 +413,14 @@ class WifiModule(Box):
             GLib.idle_add(self._update_wifi_state)
             # Connect to WiFi device signals
             self.network_client.wifi_device.connect(
-                "changed", lambda *_: GLib.idle_add(self._update_wifi_state)
-            )
+                "changed", lambda *_: GLib.idle_add(self._update_wifi_state))
             # Also listen for property changes related to connection state
             self.network_client.wifi_device.connect(
-                "notify::ssid", lambda *_: GLib.idle_add(self._update_wifi_state)
-            )
+                "notify::ssid",
+                lambda *_: GLib.idle_add(self._update_wifi_state))
             self.network_client.wifi_device.connect(
-                "notify::strength", lambda *_: GLib.idle_add(self._update_wifi_state)
-            )
+                "notify::strength",
+                lambda *_: GLib.idle_add(self._update_wifi_state))
 
     def _update_wifi_state(self):
         """Update the WiFi status display"""

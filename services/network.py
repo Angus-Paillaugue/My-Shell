@@ -17,10 +17,12 @@ class Wifi(Service):
     """A service to manage the wifi connection."""
 
     @Signal
-    def changed(self) -> None: ...
+    def changed(self) -> None:
+        ...
 
     @Signal
-    def enabled(self) -> bool: ...
+    def enabled(self) -> bool:
+        ...
 
     def __init__(self, client: NM.Client, device: NM.DeviceWifi, **kwargs):
         self._client: NM.Client = client
@@ -37,10 +39,14 @@ class Wifi(Service):
             bulk_connect(
                 self._device,
                 {
-                    "notify::active-access-point": lambda *args: self._activate_ap(),
-                    "access-point-added": lambda *args: self.emit("changed"),
-                    "access-point-removed": lambda *args: self.emit("changed"),
-                    "state-changed": lambda *args: self.ap_update(),
+                    "notify::active-access-point":
+                        lambda *args: self._activate_ap(),
+                    "access-point-added":
+                        lambda *args: self.emit("changed"),
+                    "access-point-removed":
+                        lambda *args: self.emit("changed"),
+                    "state-changed":
+                        lambda *args: self.ap_update(),
                 },
             )
             self._activate_ap()
@@ -48,14 +54,14 @@ class Wifi(Service):
     def ap_update(self):
         self.emit("changed")
         for sn in [
-            "enabled",
-            "internet",
-            "strength",
-            "frequency",
-            "access-points",
-            "ssid",
-            "state",
-            "icon-name",
+                "enabled",
+                "internet",
+                "strength",
+                "frequency",
+                "access-points",
+                "ssid",
+                "state",
+                "icon-name",
         ]:
             self.notify(sn)
 
@@ -67,11 +73,11 @@ class Wifi(Service):
             return
 
         self._ap_signal = self._ap.connect(
-            "notify::strength", lambda *args: self.ap_update()
-        )  # type: ignore
+            "notify::strength", lambda *args: self.ap_update())  # type: ignore
 
     def toggle_wifi(self):
-        self._client.wireless_set_enabled(not self._client.wireless_get_enabled())
+        self._client.wireless_set_enabled(
+            not self._client.wireless_get_enabled())
 
     def scan(self):
         self._device.request_scan_async(
@@ -149,11 +155,8 @@ class Wifi(Service):
             return {
                 "bssid": ap.get_bssid(),
                 "last_seen": ap.get_last_seen(),
-                "ssid": (
-                    NM.utils_ssid_to_utf8(ap.get_ssid().get_data())
-                    if ap.get_ssid()
-                    else "Unknown"
-                ),
+                "ssid": (NM.utils_ssid_to_utf8(ap.get_ssid().get_data())
+                         if ap.get_ssid() else "Unknown"),
                 "active-ap": self._ap,
                 "strength": ap.get_strength(),
                 "frequency": ap.get_frequency(),
@@ -200,12 +203,15 @@ class Ethernet(Service):
     """A service to manage the ethernet connection."""
 
     @Signal
-    def changed(self) -> None: ...
+    def changed(self) -> None:
+        ...
 
     @Signal
-    def enabled(self) -> bool: ...
+    def enabled(self) -> bool:
+        ...
 
-    def __init__(self, client: NM.Client, device: NM.DeviceEthernet, **kwargs) -> None:
+    def __init__(self, client: NM.Client, device: NM.DeviceEthernet,
+                 **kwargs) -> None:
         super().__init__(**kwargs)
         self._client: NM.Client = client
         self._device: NM.DeviceEthernet = device
@@ -226,10 +232,10 @@ class Ethernet(Service):
         }
 
         for pn in (
-            "active-connection",
-            "icon-name",
-            "speed",
-            "state",
+                "active-connection",
+                "icon-name",
+                "speed",
+                "state",
         ):
             self._device.connect(f"notify::{pn}", lambda *_: self.notifier(pn))
 
@@ -284,7 +290,8 @@ class Ethernet(Service):
 
     def connect_to_interface(self, interface):
         if interface not in self.interfaces:
-            raise ValueError(f"The interface {interface} does not seem to exist!")
+            raise ValueError(
+                f"The interface {interface} does not seem to exist!")
         res = exec_shell_command(f"nmcli device connect {interface}")
         return res
 
@@ -293,13 +300,16 @@ class NetworkClient(Service):
     """A service to manage the network connections."""
 
     @Signal
-    def device_ready(self) -> None: ...
+    def device_ready(self) -> None:
+        ...
 
     @Signal
-    def ethernet_changed(self) -> None: ...
+    def ethernet_changed(self) -> None:
+        ...
 
     @Signal
-    def wifi_changed(self) -> None: ...
+    def wifi_changed(self) -> None:
+        ...
 
     def __init__(self):
         super().__init__()
@@ -330,8 +340,8 @@ class NetworkClient(Service):
                 # Also connect to property changes
                 if device.get_active_connection():
                     device.get_active_connection().connect(
-                        "notify::state", lambda *args: self.emit("ethernet-changed")
-                    )
+                        "notify::state",
+                        lambda *args: self.emit("ethernet-changed"))
                 break
 
         # Look for WiFi devices
@@ -344,17 +354,18 @@ class NetworkClient(Service):
 
     def _init_network_client(self, client: NM.Client, task: Gio.Task, **kwargs):
         self._client = client
-        wifi_device: NM.DeviceWifi | None = self._get_device(NM.DeviceType.WIFI)  # type: ignore
+        wifi_device: NM.DeviceWifi | None = self._get_device(
+            NM.DeviceType.WIFI)  # type: ignore
         ethernet_device: NM.DeviceEthernet | None = self._get_device(
-            NM.DeviceType.ETHERNET
-        )
+            NM.DeviceType.ETHERNET)
 
         if wifi_device:
             self.wifi_device = Wifi(self._client, wifi_device)
             self.emit("device-ready")
 
         if ethernet_device:
-            self.ethernet_device = Ethernet(client=self._client, device=ethernet_device)
+            self.ethernet_device = Ethernet(client=self._client,
+                                            device=ethernet_device)
             self.emit("device-ready")
 
         self.notify("primary-device")
@@ -365,8 +376,8 @@ class NetworkClient(Service):
             # Update the active connection watcher if needed
             if device.get_active_connection():
                 device.get_active_connection().connect(
-                    "notify::state", lambda *args: self.emit("ethernet-changed")
-                )
+                    "notify::state",
+                    lambda *args: self.emit("ethernet-changed"))
 
         # Emit the signal to notify listeners
         self.emit("ethernet-changed")
@@ -395,9 +406,8 @@ class NetworkClient(Service):
 
     def connect_wifi_bssid(self, bssid):
         # We are using nmcli here, idk im lazy
-        exec_shell_command_async(
-            f"nmcli device wifi connect {bssid}", lambda *args: logger.debug(args)
-        )
+        exec_shell_command_async(f"nmcli device wifi connect {bssid}",
+                                 lambda *args: logger.debug(args))
 
     @Property(str, "readable")
     def primary_device(self) -> Literal["wifi", "wired"] | None:
@@ -412,7 +422,8 @@ class NetworkClient(Service):
         active_connection = None
 
         if self.ethernet_device._device.get_active_connection():
-            active_connection = self.ethernet_device._device.get_active_connection()
+            active_connection = self.ethernet_device._device.get_active_connection(
+            )
 
         # Get all connection profiles
         for conn in self._client.get_connections():
@@ -423,17 +434,16 @@ class NetworkClient(Service):
 
             if s_conn.get_connection_type() == "802-3-ethernet":
                 is_active = False
-                if active_connection and active_connection.get_connection() == conn:
+                if active_connection and active_connection.get_connection(
+                ) == conn:
                     is_active = True
 
-                connections.append(
-                    {
-                        "uuid": s_conn.get_uuid(),
-                        "id": s_conn.get_id(),
-                        "name": s_conn.get_id(),
-                        "active": is_active,
-                    }
-                )
+                connections.append({
+                    "uuid": s_conn.get_uuid(),
+                    "id": s_conn.get_id(),
+                    "name": s_conn.get_id(),
+                    "active": is_active,
+                })
 
         return connections
 
@@ -458,8 +468,7 @@ class NetworkClient(Service):
                     None,
                     None,  # No cancellable
                     lambda client, result: self._on_connection_activated(
-                        client, result, uuid
-                    ),
+                        client, result, uuid),
                 )
                 return True
         except Exception as e:

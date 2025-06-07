@@ -8,6 +8,7 @@ from fabric.core.fabricator import Fabricator
 
 
 class PowerProfile(Box):
+
     def __init__(self, **kwargs):
         super().__init__(
             name="power-profile",
@@ -18,24 +19,30 @@ class PowerProfile(Box):
         )
 
         self.profiles = [
-            {"name": "balanced", "label": "Balanced", "icon": icons.balanced},
+            {
+                "name": "balanced",
+                "label": "Balanced",
+                "icon": icons.balanced
+            },
             {
                 "name": "throughput-performance",
                 "label": "Performance",
                 "icon": icons.performance,
             },
-            {"name": "powersave", "label": "Eco", "icon": icons.eco},
+            {
+                "name": "powersave",
+                "label": "Eco",
+                "icon": icons.eco
+            },
         ]
 
         self.active_profile = self.profiles[0]  # Default to the first profile
 
         # Placeholder for WiFi module content
-        self.profile_icon = Label(
-            name="power-profile-icon", markup=self.active_profile["icon"]
-        )
-        self.profile_name = Label(
-            name="power-profile-name", label=self.active_profile["label"]
-        )
+        self.profile_icon = Label(name="power-profile-icon",
+                                  markup=self.active_profile["icon"])
+        self.profile_name = Label(name="power-profile-name",
+                                  label=self.active_profile["label"])
 
         self.button = Button(
             name="power-profile-button",

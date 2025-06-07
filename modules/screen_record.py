@@ -25,5 +25,4 @@ class ScreenRecordButton(Button):
         self.close_settings()
         script_location = get_relative_path("../services/screen-record.sh")
         exec_shell_command_async(
-            f"bash -c 'nohup bash {script_location} > /dev/null 2>&1 & disown'"
-        )
+            f"bash -c 'nohup bash {script_location} > /dev/null 2>&1 & disown'")

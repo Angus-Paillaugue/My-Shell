@@ -14,6 +14,7 @@ from services.logger import logger
 
 
 class WallpaperManager(WaylandWindow):
+
     def __init__(self, **kwargs):
         super().__init__(
             layer="overlay",
@@ -34,9 +35,8 @@ class WallpaperManager(WaylandWindow):
             os.makedirs(os.path.expanduser(self.wallpaper_location))
 
         # Make title more visible with markup
-        self.title_label = Label(
-            label="Wallpaper Manager", name="wallpaper-manager-title"
-        )
+        self.title_label = Label(label="Wallpaper Manager",
+                                 name="wallpaper-manager-title")
         self.header = CenterBox(
             name="wallpaper-manager-header",
             orientation="h",
@@ -64,8 +64,10 @@ class WallpaperManager(WaylandWindow):
             child=self.buttons_grid,
             h_expand=True,
             v_expand=True,
-            h_scroll_policy=Gtk.PolicyType.NEVER,  # Never show horizontal scrollbar
-            v_scroll_policy=Gtk.PolicyType.AUTOMATIC,  # Show vertical scrollbar when needed
+            h_scroll_policy=Gtk.PolicyType.
+            NEVER,  # Never show horizontal scrollbar
+            v_scroll_policy=Gtk.PolicyType.
+            AUTOMATIC,  # Show vertical scrollbar when needed
         )
 
         # Make sure container has explicit minimum size but can grow
@@ -82,9 +84,8 @@ class WallpaperManager(WaylandWindow):
 
         # Set a minimum size that accommodates 3 columns
         # Calculate based on image width (300px) * 3 + padding/spacing
-        min_width = (
-            (300 * self.columns) + (12 * (self.columns + 1)) + 30
-        )  # Images + spacing + padding
+        min_width = ((300 * self.columns) + (12 * (self.columns + 1)) + 30
+                    )  # Images + spacing + padding
         min_height = 420
 
         self.main_container.set_size_request(min_width, min_height)
@@ -108,8 +109,10 @@ class WallpaperManager(WaylandWindow):
         return False
 
     def setup_file_monitor(self):
-        gfile = Gio.File.new_for_path(os.path.expanduser(self.wallpaper_location))
-        self.file_monitor = gfile.monitor_directory(Gio.FileMonitorFlags.NONE, None)
+        gfile = Gio.File.new_for_path(
+            os.path.expanduser(self.wallpaper_location))
+        self.file_monitor = gfile.monitor_directory(Gio.FileMonitorFlags.NONE,
+                                                    None)
         self.file_monitor.connect("changed", self._refresh_wallpapers)
 
     def _refresh_wallpapers(self, *args):
@@ -141,7 +144,8 @@ class WallpaperManager(WaylandWindow):
         # Ensure everything is visible
         self.main_container.show_all()
 
-    def _add_wallpaper_button_placeholder(self, path: str, filename: str, index: int):
+    def _add_wallpaper_button_placeholder(self, path: str, filename: str,
+                                          index: int):
         """Add a wallpaper button with a placeholder image."""
         image_width = 240
         image_height = 135
@@ -152,9 +156,7 @@ class WallpaperManager(WaylandWindow):
         placeholder.get_style_context().add_class("wallpaper-placeholder")
 
         # Create image widget that will be updated later
-        image = Image(
-            style_classes=["wallpaper-button-image"],
-        )
+        image = Image(style_classes=["wallpaper-button-image"],)
         image.set_size_request(image_width, image_height)
 
         # Use normal Python attributes instead of set_data
@@ -183,13 +185,13 @@ class WallpaperManager(WaylandWindow):
 
         button = Button(
             child=contents,
-            on_clicked=lambda btn, wp=path: (self.set_wallpaper(wp), self.toggle()),
+            on_clicked=lambda btn, wp=path:
+            (self.set_wallpaper(wp), self.toggle()),
             style_classes=["wallpaper-button"],
         )
 
-        self.buttons_grid.attach(
-            button, index % self.columns, index // self.columns, 1, 1
-        )
+        self.buttons_grid.attach(button, index % self.columns,
+                                 index // self.columns, 1, 1)
 
     def _load_images_in_background(self, wallpapers):
         """Load images in a background thread to avoid UI freezes."""
@@ -208,8 +210,7 @@ class WallpaperManager(WaylandWindow):
                 try:
                     # Load and scale the image
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        path, 240, 135, True
-                    )
+                        path, 240, 135, True)
                     # Cache the pixbuf
                     self.image_cache[path] = pixbuf
                     # Update the UI in the main thread
@@ -236,11 +237,8 @@ class WallpaperManager(WaylandWindow):
                 continue
 
             for widget in box.get_children():
-                if (
-                    isinstance(widget, Image)
-                    and hasattr(widget, "path")
-                    and widget.path == path
-                ):
+                if (isinstance(widget, Image) and hasattr(widget, "path")
+                        and widget.path == path):
                     # Found our image widget, update it
                     widget.set_from_pixbuf(pixbuf)
 
@@ -248,8 +246,7 @@ class WallpaperManager(WaylandWindow):
                     placeholder = None
                     for sibling in box.get_children():
                         if isinstance(sibling, Gtk.Box) and not isinstance(
-                            sibling, Image
-                        ):
+                                sibling, Image):
                             placeholder = sibling
                             break
 
@@ -271,17 +268,13 @@ class WallpaperManager(WaylandWindow):
                     continue
 
                 for widget in box.get_children():
-                    if (
-                        isinstance(widget, Image)
-                        and hasattr(widget, "path")
-                        and widget.path in self.loaded_images
-                    ):
+                    if (isinstance(widget, Image) and hasattr(widget, "path")
+                            and widget.path in self.loaded_images):
                         # This image has been loaded, update visibilities
                         placeholder = None
                         for sibling in box.get_children():
                             if isinstance(sibling, Gtk.Box) and not isinstance(
-                                sibling, Image
-                            ):
+                                    sibling, Image):
                                 placeholder = sibling
                                 break
 
@@ -305,11 +298,9 @@ class WallpaperManager(WaylandWindow):
         if not os.path.exists(wallpapers_dir):
             return []
 
-        return [
-            (os.path.join(wallpapers_dir, f), f)
-            for f in os.listdir(wallpapers_dir)
-            if f.endswith((".jpg", ".png", ".jpeg"))
-        ]
+        return [(os.path.join(wallpapers_dir, f), f)
+                for f in os.listdir(wallpapers_dir)
+                if f.endswith((".jpg", ".png", ".jpeg", ".webp"))]
 
     def set_wallpaper(self, path: str) -> None:
         """
@@ -321,7 +312,8 @@ class WallpaperManager(WaylandWindow):
         path = os.path.abspath(path)
 
         if not os.path.exists(path):
-            raise FileNotFoundError(f"The specified path does not exist: {path}")
+            raise FileNotFoundError(
+                f"The specified path does not exist: {path}")
 
         try:
             # exec_shell_command_async(
@@ -331,8 +323,7 @@ class WallpaperManager(WaylandWindow):
             # Link the wallpaper to the current directory
             current_wall = os.path.expanduser("~/.current.wall")
             if os.path.isfile(current_wall) or os.path.islink(
-                current_wall
-            ):  # Check for link too
+                    current_wall):  # Check for link too
                 os.remove(current_wall)
 
             os.symlink(path, current_wall)
