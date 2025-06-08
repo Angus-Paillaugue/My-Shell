@@ -237,8 +237,8 @@ class WallpaperManager(WaylandWindow):
                 continue
 
             for widget in box.get_children():
-                if (isinstance(widget, Image) and hasattr(widget, "path")
-                        and widget.path == path):
+                if (isinstance(widget, Image) and hasattr(widget, "path") and
+                        widget.path == path):
                     # Found our image widget, update it
                     widget.set_from_pixbuf(pixbuf)
 
@@ -268,8 +268,9 @@ class WallpaperManager(WaylandWindow):
                     continue
 
                 for widget in box.get_children():
-                    if (isinstance(widget, Image) and hasattr(widget, "path")
-                            and widget.path in self.loaded_images):
+                    if (isinstance(widget, Image) and
+                            hasattr(widget, "path") and
+                            widget.path in self.loaded_images):
                         # This image has been loaded, update visibilities
                         placeholder = None
                         for sibling in box.get_children():

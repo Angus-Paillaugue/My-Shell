@@ -67,6 +67,7 @@ notifications_clear: str = "&#xf814;"
 screen_record: str = "&#xfca8;"
 # Others
 screenshot: str = "&#xf201;"
+loading: str = "&#xea95;"
 
 exceptions: list[str] = ["font_family", "font_weight", "span"]
 

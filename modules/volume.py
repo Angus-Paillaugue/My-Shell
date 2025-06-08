@@ -560,8 +560,8 @@ class MicRow(Box):
             return
 
         for child in self.inputs_box.input_container.get_children():
-            if (hasattr(child, "input_source")
-                    and child.input_source == self.audio.microphone):
+            if (hasattr(child, "input_source") and
+                    child.input_source == self.audio.microphone):
                 child.add_style_class(
                     "selected-output")  # Reuse the same style class
             else:

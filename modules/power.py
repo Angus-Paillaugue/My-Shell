@@ -144,8 +144,8 @@ class PowerConfirmDialog(WaylandWindow):
         x, y = event.get_coords()
 
         # If click is outside content area, close dialog
-        if (x < alloc.x or x > alloc.x + alloc.width or y < alloc.y
-                or y > alloc.y + alloc.height):
+        if (x < alloc.x or x > alloc.x + alloc.width or y < alloc.y or
+                y > alloc.y + alloc.height):
             self.hide()
 
         return False

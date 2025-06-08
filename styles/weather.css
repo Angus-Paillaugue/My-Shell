@@ -1,0 +1,21 @@
+#weather-temperature {
+  font-weight: bold;
+}
+.loading-icon {
+  font-size: 20px;
+  animation: loading-animation 1.5s infinite;
+}
+
+@keyframes loading-animation {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

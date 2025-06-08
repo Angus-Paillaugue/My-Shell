@@ -17,7 +17,7 @@ checkCommands() {
 
 formatPython() {
 	echo "Formatting Python files..."
-	yapf -r -i .
+	yapf -r --style google --verbose -i .
 }
 
 formatCSS() {

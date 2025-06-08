@@ -1,5 +1,3 @@
-import gi
-from fabric.widgets.datetime import DateTime
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.widgets.box import Box
@@ -7,7 +5,7 @@ from fabric.utils.helpers import invoke_repeater
 import time
 import calendar
 from datetime import datetime
-from gi.repository import Gdk, Gtk, GLib
+from gi.repository import Gdk, GLib
 from collections.abc import Iterable
 from fabric.core.service import Property
 from fabric.widgets.wayland import WaylandWindow
@@ -121,8 +119,8 @@ class CalendarDropdown(WaylandWindow):
         # Get calendar data
         year = self.current_date.year
         month = self.current_date.month
-        today = (datetime.now().day if datetime.now().year == year
-                 and datetime.now().month == month else -1)
+        today = (datetime.now().day if datetime.now().year == year and
+                 datetime.now().month == month else -1)
 
         # Update month label
         self.month_label.set_label(self.current_date.strftime("%B %Y"))
@@ -192,19 +190,16 @@ class CalendarDropdown(WaylandWindow):
         self.render_calendar()
 
     def toggle_visibility(self):
-        try:
-            if self.is_visible():
-                self.hide()
-            else:
-                # Update parent_box reference if it was None initially
-                if not self.parent_box and self.parent_button:
-                    self.parent_box = self.parent_button.get_parent()
+        if self.is_visible():
+            self.hide()
+        else:
+            # Update parent_box reference if it was None initially
+            if not self.parent_box and self.parent_button:
+                self.parent_box = self.parent_button.get_parent()
 
-                self.show_all()
-                # Make sure window has focus
-                self.present()
-        except Exception as e:
-            logger.error(f"Error toggling calendar visibility: {e}")
+            self.show_all()
+            # Make sure window has focus
+            self.present()
 
 
 class Time(Button):

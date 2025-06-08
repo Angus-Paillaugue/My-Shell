@@ -38,8 +38,8 @@ class WifiAccessPointSlot(Box):
 
         self.is_active = False
         active_ap_details = ap_data.get("active-ap")
-        if (active_ap_details and hasattr(active_ap_details, "get_bssid")
-                and active_ap_details.get_bssid() == ap_data.get("bssid")):
+        if (active_ap_details and hasattr(active_ap_details, "get_bssid") and
+                active_ap_details.get_bssid() == ap_data.get("bssid")):
             self.is_active = True
 
         self.ap_icon = Image(icon_name=icon_name, size=16)
@@ -182,8 +182,8 @@ class WifiNetworksDropdown(Revealer):
         if self.shown:
             self._update_wifi_status_ui()
             # Only try to load APs if WiFi is enabled
-            if (self.network_client.wifi_device
-                    and self.network_client.wifi_device.enabled):
+            if (self.network_client.wifi_device and
+                    self.network_client.wifi_device.enabled):
                 self._load_access_points()
 
     def _on_device_ready(self, _client):
@@ -293,8 +293,8 @@ class WifiNetworksDropdown(Revealer):
             child.destroy()
 
     def _load_access_points(self, *args):
-        if (not self.network_client.wifi_device
-                or not self.network_client.wifi_device.enabled):
+        if (not self.network_client.wifi_device or
+                not self.network_client.wifi_device.enabled):
             self._clear_ap_list()
             self.status_label.set_label("Wi-Fi disabled.")
             self.wifi_status_text.set_label("Disabled")
