@@ -42,20 +42,20 @@ class WifiAccessPointSlot(Box):
                 active_ap_details.get_bssid() == ap_data.get("bssid")):
             self.is_active = True
 
-        self.ap_icon = Image(icon_name=icon_name, size=16)
+        self.ap_icon = Image(icon_name=icon_name,
+                             size=16,
+                             style_classes=["wifi-ap-icon"])
 
-        self.ssid_label = Label(
-            label=ssid,
-            h_align="start",
-            ellipsization="end",
-        )
+        self.ssid_label = Label(label=ssid,
+                                h_align="start",
+                                ellipsization="end",
+                                style_classes=["wifi-connection-label"])
 
-        self.freq_label = Label(
-            label=(f" ({freq_text})" if freq_text else ""),
-            h_expand=False,
-            h_align="start",
-            name="wifi-freq-label",
-        )
+        self.freq_label = Label(label=(f" ({freq_text})" if freq_text else ""),
+                                h_expand=False,
+                                h_align="start",
+                                name="wifi-freq-label",
+                                style_classes=["wifi-connection-label"])
 
         ssid_freq_box = Box(
             orientation="horizontal",

@@ -80,3 +80,9 @@
 #wired-scan.scanning {
   background-color: var(--primary);
 }
+#wired-connect-button label {
+  font-size: 14px;
+}
+.wired-connection-label {
+  font-size: 14px;
+}

@@ -59,3 +59,8 @@
 #wifi-scan.scanning {
   background-color: var(--primary);
 }
+#wifi-connect-button label,
+.wifi-ap-icon,
+.wifi-connection-label {
+  font-size: 14px;
+}
