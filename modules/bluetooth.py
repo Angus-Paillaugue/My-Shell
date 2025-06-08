@@ -171,13 +171,13 @@ class BluetoothDevicesDropdown(Revealer):
 
         # Check if device is already displayed
         for child in self.paired_box.get_children():
-            if (isinstance(child, BluetoothDeviceSlot)
-                    and child.device.address == address):
+            if (isinstance(child, BluetoothDeviceSlot) and
+                    child.device.address == address):
                 return
 
         for child in self.available_box.get_children():
-            if (isinstance(child, BluetoothDeviceSlot)
-                    and child.device.address == address):
+            if (isinstance(child, BluetoothDeviceSlot) and
+                    child.device.address == address):
                 return
 
         slot = BluetoothDeviceSlot(device)

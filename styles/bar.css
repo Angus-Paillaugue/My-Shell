@@ -2,6 +2,11 @@
   padding: 4px 4px 4px 4px;
   border-radius: 0;
 }
+
 .bar-item {
   border: 1px solid var(--surface-bright);
+  padding: 0 12px;
+  min-height: 40px;
+  background-color: var(--surface);
+  font-weight: bold;
 }

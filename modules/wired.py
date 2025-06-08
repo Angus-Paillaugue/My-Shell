@@ -137,8 +137,8 @@ class WiredNetworksDropdown(Revealer):
 
     def toggle_visibility(self):
         """Toggle the visibility of the wired networks dropdown."""
-        if (not self.network_client.ethernet_device
-                or self.network_client.ethernet_device._device.get_state()
+        if (not self.network_client.ethernet_device or
+                self.network_client.ethernet_device._device.get_state()
                 != NM.DeviceState.ACTIVATED):
             return
         self.shown = not self.shown

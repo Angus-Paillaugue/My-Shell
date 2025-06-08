@@ -4,6 +4,8 @@ from fabric.utils.helpers import exec_shell_command_async
 import toml
 import shutil
 
+app_location = os.path.expanduser(f"~/.config/{APP_NAME}")
+
 
 def deep_update(target: dict, update: dict) -> dict:
     """
@@ -78,21 +80,25 @@ def ensure_matugen_config():
         "templates": {
             "hyprland": {
                 "input_path":
-                    f"~/.config/{APP_NAME}/config/matugen/templates/hyprland-colors.conf",
+                    os.path.join(
+                        app_location,
+                        "config/matugen/templates/hyprland-colors.conf"),
                 "output_path":
-                    f"~/.config/{APP_NAME}/config/hypr/colors.conf",
+                    os.path.join(app_location, "config/hypr/colors.conf"),
             },
             f"{APP_NAME}": {
                 "input_path":
-                    f"~/.config/{APP_NAME}/config/matugen/templates/{APP_NAME}.css",
+                    os.path.join(app_location,
+                                 "config/matugen/templates/{APP_NAME}.css"),
                 "output_path":
-                    f"~/.config/{APP_NAME}/styles/colors.css",
+                    os.path.join(app_location, "styles/colors.css"),
                 "post_hook":
                     f"fabric-cli exec {APP_NAME} 'app.apply_stylesheet()' &",
             },
             "kitty": {
                 "input_path":
-                    "~/.config/my-shell/config/matugen/templates/kitty.conf",
+                    os.path.join(app_location,
+                                 "config/matugen/templates/kitty.conf"),
                 "output_path":
                     "~/.config/kitty/colors.conf",
             },
@@ -125,19 +131,18 @@ def ensure_matugen_config():
         print(f"Error writing matugen config to {config_path}: {e}")
 
     current_wall = os.path.expanduser("~/.current.wall")
-    hypr_colors = os.path.expanduser(
-        f"~/.config/{APP_NAME}/config/hypr/colors.conf")
-    css_colors = os.path.expanduser(f"~/.config/{APP_NAME}/styles/colors.css")
+    hypr_colors = os.path.join(app_location, "config/hypr/colors.conf")
+    css_colors = os.path.join(app_location, "/styles/colors.css")
 
-    if (not os.path.exists(current_wall) or not os.path.exists(hypr_colors)
-            or not os.path.exists(css_colors)):
+    if (not os.path.exists(current_wall) or not os.path.exists(hypr_colors) or
+            not os.path.exists(css_colors)):
         os.makedirs(os.path.dirname(hypr_colors), exist_ok=True)
         os.makedirs(os.path.dirname(css_colors), exist_ok=True)
 
         image_path = ""
         if not os.path.exists(current_wall):
-            example_wallpaper_path = os.path.expanduser(
-                f"~/.config/{APP_NAME}/assets/wallpapers_example/example-3.jpg")
+            example_wallpaper_path = os.path.join(
+                app_location, "assets/wallpapers_example/green_forest.jpg")
             if os.path.exists(example_wallpaper_path):
                 try:
                     if os.path.lexists(current_wall):
@@ -189,7 +194,7 @@ def generate_hypr_entrypoint():
 
 
 def generate_hyprlock_config():
-    contents = "source = ~/.config/my-shell/config/hypr/colors.conf"
+    contents = f"source = ~/.config/{APP_NAME}/config/hypr/colors.conf"
     location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf")
     if not os.path.exists(location):
         raise FileNotFoundError(
@@ -232,8 +237,7 @@ def wallpapers():
     """
     Ensure the wallpapers directory exists and contains example wallpapers.
     """
-    input_dir = os.path.expanduser(
-        f"~/.config/{APP_NAME}/assets/wallpapers_example")
+    input_dir = os.path.join(app_location, "assets/wallpapers_example")
     output_dir = os.path.expanduser(f"~/Pictures/wallpapers/")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

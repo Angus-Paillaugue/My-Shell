@@ -5,6 +5,7 @@ from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.label import Label
 from fabric.widgets.box import Box
 from fabric.hyprland.service import HyprlandEvent
+import os
 from fabric.hyprland.widgets import (
     Language,
     WorkspaceButton,
@@ -15,6 +16,7 @@ from modules.time import Time
 from modules.settings import Settings
 from modules.metrics import Metrics
 from modules.tray import SystemTray
+from modules.weather import WeatherButton
 import modules.icons as icons
 
 
@@ -62,7 +64,12 @@ class Bar(WaylandWindow):
         self.on_language_switch()
         self.connection.connect("event::activelayout", self.on_language_switch)
 
-        self.start_children = [Time(), Metrics()]
+        self.start_children = [
+            Time(),
+            WeatherButton() if not os.environ.get("DEV_MODE") else Box(
+                visible=False),
+            Metrics(),
+        ]
         self.center_children = [self.workspaces]
         self.end_children = [
             SystemTray(),
@@ -99,8 +106,8 @@ class Bar(WaylandWindow):
 
     def on_language_switch(self, _=None, event: HyprlandEvent = None):
         """Update the language widget based on the active layout."""
-        lang_data = (event.data[1] if event and event.data
-                     and len(event.data) > 1 else Language().get_label())
+        lang_data = (event.data[1] if event and event.data and
+                     len(event.data) > 1 else Language().get_label())
         self.language.set_tooltip_text(lang_data)
         self.lang_label.set_label(lang_data[:2].upper())
 

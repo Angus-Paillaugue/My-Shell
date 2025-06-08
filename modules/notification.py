@@ -64,9 +64,9 @@ def load_scaled_pixbuf(notification_box, width, height):
         return None
 
     pixbuf = None
-    if (hasattr(notification_box, "cached_image_path")
-            and notification_box.cached_image_path
-            and os.path.exists(notification_box.cached_image_path)):
+    if (hasattr(notification_box, "cached_image_path") and
+            notification_box.cached_image_path and
+            os.path.exists(notification_box.cached_image_path)):
         try:
             logger.debug(
                 f"Attempting to load cached image from: {notification_box.cached_image_path} for notification {notification.id}"
@@ -244,9 +244,9 @@ class NotificationBox(Box):
         logger.debug(
             f"NotificationBox destroy called for notification: {self.notification.id}, from_history_delete: {from_history_delete}, is_history: {self._is_history}"
         )
-        if (hasattr(self, "cached_image_path") and self.cached_image_path
-                and os.path.exists(self.cached_image_path)
-                and (not self._is_history or from_history_delete)):
+        if (hasattr(self, "cached_image_path") and self.cached_image_path and
+                os.path.exists(self.cached_image_path) and
+            (not self._is_history or from_history_delete)):
             try:
                 os.unlink(self.cached_image_path)
                 logger.debug(f"Deleted cached image: {self.cached_image_path}")
@@ -838,9 +838,9 @@ class NotificationHistory(Box):
         if len(self.containers) >= 50:
             oldest_container = self.containers.pop()
             if (hasattr(oldest_container, "notification_box") and hasattr(
-                    oldest_container.notification_box, "cached_image_path")
-                    and oldest_container.notification_box.cached_image_path
-                    and os.path.exists(
+                    oldest_container.notification_box, "cached_image_path") and
+                    oldest_container.notification_box.cached_image_path and
+                    os.path.exists(
                         oldest_container.notification_box.cached_image_path)):
                 try:
                     os.remove(
@@ -855,8 +855,8 @@ class NotificationHistory(Box):
             oldest_container.destroy()
 
         def on_container_destroy(container):
-            if (hasattr(container, "_timestamp_timer_id")
-                    and container._timestamp_timer_id):
+            if (hasattr(container, "_timestamp_timer_id") and
+                    container._timestamp_timer_id):
                 GLib.source_remove(container._timestamp_timer_id)
             if hasattr(container, "notification_box"):
                 notif_box = container.notification_box
@@ -1051,18 +1051,18 @@ class NotificationHistory(Box):
         containers_to_remove = []
         persistent_notes_to_remove_ids = set()
         for container in list(self.containers):
-            if (hasattr(container, "notification_box")
-                    and container.notification_box.notification.app_name
+            if (hasattr(container, "notification_box") and
+                    container.notification_box.notification.app_name
                     == app_name):
                 containers_to_remove.append(container)
                 persistent_notes_to_remove_ids.add(
                     container.notification_box.uuid)
 
         for container in containers_to_remove:
-            if (hasattr(container, "notification_box")
-                    and hasattr(container.notification_box, "cached_image_path")
-                    and container.notification_box.cached_image_path
-                    and os.path.exists(
+            if (hasattr(container, "notification_box") and
+                    hasattr(container.notification_box, "cached_image_path") and
+                    container.notification_box.cached_image_path and
+                    os.path.exists(
                         container.notification_box.cached_image_path)):
                 try:
                     os.remove(container.notification_box.cached_image_path)
@@ -1208,8 +1208,8 @@ class NotificationContainer(Box):
         hidden_notifications = [
             n for n in self.notifications if n not in self.visible_notifications
         ]
-        if (hidden_notifications and len(self.visible_notifications)
-                < MAX_VISIBLE_NOTIFICATIONS):
+        if (hidden_notifications and
+                len(self.visible_notifications) < MAX_VISIBLE_NOTIFICATIONS):
             next_to_show = hidden_notifications[0]
             self.visible_notifications.append(next_to_show)
             self.notifications_box.add(next_to_show)
@@ -1251,9 +1251,9 @@ class NotificationContainer(Box):
                 else:
                     notif_box.destroy()
 
-            elif (reason_str == "NotificationCloseReason.EXPIRED"
-                  or reason_str == "NotificationCloseReason.CLOSED"
-                  or reason_str == "NotificationCloseReason.UNDEFINED"):
+            elif (reason_str == "NotificationCloseReason.EXPIRED" or
+                  reason_str == "NotificationCloseReason.CLOSED" or
+                  reason_str == "NotificationCloseReason.UNDEFINED"):
                 logger.info(
                     f"Adding notification {notification.id} to history (reason: {reason_str})"
                 )
