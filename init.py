@@ -171,24 +171,6 @@ def ensure_matugen_config():
             )
 
 
-def generate_hypr_overrides():
-    contents = """$fabricSend = fabric-cli exec my-shell
-
-bind = $mainMod, COMMA, exec, $fabricSend 'wallpaper_manager.toggle()'
-bind = $mainMod SHIFT, V, exec, $fabricSend 'clipboard_manager.toggle()'
-
-exec = ~/.config/my-shell/run.sh
-exec = ~/.config/my-shell/workflows/update.sh
-"""
-    location = os.path.expanduser(
-        f"~/.config/{APP_NAME}/config/hypr/overrides.conf")
-    if not os.path.exists(location):
-        os.makedirs(os.path.dirname(location), exist_ok=True)
-        with open(location, "w") as f:
-            f.write(contents)
-            print(f"Hypr overrides generated at {location}")
-
-
 def generate_hypr_entrypoint():
     contents = f"""source = ~/.config/{APP_NAME}/config/hypr/overrides.conf"""
     location = os.path.expanduser(f"~/.config/hypr/hyprland.conf")
@@ -230,7 +212,7 @@ def update_kitty_config():
     contents = "include colors.conf"
     location = os.path.expanduser(f"~/.config/kitty/kitty.conf")
     if not os.path.exists(location):
-        raise FileNotFoundError(
+        print(
             f"Kitty configuration file not found at {location}. Please ensure kitty is installed."
         )
 
@@ -265,7 +247,6 @@ def wallpapers():
 
 if __name__ == "__main__":
     ensure_matugen_config()
-    generate_hypr_overrides()
     generate_hypr_entrypoint()
     generate_hyprlock_config()
     update_kitty_config()

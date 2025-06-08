@@ -28,7 +28,7 @@ check_if_new_version() {
 	latest_version=$(get_latest_version)
 	local_version=$(get_local_version)
 
-	if [[ "$latest_version" != "$local_version" ]]; then
+	if [[ -n "$latest_version" && -n "$local_version" && "$latest_version" != "$local_version" ]]; then
 		echo $latest_version
 		return 0
 	else
