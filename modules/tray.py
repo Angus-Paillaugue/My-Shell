@@ -13,7 +13,6 @@ class SystemTray(Box):
             name="systray",
             orientation=Gtk.Orientation.HORIZONTAL,
             spacing=8,
-            style_classes=["bar-item"],
             **kwargs,
         )
         super().set_visible(False)

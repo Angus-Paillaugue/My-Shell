@@ -53,6 +53,7 @@ battery_charging: str = "&#xea33;"
 cpu: str = "&#xef8e;"
 memory: str = "&#xf0a0;"
 temperature: str = "&#xeb38;"
+disk: str = "&#xea88;"
 # Launcher
 cancel: str = "&#xf640;"
 # Power profile

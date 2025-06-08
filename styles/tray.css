@@ -1,6 +1,4 @@
 #systray {
-  background-color: var(--surface);
-  min-height: 40px;
   padding: 0 12px;
 }
 

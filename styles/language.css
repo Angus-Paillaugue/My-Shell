@@ -1,9 +1,6 @@
 #language {
-  background-color: var(--surface);
   padding: 0 12px;
-  min-height: 40px;
 }
-
 #lang-label {
   color: var(--foreground);
   font-size: 16px;

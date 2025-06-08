@@ -2,8 +2,10 @@ from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.widgets.centerbox import CenterBox
+from fabric.widgets.revealer import Revealer
 from fabric.widgets.wayland import WaylandWindow
 from gi.repository import GLib, Gtk
+from modules.corners import MyCorner
 import modules.icons as icons
 from modules.bluetooth import BluetoothButton
 from modules.battery import Battery
@@ -25,7 +27,6 @@ class SettingsMenuDropdown(WaylandWindow):
             anchor="top right",
             exclusivity="none",
             visible=False,
-            margin="0 8px 0 0",
             **kwargs,
         )
 
@@ -101,30 +102,22 @@ class SettingsMenuDropdown(WaylandWindow):
             name="settings-container",
             orientation="v",
         )
-        self.add(self.settings_container)
+        self.corner_container = Box(
+            name="settings-corner-container",
+            orientation="v",
+            children=[
+                self.settings_container,
+                MyCorner(
+                    "top-right",
+                    size=48,
+                    h_align="end",
+                ),
+            ],
+        )
+        self.add(self.corner_container)
 
         for item in self.items:
             self.settings_container.add(item)
-
-        # Position window next to the button
-        GLib.timeout_add(100, self.position_window)
-
-    def position_window(self):
-        if not self.is_visible() or not self.parent_button:
-            return False
-
-        # Position right below the button and align with right edge
-        # This is a simplified approach and might need adjustment
-        button_alloc = self.parent_button.get_allocation()
-        parent_alloc = self.parent_box.get_allocation()
-
-        # Move the window to position it right below the button
-        x = (parent_alloc.x + button_alloc.x + button_alloc.width -
-             self.get_allocated_width())
-        y = parent_alloc.y + button_alloc.y + button_alloc.height + 8
-
-        self.move(x, y)
-        return False  # Stop the timeout
 
     def toggle_visibility(self):
         if self.is_visible():
@@ -132,7 +125,6 @@ class SettingsMenuDropdown(WaylandWindow):
             self.collapse_slots()
         else:
             self.show_all()
-            self.position_window()
             # Make sure our window has focus so we can detect focus out events
             self.present()
 
@@ -161,12 +153,12 @@ class Settings(Box):
         # Main power button
         self.settings_button = Button(
             name="settings-menu-main-button",
-            child=Label(name="button-label", markup=icons.settings),
+            child=Label(markup=icons.settings),
             h_expand=False,
-            style_classes=["bar-item"],
             v_expand=False,
             h_align="center",
             v_align="center",
+            style_classes=["bar-action-button"],
         )
 
         # Add the button to our container

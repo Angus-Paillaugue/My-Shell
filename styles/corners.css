@@ -3,7 +3,7 @@
   min-height: 20px;
 }
 
-#corner {
+.corner {
   background-color: var(--shadow);
   border-radius: 0;
 }

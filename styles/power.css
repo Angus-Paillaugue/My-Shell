@@ -2,38 +2,6 @@
   margin-top: 12px;
   background-color: var(--surface);
 }
-
-#power-menu-main-button {
-  min-width: 40px;
-  min-height: 40px;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  background-color: var(--surface);
-}
-
-#power-menu-main-button label {
-  font-size: 24px;
-  color: var(--foreground);
-}
-
-#power-menu-main-button:hover,
-#power-menu-main-button:focus {
-  border-radius: 20px;
-  background-color: var(--surface-bright);
-}
-
-#power-menu-main-button:hover label,
-#power-menu-main-button:focus label {
-  color: var(--primary);
-}
-
-#power-menu-main-button:active {
-  background-color: var(--primary);
-}
-
-#power-menu-main-button:active label {
-  color: var(--shadow);
-}
-
 /* Power menu dropdown styling */
 #power-menu-dropdown {
   background-color: var(--shadow);
