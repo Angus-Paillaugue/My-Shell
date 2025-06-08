@@ -24,7 +24,7 @@
   background-color: var(--shadow);
   color: var(--foreground);
   padding: 20px;
-  border-radius: 0 0 12px 0;
+  border-radius: 12px;
 }
 
 #month-navigation {

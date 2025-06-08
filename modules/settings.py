@@ -27,6 +27,7 @@ class SettingsMenuDropdown(WaylandWindow):
             anchor="top right",
             exclusivity="none",
             visible=False,
+            margin="6px 8px 0 0",
             **kwargs,
         )
 
@@ -102,19 +103,7 @@ class SettingsMenuDropdown(WaylandWindow):
             name="settings-container",
             orientation="v",
         )
-        self.corner_container = Box(
-            name="settings-corner-container",
-            orientation="v",
-            children=[
-                self.settings_container,
-                MyCorner(
-                    "top-right",
-                    size=48,
-                    h_align="end",
-                ),
-            ],
-        )
-        self.add(self.corner_container)
+        self.add(self.settings_container)
 
         for item in self.items:
             self.settings_container.add(item)

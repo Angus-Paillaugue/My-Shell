@@ -292,7 +292,7 @@ class Wired(Box):
         )
         self.wired_icon = Label(name="wired-icon", markup=icons.ethernet_off)
         self.wired_networks_open_button = Button(
-            name="wired-networks-expand-button",
+            style_classes=["expand-button-caret"],
             child=Label(name="wired-open-label", markup=icons.chevron_right),
         )
 

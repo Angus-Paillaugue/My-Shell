@@ -11,7 +11,7 @@
 #settings-container {
   background-color: var(--shadow);
   padding: 20px;
-  border-radius: 12px 0 0 12px;
+  border-radius: 12px;
 }
 .settings-action-button {
   min-width: 40px;
@@ -45,6 +45,28 @@
   background-color: var(--shadow);
   padding: 20px;
   min-width: 400px;
+}
+
+/* See more buttons with caret */
+.expand-button-caret {
+  border-radius: 2px 12px 12px 2px;
+  background-color: var(--surface);
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.expand-button-caret label {
+  font-size: 20px;
+  color: var(--foreground);
+  transition: all 0.1s ease;
+}
+.expand-button-caret:hover {
+  background-color: var(--primary);
+  padding: 0 4px;
+}
+.expand-button-caret:active {
+  border-radius: 2px 20px 20px 2px;
+}
+.expand-button-caret:hover label {
+  color: var(--shadow);
 }
 
 /* Shared */

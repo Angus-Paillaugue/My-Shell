@@ -353,7 +353,7 @@ class WifiModule(Box):
         )
         self.wifi_icon = Label(name="wifi-icon", markup=icons.wifi_off)
         self.wifi_networks_open_button = Button(
-            name="wifi-networks-expand-button",
+            style_classes=["expand-button-caret"],
             child=Label(name="wifi-open-label", markup=icons.chevron_right),
         )
 

@@ -24,13 +24,15 @@ import modules.icons as icons
 class Bar(WaylandWindow):
 
     def __init__(self, **kwargs):
-        super().__init__(name="bar",
-                         layer="top",
-                         anchor="left top right",
-                         exclusivity="auto",
-                         visible=True,
-                         all_visible=True,
-                         **kwargs)
+        super().__init__(
+            name="bar",
+            layer="top",
+            anchor="left top right",
+            exclusivity="auto",
+            visible=True,
+            all_visible=True,
+            **kwargs
+        )
         self.connection = get_hyprland_connection()
 
         self.workspaces = Workspaces(
@@ -47,11 +49,14 @@ class Bar(WaylandWindow):
                     h_align="center",
                     v_align="center",
                     id=i,
-                ) for i in range(1, 5)
+                )
+                for i in range(1, 5)
             ],
         )
 
-        self.lang_label = Label(name="lang-label",)
+        self.lang_label = Label(
+            name="lang-label",
+        )
         self.lang_icon = Label(markup=icons.keyboard, name="keyboard-lang-icon")
         self.language = Button(
             name="language",
@@ -62,29 +67,36 @@ class Bar(WaylandWindow):
         self.on_language_switch()
         self.connection.connect("event::activelayout", self.on_language_switch)
 
-        self.start_box = CornerContainer(
+        self.start_box = Box(
             name="bar-start-container",
-            corners=["right"],
-            children=[
-                Time(),
-                (WeatherButton() if not os.environ.get("DEV_MODE") else Box(
-                    visible=False)),
-                Metrics(),
-            ],
+            children=Box(
+                name="bar-start-container-inner",
+                children=[
+                    Time(),
+                    (
+                        WeatherButton()
+                        if not os.environ.get("DEV_MODE")
+                        else Box(visible=False)
+                    ),
+                    Metrics(),
+                ],
+            ),
         )
         self.center_box = CornerContainer(
             name="bar-center-container",
             corners=["left", "right"],
             children=[self.workspaces],
         )
-        self.end_box = CornerContainer(
+        self.end_box = Box(
             name="bar-end-container",
-            corners=["left"],
-            children=[
-                SystemTray(),
-                self.language,
-                Settings(),
-            ],
+            children=Box(
+                name="bar-end-container-inner",
+                children=[
+                    SystemTray(),
+                    self.language,
+                    Settings(),
+                ],
+            ),
         )
 
         self.bar_inner = CenterBox(
@@ -101,7 +113,10 @@ class Bar(WaylandWindow):
 
     def on_language_switch(self, _=None, event: HyprlandEvent = None):
         """Update the language widget based on the active layout."""
-        lang_data = (event.data[1] if event and event.data and
-                     len(event.data) > 1 else Language().get_label())
+        lang_data = (
+            event.data[1]
+            if event and event.data and len(event.data) > 1
+            else Language().get_label()
+        )
         self.language.set_tooltip_text(lang_data)
         self.lang_label.set_label(lang_data[:2].upper())

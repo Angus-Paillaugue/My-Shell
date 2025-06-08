@@ -232,9 +232,8 @@ class BluetoothButton(Box):
         self.bluetooth_icon = Label(name="bluetooth-icon",
                                     markup=icons.bluetooth)
         self.bluetooth_devices_open_button = Button(
-            name="bluetooth-open-button",
-            child=Label(name="bluetooth-open-label",
-                        markup=icons.chevron_right),
+            style_classes=["expand-button-caret"],
+            child=Label(name="bluetooth-open-label", markup=icons.chevron_right),
         )
         self.labels = dict()
         self.labels["bluetooth_button"] = self.left_button

@@ -1,22 +1,32 @@
 /* Bar height items are 40px ! */
-#bar-start-container-inner {
+#bar-start-container,
+#bar-end-container {
+  padding: 8px;
+  padding-bottom: 0;
+}
+#bar-start-container-inner, #bar-end-container-inner {
+  background-color: var(--shadow);
+  border-radius: 20px;
+  padding: 4px;
+}
+/* #bar-start-container-inner {
   background-color: var(--shadow);
   padding: 4px 8px;
   min-height: 40px;
   border-radius: 0 0 25px 0;
-}
+} */
 #bar-center-container-inner {
   background-color: var(--shadow);
   padding: 4px 8px;
   min-height: 40px;
   border-radius: 0 0 25px 25px;
 }
-#bar-end-container-inner {
+/* #bar-end-container-inner {
   background-color: var(--shadow);
   padding: 4px 8px;
   min-height: 40px;
   border-radius: 0 0 0 25px;
-}
+} */
 
 .bar-action-button {
   padding: 0 12px;

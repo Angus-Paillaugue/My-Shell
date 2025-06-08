@@ -22,6 +22,7 @@ class CalendarDropdown(WaylandWindow):
             anchor="top left",
             exclusivity="none",
             visible=False,
+            margin="6px 0 0 8px",
             name="calendar-dropdown",
             **kwargs,
         )
@@ -105,24 +106,7 @@ class CalendarDropdown(WaylandWindow):
         self.calendar_container.add(self.days_header)
         self.calendar_container.add(self.calendar_grid)
 
-        # Add calendar container to window
-        self.corner_container = Box(
-            orientation="v",
-            children=[
-                Box(
-                    orientation="h",
-                    children=[
-                        self.calendar_container,
-                        MyCorner("top-left",
-                                 size=48,
-                                 h_align="start",
-                                 v_align="start"),
-                    ],
-                ),
-                MyCorner("top-left", size=48, h_align="start", v_align="start"),
-            ],
-        )
-        self.add(self.corner_container)
+        self.add(self.calendar_container)
 
         # Render initial calendar
         self.render_calendar()

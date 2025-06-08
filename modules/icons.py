@@ -57,7 +57,7 @@ disk: str = "&#xea88;"
 # Launcher
 cancel: str = "&#xf640;"
 # Power profile
-performance: str = "&#x10021;"
+performance: str = "&#xea38;"
 eco: str = "&#xed4f;"
 balanced: str = "&#xebc2;"
 # Notification
