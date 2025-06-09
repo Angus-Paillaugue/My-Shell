@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-
 here=$(dirname "$(readlink -f "$0")")
 project_dir=$(realpath "$here/..")
 . "$project_dir/workflows/shared.sh"
 app_name=$(cat $project_dir/services/config.py | grep -E "^APP_NAME\s*=" | sed -E "s/^APP_NAME\s*=\s*['\"]?([^'\"]+)['\"]?/\1/")
 notification_app_name="󰚰 $app_name Updater"
-
 
 update_version() {
 	git fetch origin "$release_branch" &&

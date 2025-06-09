@@ -250,13 +250,12 @@ def wallpapers():
 
 
 def others():
-    pinned_aps_location = os.path.join(
-        app_location, "config/pinned_apps.json"
-    )
+    pinned_aps_location = os.path.join(app_location, "config/pinned_apps.json")
 
     if not os.path.exists(pinned_aps_location):
         with open(pinned_aps_location, "w") as f:
             f.write("[]")
+
 
 if __name__ == "__main__":
     ensure_matugen_config()
