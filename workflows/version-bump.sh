@@ -25,7 +25,6 @@ update_versions_in_files() {
 }
 
 main() {
-  bump_branch="version-bump-$current_local_version"
   git checkout "$release_branch" || {
     echo "Error: Unable to checkout the release branch '$release_branch'."
     exit 1
@@ -34,12 +33,13 @@ main() {
     echo "Error: Unable to pull the latest changes from the release branch '$release_branch'."
     exit 1
   }
+  local new_version
+  read -p "Enter the new version (current: $current_local_version, latest: $current_latest_version): " new_version
+  bump_branch="version-bump-$new_version"
   git checkout -b "$bump_branch" || {
     echo "Error: Unable to create a new branch for version bump."
     exit 1
   }
-  local new_version
-  read -p "Enter the new version (current: $current_local_version, latest: $current_latest_version): " new_version
   if [[ -z "$new_version" ]]; then
     echo "No version entered. Exiting."
     exit 0
