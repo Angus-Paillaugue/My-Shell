@@ -6,7 +6,7 @@ yapf = "^0.43.0"
 
 [project]
 name = "my-shell"
-version = "0.0.3"
+version = "0.0.4"
 description = "An all-in-one Wayland shell implementation"
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
