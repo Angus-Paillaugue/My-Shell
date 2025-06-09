@@ -249,9 +249,19 @@ def wallpapers():
             shutil.copy(src_path, dest_path)
 
 
+def others():
+    pinned_aps_location = os.path.join(
+        app_location, "config/pinned_apps.json"
+    )
+
+    if not os.path.exists(pinned_aps_location):
+        with open(pinned_aps_location, "w") as f:
+            f.write("[]")
+
 if __name__ == "__main__":
     ensure_matugen_config()
     generate_hypr_entrypoint()
     generate_hyprlock_config()
     update_kitty_config()
     wallpapers()
+    others()

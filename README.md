@@ -24,11 +24,17 @@ git clone https://github.com/Angus-Paillaugue/My-Shell.git ~/.config/my-shell &&
 Then, create a virtual environment and install the dependencies:
 
 ```bash
-python3 -m venv .venv && pip install -r requirements.txt
+make venv && make install
 ```
 
 The, run the init script to set up the configuration files:
 
 ```bash
-python init.py
+make init
+```
+
+If all goes well, the shell should start on it's own. If not, you can start it manually with:
+
+```bash
+make run
 ```
