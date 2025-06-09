@@ -194,23 +194,11 @@ def generate_hypr_entrypoint():
 
 
 def generate_hyprlock_config():
-    contents = f"source = ~/.config/{APP_NAME}/config/hypr/colors.conf"
     location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf")
-    if not os.path.exists(location):
-        raise FileNotFoundError(
-            f"Hyprlock configuration file not found at {location}. Please ensure Hyprlock is installed."
-        )
-
-    already_contains = False
-    with open(location, "r") as f:
-        if contents.strip() in f.read():
-            already_contains = True
-    if not already_contains:
-        with open(location, "r") as original_file:
-            data = original_file.read()
-        with open(location, "w") as modified_file:
-            modified_file.write(contents + "\n" + data)
-        print(f"Hyprlock configuration updated at {location}")
+    backup_location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf.bak")
+    if os.path.exists(location) and not os.path.exists(backup_location):
+        shutil.copyfile(location, backup_location)
+        print(f"Hyprlock configuration updated")
 
 
 def update_kitty_config():
@@ -218,7 +206,7 @@ def update_kitty_config():
     location = os.path.expanduser(f"~/.config/kitty/kitty.conf")
     if not os.path.exists(location):
         print(
-            f"Kitty configuration file not found at {location}. Please ensure kitty is installed."
+            f"Kitty configuration file not found at {location}."
         )
 
     already_contains = False
