@@ -16,3 +16,5 @@ version-bump:
 	./workflows/version-bump.sh
 format:
 	./workflows/format.sh
+update:
+	./workflows/update.sh

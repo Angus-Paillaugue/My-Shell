@@ -13,6 +13,8 @@ update_version() {
 
   if [[ $? -eq 0 ]]; then
     notify-send -a "$notification_app_name" "Successfully updated to version: $latest_version"
+    echo "Update successful. Restarting the application..."
+    . "$project_dir/run.sh"
   else
     notify-send -a "$notification_app_name" "Update failed. Please check the logs for more details."
   fi
