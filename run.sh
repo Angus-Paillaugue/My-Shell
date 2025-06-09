@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-cd ~/.config/my-shell/
-source ./.venv/bin/activate
-python ./init.py
-uwsm app -- python ./app.py >/dev/null 2>&1 &
-disown
+here=$(dirname "$(readlink -f "$0")")
+. ./.venv/bin/activate
+. "$here/workflows/shared.sh"
+python "$here/init.py"
+pkill $app_name
+uwsm app -- python "$here/app.py" >/dev/null 2>&1 & disown
 
 # Run update script
-bash ./workflows/update.sh
+bash "$here/workflows/update.sh"
