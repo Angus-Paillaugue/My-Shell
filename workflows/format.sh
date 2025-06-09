@@ -7,40 +7,38 @@ projectRoot=$(realpath "$here/..")
 cd "$projectRoot" || exit 1
 
 checkCommands() {
-	for cmd in "${requiredCommands[@]}"; do
-		if ! command -v "$cmd" &>/dev/null; then
-			echo "Error: $cmd is not installed."
-			exit 1
-		fi
-	done
+  for cmd in "${requiredCommands[@]}"; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo "Error: $cmd is not installed."
+      exit 1
+    fi
+  done
 }
 
 formatPython() {
-	echo "Formatting Python files..."
-	yapf -r --style google --verbose -i .
+  echo "Formatting Python files..."
+  yapf -r --style google --verbose -i .
 }
 
 formatCSS() {
-	ignorePatterns=("config/")
-	echo "Formatting CSS files..."
-	prettier --write "**/*.css" --ignore-path <(printf "%s\n" "${ignorePatterns[@]}")
+  prettier --write "**/*.css"
 }
 
 formatShell() {
-	echo "Formatting shell scripts..."
-	shfmt -w .
+  echo "Formatting shell scripts..."
+  shfmt -i=2 -w .
 }
 
 formatAll() {
-	formatPython
-	formatCSS
-	formatShell
+  formatPython
+  formatCSS
+  formatShell
 }
 
 main() {
-	checkCommands
-	formatAll
-	echo "All files formatted successfully."
+  checkCommands
+  formatAll
+  echo "All files formatted successfully."
 }
 
 main "$@"

@@ -195,9 +195,12 @@ def generate_hypr_entrypoint():
 
 def generate_hyprlock_config():
     location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf")
+    template_location = os.path.join(app_location, "config/hypr/hyprlock.conf")
     backup_location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf.bak")
-    if os.path.exists(location) and not os.path.exists(backup_location):
+    if (os.path.exists(location) and not os.path.exists(backup_location) and
+            os.path.exists(template_location)):
         shutil.copyfile(location, backup_location)
+        shutil.copyfile(template_location, location)
         print(f"Hyprlock configuration updated")
 
 
@@ -205,9 +208,7 @@ def update_kitty_config():
     contents = "include colors.conf"
     location = os.path.expanduser(f"~/.config/kitty/kitty.conf")
     if not os.path.exists(location):
-        print(
-            f"Kitty configuration file not found at {location}."
-        )
+        print(f"Kitty configuration file not found at {location}.")
 
     already_contains = False
     with open(location, "r") as f:
