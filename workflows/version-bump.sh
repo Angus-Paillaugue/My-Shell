@@ -25,10 +25,19 @@ update_versions_in_files() {
 }
 
 main() {
+    bump_branch="version-bump-$current_local_version"
 	git checkout "$release_branch" || {
 		echo "Error: Unable to checkout the release branch '$release_branch'."
 		exit 1
 	}
+    git pull origin "$release_branch" || {
+        echo "Error: Unable to pull the latest changes from the release branch '$release_branch'."
+        exit 1
+    }
+    git checkout -b "$bump_branch" || {
+        echo "Error: Unable to create a new branch for version bump."
+        exit 1
+    }
 	local new_version
 	read -p "Enter the new version (current: $current_local_version, latest: $current_latest_version): " new_version
 	if [[ -z "$new_version" ]]; then
@@ -45,10 +54,24 @@ main() {
 	fi
 	update_versions_in_files "$new_version"
 
-    git add $project_dir
+    git add "$project_dir/VERSION" "$project_dir/pyproject.toml"
     git commit -m "Bump version to $new_version"
-    git push origin "$release_branch"
-    echo "Version bumped to $new_version and changes pushed to the release branch '$release_branch'."
+    git push origin "$bump_branch"
+    gh pr create --base "$release_branch" --head "$bump_branch" --title "Version Bump to $new_version" --body "This PR bumps the version to $new_version."
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to create a pull request."
+        exit 1
+    fi
+    gh pr merge --auto --squash "$bump_branch"
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to merge the pull request."
+        exit 1
+    fi
+    git checkout "$release_branch"
+    git pull origin "$release_branch"
+    git branch -d "$bump_branch"
+    git push origin --delete "$bump_branch"
+    echo "Version bumped to $new_version and changes pushed to the release branch '$bump_branch'."
 }
 
 main "$@"
