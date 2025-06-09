@@ -3,5 +3,4 @@ __pycache__
 logs
 config/hypr/colors.conf
 styles/colors.css
-
 config/pinned_apps.json

@@ -18,13 +18,15 @@ class MyCorner(Corner):
 
 class CornerContainer(Box):
 
-    def __init__(self,
-                 name=None,
-                 position="top",
-                 corners=["left", "right"],
-                 children=[],
-                 height=25,
-                 **kwargs):
+    def __init__(
+        self,
+        name=None,
+        position="top",
+        corners=["left", "right"],
+        children=[],
+        height=25,
+        **kwargs,
+    ):
         super().__init__(
             name=name,
             h_align="start" if position == "top" else "end",
@@ -51,7 +53,8 @@ class CornerContainer(Box):
                         size=height,
                         h_align="start" if position == "top" else "end",
                         v_align="start" if position == "top" else "end",
-                    ))
+                    )
+                )
             elif corner == "left":
                 self.add(
                     MyCorner(
@@ -60,11 +63,11 @@ class CornerContainer(Box):
                         size=height,
                         h_align="start" if position == "top" else "end",
                         v_align="start" if position == "top" else "end",
-                    ))
+                    )
+                )
                 self._add_children()
             else:
-                raise ValueError(
-                    "Invalid corner specified, must be 'left' or 'right'")
+                raise ValueError("Invalid corner specified, must be 'left' or 'right'")
 
     def _add_children(self):
         self.inner = Box(
@@ -79,32 +82,47 @@ class CornerContainer(Box):
 
 
 class Corners(Window):
-
     def __init__(self):
         super().__init__(
             name="corners",
             layer="top",
-            anchor="bottom left right",
-            exclusivity="none",
+            anchor="top bottom left right",
+            margin="-56px 0 0 0",
+            exclusivity="normal",
             pass_through=True,
             visible=False,
             all_visible=False,
         )
 
         self.all_corners = Box(
-            orientation="h",
+            name="all-corners",
+            orientation="v",
             h_expand=True,
             v_expand=True,
             h_align="fill",
             v_align="fill",
             children=[
-                MyCorner("bottom-left", size=12, h_align="start",
-                         v_align="end"),
-                Box(h_expand=True),
-                MyCorner("bottom-right",
-                         size=12,
-                         h_align="start",
-                         v_align="end"),
+                Box(
+                    name="top-corners",
+                    orientation="h",
+                    h_align="fill",
+                    children=[
+                        MyCorner("top-left"),
+                        Box(h_expand=True),
+                        MyCorner("top-right"),
+                    ],
+                ),
+                Box(v_expand=True),
+                Box(
+                    name="bottom-corners",
+                    orientation="h",
+                    h_align="fill",
+                    children=[
+                        MyCorner("bottom-left"),
+                        Box(h_expand=True),
+                        MyCorner("bottom-right"),
+                    ],
+                ),
             ],
         )
 
