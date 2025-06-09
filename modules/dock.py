@@ -3,7 +3,6 @@ from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.image import Image
 from fabric.widgets.revealer import Revealer
-from modules.corners import MyCorner
 import os
 from gi.repository import GLib
 import json

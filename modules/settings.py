@@ -2,10 +2,8 @@ from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.widgets.centerbox import CenterBox
-from fabric.widgets.revealer import Revealer
-from fabric.widgets.wayland import WaylandWindow
-from gi.repository import GLib, Gtk
-from modules.corners import MyCorner
+from gi.repository import Gtk
+from modules.dismissible_window import DismissibleWindow
 import modules.icons as icons
 from modules.bluetooth import BluetoothButton
 from modules.battery import Battery
@@ -19,11 +17,10 @@ from modules.screenshot import ScreenshotButton
 from modules.screen_record import ScreenRecordButton
 
 
-class SettingsMenuDropdown(WaylandWindow):
+class SettingsMenuDropdown(DismissibleWindow):
 
     def __init__(self, parent_button, **kwargs):
         super().__init__(
-            layer="overlay",
             anchor="top right",
             exclusivity="none",
             visible=False,
