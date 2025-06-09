@@ -1,13 +1,18 @@
 #metrics-main-box {
-  background-color: var(--surface);
-  padding: 0 12px 0 12px;
-  min-height: 40px;
-  font-size: 16px;
+  font-weight: bold;
+  padding: 0 12px;
 }
 
-#cpu-label,
-#memory-label,
-#temp-label {
-  font-weight: bold;
-  font-size: 20px;
+#ram-label {
+  font-size: 14px;
+}
+.metrics-progress-bar {
+  color: var(--surface-bright);
+  border: 3px solid var(--primary);
+}
+.metrics-progress-bar.warning {
+  border: 3px solid var(--yellow-dim);
+}
+.metrics-progress-bar.danger {
+  border: 3px solid var(--red-dim);
 }

@@ -4,6 +4,7 @@
 @import url("./styles/clipboard.css");
 @import url("./styles/colors.css");
 @import url("./styles/corners.css");
+@import url("./styles/dock.css");
 @import url("./styles/language.css");
 @import url("./styles/launcher.css");
 @import url("./styles/metrics.css");
@@ -28,4 +29,30 @@
   font-size: unset;
   font-family: "JetBrains Mono", monospace;
   border-radius: 12px;
+  font-size: 18px;
+}
+
+tooltip {
+  border: solid 1px var(--surface);
+  background-color: var(--shadow);
+  animation: tooltipShow 0.25s cubic-bezier(0.5, 0.25, 0, 1);
+}
+
+@keyframes tooltipShow {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+tooltip > * {
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+tooltip label {
+  font-size: 14px;
+  font-weight: bold;
 }

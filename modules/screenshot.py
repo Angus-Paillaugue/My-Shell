@@ -10,12 +10,12 @@ class ScreenshotButton(Button):
 
     def __init__(self, close_settings=None):
         super().__init__(
-            name="screenshot-button",
             orientation="h",
             spacing=4,
             v_align="center",
             h_align="center",
             visible=True,
+            style_classes=["settings-action-button"],
             child=Label(markup=icons.screenshot),
             tooltip_text="Screenshot",
             on_clicked=self._on_click,

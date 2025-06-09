@@ -1,12 +1,63 @@
-#bar-inner {
-  padding: 4px 4px 4px 4px;
-  border-radius: 0;
+/* Bar height items are 40px ! */
+#bar-start-container,
+#bar-end-container {
+  padding: 8px;
+  padding-bottom: 0;
+}
+#bar-start-container-inner,
+#bar-end-container-inner {
+  background-color: var(--shadow);
+  border-radius: 20px;
+  padding: 4px;
+}
+/* #bar-start-container-inner {
+  background-color: var(--shadow);
+  padding: 4px 8px;
+  min-height: 40px;
+  border-radius: 0 0 25px 0;
+} */
+#bar-center-container-inner {
+  background-color: var(--shadow);
+  padding: 4px 8px;
+  min-height: 40px;
+  border-radius: 0 0 25px 25px;
+}
+/* #bar-end-container-inner {
+  background-color: var(--shadow);
+  padding: 4px 8px;
+  min-height: 40px;
+  border-radius: 0 0 0 25px;
+} */
+
+.bar-action-button {
+  padding: 0 12px;
+}
+.bar-action-button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.bar-item {
-  border: 1px solid var(--surface-bright);
-  padding: 0 12px;
-  min-height: 40px;
-  background-color: var(--surface);
-  font-weight: bold;
+.bar-action-button label {
+  color: var(--foreground);
+}
+
+.bar-action-button:hover,
+.bar-action-button:focus {
+  border-radius: 20px;
+  background-color: var(--surface-bright);
+}
+
+.bar-action-button:hover label,
+.bar-action-button:focus label {
+  color: var(--primary);
+}
+
+.bar-action-button:active {
+  background-color: var(--primary);
+}
+
+.bar-action-button:active label {
+  color: var(--shadow);
 }

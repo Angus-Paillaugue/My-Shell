@@ -155,7 +155,7 @@ class ActionButton(Button):
 
 class NotificationBox(Box):
 
-    def __init__(self, notification: Notification, timeout_ms=5000, **kwargs):
+    def __init__(self, notification: Notification, timeout_ms=50000, **kwargs):
         super().__init__(
             name="notification-box",
             orientation="v",
@@ -365,7 +365,7 @@ class NotificationBox(Box):
             name="notification-content",
             spacing=8,
             children=[
-                self.notification_image_box,
+                self.notification_image_box if pixbuf else Box(h_expand=False),
                 self.notification_text_box,
                 self.content_close_button_box,
             ],
@@ -738,11 +738,12 @@ class NotificationHistory(Box):
             h_align="start",
             ellipsization="end",
         )
+        pixbuf = load_scaled_pixbuf(hist_box, 48, 48)
         self.hist_notif_image_box = Box(
             name="notification-image",
             orientation="v",
             children=[
-                Image(pixbuf=load_scaled_pixbuf(hist_box, 48, 48)),
+                Image(pixbuf=pixbuf),
                 Box(v_expand=True),
             ],
         )
@@ -820,7 +821,7 @@ class NotificationHistory(Box):
             name="notification-box-hist",
             spacing=8,
             children=[
-                self.hist_notif_image_box,
+                self.hist_notif_image_box if pixbuf else Box(h_expand=False),
                 self.hist_notif_text_box,
                 self.hist_notif_close_button_box,
             ],
@@ -880,11 +881,12 @@ class NotificationHistory(Box):
             name="notification-timestamp",
             markup=compute_time_label(container.arrival_time),
         )
+        pixbuf = load_scaled_pixbuf(notification_box, 48, 48)
         self.current_notif_image_box = Box(
             name="notification-image",
             orientation="v",
             children=[
-                Image(pixbuf=load_scaled_pixbuf(notification_box, 48, 48)),
+                Image(pixbuf=pixbuf),
                 Box(v_expand=True, v_align="fill"),
             ],
         )
@@ -956,9 +958,8 @@ class NotificationHistory(Box):
         )
         content_box = Box(
             name="notification-content",
-            spacing=8,
             children=[
-                self.current_notif_image_box,
+                self.current_notif_image_box if pixbuf else Box(h_expand=False),
                 self.current_notif_text_box,
                 self.current_notif_close_button_box,
             ],

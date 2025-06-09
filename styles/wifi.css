@@ -10,27 +10,6 @@
   color: var(--foreground);
 }
 
-#wifi-networks-expand-button {
-  border-radius: 2px 12px 12px 2px;
-  background-color: var(--surface);
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-#wifi-networks-expand-button label {
-  font-size: 20px;
-  color: var(--foreground);
-  transition: all 0.25s ease;
-}
-
-#wifi-networks-expand-button:hover {
-  background-color: var(--primary);
-  padding: 0 4px;
-}
-
-#wifi-networks-expand-button:hover label {
-  color: var(--shadow);
-}
-
 #wifi-connections-box {
   margin-top: 12px;
   background-color: var(--surface);
@@ -79,4 +58,9 @@
 
 #wifi-scan.scanning {
   background-color: var(--primary);
+}
+#wifi-connect-button label,
+.wifi-ap-icon,
+.wifi-connection-label {
+  font-size: 14px;
 }

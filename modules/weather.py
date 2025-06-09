@@ -71,7 +71,6 @@ class WeatherButton(Button):
     def __init__(self, **kwargs):
         super().__init__(
             name="weather-button",
-            style_classes=["bar-item"],
             **kwargs,
         )
         self.weather_worker = WeatherWorker()
@@ -83,17 +82,15 @@ class WeatherButton(Button):
         self.loading_icon = Label(
             name="weather-loading-icon",
             markup=icons.loading,
-            style_classes=["bar-item-icon", "loading-icon"],
+            style_classes=["loading-icon"],
         )
         self.icon = Label(
             name="weather-icon",
             label="",
-            style_classes=["bar-item-icon"],
         )
         self.temperature = Label(
             name="weather-temperature",
             label="",
-            style_classes=["bar-item-text"],
         )
         self.main_container.add(self.loading_icon)
         self.main_container.add(self.icon)

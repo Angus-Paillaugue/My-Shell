@@ -13,11 +13,11 @@ import modules.icons as icons
 from services.network import NetworkClient
 
 
-class WiredConnectionSlot(CenterBox):
+class WiredConnectionSlot(Box):
 
     def __init__(self, connection_data, network_service: NetworkClient,
                  **kwargs):
-        super().__init__(name="wired-connection-slot", **kwargs)
+        super().__init__(name="wired-connection-slot", spacing=8, **kwargs)
         self.connection_data = connection_data
         self.network_service = network_service
 
@@ -26,19 +26,12 @@ class WiredConnectionSlot(CenterBox):
         self.is_active = connection_data.get("active", False)
 
         self.connection_label = Label(label=conn_name,
+                                      style_classes=["wired-connection-label"],
                                       h_expand=True,
                                       h_align="start",
                                       ellipsization="end")
 
-        self.connect_button = Button(
-            name="wired-connect-button",
-            label="Connected" if self.is_active else "Connect",
-            sensitive=not self.is_active,
-            on_clicked=self._on_connect_clicked,
-            style_classes=["connected"] if self.is_active else None,
-        )
-
-        self.set_start_children([
+        self.add(
             Box(
                 spacing=8,
                 h_expand=True,
@@ -47,9 +40,15 @@ class WiredConnectionSlot(CenterBox):
                     Label(name="wired-connection-icon", markup=icons.ethernet),
                     self.connection_label,
                 ],
-            )
-        ])
-        self.set_end_children([self.connect_button])
+            ))
+        self.connect_button = Button(
+            name="wired-connect-button",
+            label="Connected" if self.is_active else "Connect",
+            sensitive=not self.is_active,
+            on_clicked=self._on_connect_clicked,
+            style_classes=["connected"] if self.is_active else None,
+        )
+        self.add(self.connect_button)
 
     def _on_connect_clicked(self, _):
         if not self.is_active and self.connection_data.get("uuid"):
@@ -292,7 +291,7 @@ class Wired(Box):
         )
         self.wired_icon = Label(name="wired-icon", markup=icons.ethernet_off)
         self.wired_networks_open_button = Button(
-            name="wired-networks-expand-button",
+            style_classes=["expand-button-caret"],
             child=Label(name="wired-open-label", markup=icons.chevron_right),
         )
 

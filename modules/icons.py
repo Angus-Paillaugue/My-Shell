@@ -53,10 +53,13 @@ battery_charging: str = "&#xea33;"
 cpu: str = "&#xef8e;"
 memory: str = "&#xf0a0;"
 temperature: str = "&#xeb38;"
+disk: str = "&#xea88;"
 # Launcher
 cancel: str = "&#xf640;"
+pin_off: str = "&#xec9c;"
+pin_on: str = "&#xf68d;"
 # Power profile
-performance: str = "&#x10021;"
+performance: str = "&#xea38;"
 eco: str = "&#xed4f;"
 balanced: str = "&#xebc2;"
 # Notification

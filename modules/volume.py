@@ -299,6 +299,7 @@ class VolumeRow(Box):
                     ellipsization="end",
                     h_expand=True,
                     h_align="start",
+                    style_classes=["volume-entry-label"],
                 ),
                 check_icon,
             ],
@@ -319,7 +320,7 @@ class VolumeRow(Box):
         # Store output reference for later use
         button.output = output
 
-        button.add_style_class("bt-output-item")
+        button.add_style_class("volume-entry-button")
         if is_current:
             button.add_style_class("selected-output")
 
@@ -657,6 +658,7 @@ class MicRow(Box):
                     ellipsization="end",
                     h_expand=True,
                     h_align="start",
+                    style_classes=["volume-entry-label"],
                 ),
                 check_icon,
             ],
@@ -674,11 +676,9 @@ class MicRow(Box):
             on_clicked=lambda _: self.switch_to_input(input_src),
         )
 
-        # Store input reference for later use
         button.input_source = input_src
 
-        # Apply style classes
-        button.add_style_class("bt-output-item")  # Reuse the same style class
+        button.add_style_class("volume-entry-button")
         if is_current:
             button.add_style_class("selected-output")
 

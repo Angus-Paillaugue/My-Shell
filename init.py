@@ -89,7 +89,7 @@ def ensure_matugen_config():
             f"{APP_NAME}": {
                 "input_path":
                     os.path.join(app_location,
-                                 "config/matugen/templates/{APP_NAME}.css"),
+                                 f"config/matugen/templates/{APP_NAME}.css"),
                 "output_path":
                     os.path.join(app_location, "styles/colors.css"),
                 "post_hook":
@@ -132,7 +132,7 @@ def ensure_matugen_config():
 
     current_wall = os.path.expanduser("~/.current.wall")
     hypr_colors = os.path.join(app_location, "config/hypr/colors.conf")
-    css_colors = os.path.join(app_location, "/styles/colors.css")
+    css_colors = os.path.join(app_location, "styles/colors.css")
 
     if (not os.path.exists(current_wall) or not os.path.exists(hypr_colors) or
             not os.path.exists(css_colors)):

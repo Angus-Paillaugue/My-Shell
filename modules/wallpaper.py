@@ -329,6 +329,9 @@ class WallpaperManager(WaylandWindow):
 
             os.symlink(path, current_wall)
 
-            exec_shell_command_async(f'matugen image "{current_wall}"')
+            exec_shell_command_async(
+                f'matugen image "{current_wall}"',
+                lambda process, stdout: logger.debug(stdout),
+            )
         except Exception as e:
             logger.error(f"Failed to set wallpaper: {e}")

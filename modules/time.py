@@ -9,6 +9,7 @@ from gi.repository import Gdk, GLib
 from collections.abc import Iterable
 from fabric.core.service import Property
 from fabric.widgets.wayland import WaylandWindow
+from modules.corners import MyCorner
 import modules.icons as icons
 from services.logger import logger
 
@@ -21,8 +22,8 @@ class CalendarDropdown(WaylandWindow):
             anchor="top left",
             exclusivity="none",
             visible=False,
+            margin="6px 0 0 8px",
             name="calendar-dropdown",
-            margin="0 0 0 8px",
             **kwargs,
         )
 
@@ -105,7 +106,6 @@ class CalendarDropdown(WaylandWindow):
         self.calendar_container.add(self.days_header)
         self.calendar_container.add(self.calendar_grid)
 
-        # Add calendar container to window
         self.add(self.calendar_container)
 
         # Render initial calendar
@@ -239,7 +239,7 @@ class Time(Button):
     ):
         super().__init__(
             name="time",
-            style_classes=["bar-item"],
+            style_classes=["bar-action-button"],
             **kwargs,
         )
 

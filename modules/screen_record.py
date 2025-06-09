@@ -9,9 +9,9 @@ class ScreenRecordButton(Button):
 
     def __init__(self, close_settings=None):
         super().__init__(
-            name="screenshot-button",
             tooltip_text="Screen Record",
             orientation="h",
+            style_classes=['settings-action-button'],
             spacing=4,
             v_align="center",
             h_align="center",

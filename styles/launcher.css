@@ -5,9 +5,7 @@
   min-height: 350px;
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1);
 }
-#search-entry,
-#session-name-entry,
-#search-entry-walls {
+#search-entry {
   font-weight: bold;
   background-color: var(--surface);
   color: var(--foreground);
@@ -15,70 +13,34 @@
   padding: 10px;
 }
 
-#search-entry selection,
-#search-entry-walls selection,
-#session-name-entry selection {
+#search-entry selection {
   color: var(--background);
   background-color: var(--primary);
 }
 
-.close-button,
-#clear-button,
-#config-button,
-#new-session-button,
-#random-wall-button {
+.close-button {
   background-color: var(--surface);
   border-radius: 40px;
   padding: 8px;
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.close-button:hover,
-#clear-button:hover,
-#clear-button:focus,
-#config-button:hover,
-#config-button:focus,
-#new-session-button:hover,
-#new-session-button:focus,
-#random-wall-button:hover {
+.close-button:hover {
   background-color: var(--surface-bright);
   border-radius: 16px;
 }
 
-.close-button:active,
-#clear-button:active {
+.close-button:active {
   background-color: var(--red-dim);
   border-radius: 40px;
 }
 
-.close-button label,
-#clear-label {
+.close-button label {
   color: var(--red-dim);
   font-size: 24px;
 }
 
-.close-button:active .close-button label,
-#clear-button:active #clear-label {
-  color: var(--shadow);
-}
-
-#config-button:active,
-#new-session-button:active,
-#random-wall-button:active {
-  background-color: var(--primary);
-  border-radius: 40px;
-}
-
-#config-label,
-#new-session-label,
-#random-wall-label {
-  color: var(--primary);
-  font-size: 24px;
-}
-
-#config-button:active #config-label,
-#new-session-button:active #new-session-label,
-#random-wall-button:active #random-wall-label {
+.close-button:active .close-button label {
   color: var(--shadow);
 }
 
@@ -168,6 +130,45 @@
   font-style: italic;
 }
 
-#clip-label {
-  font-weight: bold;
+.pin-button {
+  opacity: 0;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+#slot-button:hover .pin-button,
+#slot-button:focus .pin-button,
+#slot-button.selected .pin-button {
+  opacity: 1;
+}
+#app-button {
+  padding: 8px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+#app-button:hover,
+#app-button:focus,
+#app-button.selected {
+  background-color: var(--surface);
+}
+.pin-button:hover {
+  opacity: 1;
+  background-color: var(--surface-bright);
+}
+.pin-button:active {
+  opacity: 1;
+  background-color: var(--primary);
+}
+.pin-button.pinned #pin-icon {
+  color: var(--primary);
+  font-size: 16px;
+}
+.pin-button.unpinned #pin-icon {
+  color: var(--foreground);
+  font-size: 16px;
+}
+.pin-button:active #pin-icon {
+  color: var(--shadow);
 }

@@ -255,12 +255,12 @@ class PowerMenuButton(Box):
 
         # Main power button
         self.power_button = Button(
-            name="power-menu-main-button",
             child=Label(name="button-label", markup=icons.shutdown),
             h_expand=False,
             v_expand=False,
             h_align="center",
             v_align="center",
+            style_classes=['settings-action-button'],
         )
 
         # Add the button to our container

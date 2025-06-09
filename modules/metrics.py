@@ -1,6 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
+from fabric.widgets.circularprogressbar import CircularProgressBar
 import modules.icons as icons
 from services.metrics import shared_provider
 from fabric.core.fabricator import Fabricator
@@ -14,72 +15,69 @@ class Metrics(Button):
             visible=True,
             **kwargs,
         )
+
+        self.thresholds = {
+            'cpu': {    # CPU usage thresholds in percentage
+                'warning': 70,
+                'danger': 90,
+            },
+            'ram': {    # RAM usage thresholds in percentage
+                'warning': 70,
+                'danger': 99,
+            },
+            'disk': {    # Disk usage thresholds in percentage
+                'warning': 70,
+                'danger': 90,
+            },
+            'temp': {    # Temperature thresholds in Celsius
+                'warning': 65,
+                'danger': 80,
+            },
+        }
+
         self.main_box = Box(
             name="metrics-main-box",
             orientation="h",
             spacing=12,
             v_align="center",
             h_align="center",
-            style_classes=["bar-item"],
         )
         self.add(self.main_box)
 
-        # CPU
-        self.cpu_percentage = Label(
-            name="cpu-percentage",
-            label="0%",
+        self.cpu = CircularProgressBar(
+            value=0,
+            size=30,
+            line_width=2,
+            start_angle=150,
+            end_angle=390,
+            style_classes=['metrics-progress-bar'],
+            child=Label(markup=icons.cpu),
         )
-        self.cpu_container = Box(
-            name="cpu-container",
-            orientation="h",
-            spacing=4,
-            v_align="center",
-            h_align="center",
-            children=[
-                Label(name="cpu-label", markup=icons.cpu), self.cpu_percentage
-            ],
+        self.ram = CircularProgressBar(
+            value=0,
+            size=30,
+            line_width=2,
+            start_angle=150,
+            end_angle=390,
+            style_classes=['metrics-progress-bar'],
+            child=Label(
+                name="ram-label",
+                markup=
+                "<span font-family='JetBrainsMono Nerd Font' font-weight='normal'> </span>",
+            ),
         )
-        self.main_box.add(self.cpu_container)
-
-        # RAM
-        self.mem_percentage = Label(
-            name="mem-percentage",
-            label="0%",
+        self.temp = CircularProgressBar(
+            value=0,
+            size=30,
+            line_width=2,
+            start_angle=150,
+            end_angle=390,
+            style_classes=['metrics-progress-bar'],
+            child=Label(markup=icons.temperature),
         )
-        self.mem_container = Box(
-            name="mem-container",
-            orientation="h",
-            spacing=4,
-            v_align="center",
-            h_align="center",
-            children=[
-                Label(
-                    name="memory-label",
-                    markup=
-                    "<span font-family='JetBrainsMono Nerd Font' font-weight='normal'> </span>",
-                ),
-                self.mem_percentage,
-            ],
-        )
-        self.main_box.add(self.mem_container)
-
-        # Temperature
-        self.temp_level = Label(
-            name="temp-level",
-            markup=icons.temperature,
-        )
-        self.temp_container = Box(
-            name="cpu-container",
-            orientation="h",
-            spacing=4,
-            v_align="center",
-            h_align="center",
-            children=[
-                Label(name="temp-label", markup=icons.temperature),
-                self.temp_level,
-            ],
-        )
-        self.main_box.add(self.temp_container)
+        self.main_box.add(self.cpu)
+        self.main_box.add(self.ram)
+        self.main_box.add(self.temp)
 
         self.metrics_fabricator = Fabricator(
             poll_from=lambda v: shared_provider.get_metrics(),
@@ -92,7 +90,25 @@ class Metrics(Button):
         GLib.idle_add(self.update_metrics, None, shared_provider.get_metrics())
 
     def update_metrics(self, sender, metrics):
-        cpu, mem, temp, disk = metrics
-        self.cpu_percentage.set_label("{:.0f}%".format(cpu))
-        self.mem_percentage.set_label("{:.0f}%".format(mem))
-        self.temp_level.set_label("{:.0f}°C".format(temp))
+        cpu, ram, temp = metrics
+
+        self.cpu.set_value(cpu / 100)
+        self.cpu.set_tooltip_text(f"{cpu:.1f}%")
+        self.cpu.add_style_class(
+            "danger" if self.thresholds["cpu"]["danger"] <= cpu else (
+                "warning" if self.thresholds["cpu"]["warning"] <=
+                cpu else "normal"))
+
+        self.ram.set_value(ram / 100)
+        self.ram.set_tooltip_text(f"{ram:.1f}%")
+        self.ram.add_style_class(
+            "danger" if self.thresholds["ram"]["danger"] <= ram else (
+                "warning" if self.thresholds["ram"]["warning"] <=
+                ram else "normal"))
+
+        self.temp.set_value(temp / 100)
+        self.temp.set_tooltip_text(f"{temp:.0f}°C")
+        self.temp.add_style_class(
+            "danger" if self.thresholds["temp"]["danger"] <= temp else (
+                "warning" if self.thresholds["temp"]["warning"] <=
+                temp else "normal"))
