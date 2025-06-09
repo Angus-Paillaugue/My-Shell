@@ -53,8 +53,7 @@ class CornerContainer(Box):
                         size=height,
                         h_align="start" if position == "top" else "end",
                         v_align="start" if position == "top" else "end",
-                    )
-                )
+                    ))
             elif corner == "left":
                 self.add(
                     MyCorner(
@@ -63,11 +62,11 @@ class CornerContainer(Box):
                         size=height,
                         h_align="start" if position == "top" else "end",
                         v_align="start" if position == "top" else "end",
-                    )
-                )
+                    ))
                 self._add_children()
             else:
-                raise ValueError("Invalid corner specified, must be 'left' or 'right'")
+                raise ValueError(
+                    "Invalid corner specified, must be 'left' or 'right'")
 
     def _add_children(self):
         self.inner = Box(
@@ -82,6 +81,7 @@ class CornerContainer(Box):
 
 
 class Corners(Window):
+
     def __init__(self):
         super().__init__(
             name="corners",

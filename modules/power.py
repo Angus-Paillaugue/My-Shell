@@ -4,16 +4,14 @@ from fabric.widgets.label import Label
 from fabric.utils import exec_shell_command_async
 import modules.icons as icons
 from fabric.widgets.revealer import Revealer
-from fabric.widgets.centerbox import CenterBox
-from fabric.widgets.wayland import WaylandWindow
+from modules.dismissible_window import DismissibleWindow
 from gi.repository import GLib, Gdk
 
 
-class PowerConfirmDialog(WaylandWindow):
+class PowerConfirmDialog(DismissibleWindow):
 
     def __init__(self, action_name, action_icon, command, **kwargs):
         super().__init__(
-            layer="overlay",
             anchor="center",
             exclusivity="exclusive",  # Make it modal
             visible=False,

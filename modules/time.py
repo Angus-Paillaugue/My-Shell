@@ -8,17 +8,14 @@ from datetime import datetime
 from gi.repository import Gdk, GLib
 from collections.abc import Iterable
 from fabric.core.service import Property
-from fabric.widgets.wayland import WaylandWindow
-from modules.corners import MyCorner
+from modules.dismissible_window import DismissibleWindow
 import modules.icons as icons
-from services.logger import logger
 
 
-class CalendarDropdown(WaylandWindow):
+class CalendarDropdown(DismissibleWindow):
 
     def __init__(self, parent_button, **kwargs):
         super().__init__(
-            layer="overlay",
             anchor="top left",
             exclusivity="none",
             visible=False,

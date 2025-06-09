@@ -1,23 +1,22 @@
 import os
 import threading
 from fabric.utils import exec_shell_command_async
-from fabric.widgets.wayland import WaylandWindow
-from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
+from fabric.widgets.entry import Entry
 from fabric.widgets.label import Label
 from gi.repository import Gtk, GdkPixbuf, Gio, Gdk, GLib
 from fabric.widgets.image import Image
 from fabric.widgets.scrolledwindow import ScrolledWindow
 import modules.icons as icons
 from services.logger import logger
+from modules.dismissible_window import DismissibleWindow
 
 
-class WallpaperManager(WaylandWindow):
+class WallpaperManager(DismissibleWindow):
 
     def __init__(self, **kwargs):
         super().__init__(
-            layer="overlay",
             anchor="center center",
             exclusivity="exclusive",
             keyboard_mode="exclusive",
@@ -26,29 +25,13 @@ class WallpaperManager(WaylandWindow):
         )
 
         self.columns = 3
-        self.wallpaper_location = "~/Pictures/wallpapers"
+        self.wallpaper_location = os.path.expanduser("~/Pictures/wallpapers")
         self.image_cache = {}
         self.loaded_images = set()
         self.load_thread_active = False
 
-        if not os.path.exists(os.path.expanduser(self.wallpaper_location)):
-            os.makedirs(os.path.expanduser(self.wallpaper_location))
-
-        # Make title more visible with markup
-        self.title_label = Label(label="Wallpaper Manager",
-                                 name="wallpaper-manager-title")
-        self.header = CenterBox(
-            name="wallpaper-manager-header",
-            orientation="h",
-            start_children=[self.title_label],
-            end_children=[
-                Button(
-                    child=Label(markup=icons.cancel),
-                    on_clicked=lambda btn: self.toggle(),
-                    style_classes=["close-button"],
-                )
-            ],
-        )
+        if not os.path.exists(self.wallpaper_location):
+            os.makedirs(self.wallpaper_location)
 
         # Create a grid that will adapt to its contents
         self.buttons_grid = Gtk.Grid(
@@ -69,7 +52,6 @@ class WallpaperManager(WaylandWindow):
             v_scroll_policy=Gtk.PolicyType.
             AUTOMATIC,  # Show vertical scrollbar when needed
         )
-
         # Make sure container has explicit minimum size but can grow
         self.main_container = Box(
             name="wallpaper-manager-container",
@@ -79,8 +61,32 @@ class WallpaperManager(WaylandWindow):
             v_expand=True,
             h_align="fill",
             v_align="fill",
-            children=[self.header, self.scrollable_area],
         )
+
+        self.entry = Entry(
+            name="search-entry",
+            placeholder="Search Wallpapers...",
+            h_expand=True,
+            h_align="fill",
+            notify_text=self.notify_text,
+        )
+        self.entry.props.xalign = 0.5
+
+        self.header = Box(
+            name="wallpaper-manager-header",
+            orientation="h",
+            spacing=10,
+            children=[
+                self.entry,
+                Button(
+                    child=Label(markup=icons.cancel),
+                    on_clicked=lambda btn: self.toggle(),
+                    style_classes=["close-button"],
+                ),
+            ],
+        )
+        self.main_container.add(self.header)
+        self.main_container.add(self.scrollable_area)
 
         # Set a minimum size that accommodates 3 columns
         # Calculate based on image width (300px) * 3 + padding/spacing
@@ -96,6 +102,11 @@ class WallpaperManager(WaylandWindow):
         self.connect("key-press-event", self.on_key_press)
         self.connect("show", self._on_window_show)
 
+    def notify_text(self, entry, *_):
+        """Handle text changes in the search entry"""
+        text = entry.get_text()
+        self._refresh_wallpapers(text)
+
     def on_key_press(self, widget, event):
         """Handle keyboard navigation"""
         keyval = event.get_keyval()[1]
@@ -109,13 +120,13 @@ class WallpaperManager(WaylandWindow):
         return False
 
     def setup_file_monitor(self):
-        gfile = Gio.File.new_for_path(
-            os.path.expanduser(self.wallpaper_location))
+        gfile = Gio.File.new_for_path(self.wallpaper_location)
         self.file_monitor = gfile.monitor_directory(Gio.FileMonitorFlags.NONE,
                                                     None)
-        self.file_monitor.connect("changed", self._refresh_wallpapers)
+        self.file_monitor.connect("changed",
+                                  lambda *_: self._refresh_wallpapers())
 
-    def _refresh_wallpapers(self, *args):
+    def _refresh_wallpapers(self, search=""):
         """
         Refresh the list of wallpapers and update the buttons.
         """
@@ -135,17 +146,45 @@ class WallpaperManager(WaylandWindow):
             self.buttons_grid.attach(label, 0, 0, self.columns, 1)
         else:
             # Create all buttons with placeholder images first
-            for i, (abs_path, filename) in enumerate(wallpapers):
-                self._add_wallpaper_button_placeholder(abs_path, filename, i)
+            grid_position = 0  # Separate counter for grid positions
+            filtered_wallpapers = []
 
-            # Load actual images in the background
-            self._load_images_in_background(wallpapers)
+            for abs_path, filename in wallpapers:
+                # Filter wallpapers based on search text
+                if search and search.lower() not in filename.lower():
+                    continue
+
+                # Add wallpaper to grid using the grid_position counter
+                row = grid_position // self.columns
+                col = grid_position % self.columns
+                self._add_wallpaper_button_placeholder(abs_path, filename, col,
+                                                       row)
+
+                # Add to filtered list for background loading
+                filtered_wallpapers.append((abs_path, filename))
+
+                # Only increment grid position when we actually add a wallpaper
+                grid_position += 1
+
+            # If no wallpapers match the search
+            if grid_position == 0 and search:
+                label = Label(
+                    name="no-wallpapers-label",
+                    text=f"No wallpapers matching '{search}'",
+                    h_align="center",
+                    v_align="center",
+                )
+                self.buttons_grid.attach(label, 0, 0, self.columns, 1)
+                label.show()
+
+            # Load actual images in the background - only for filtered wallpapers
+            self._load_images_in_background(filtered_wallpapers)
 
         # Ensure everything is visible
         self.main_container.show_all()
 
     def _add_wallpaper_button_placeholder(self, path: str, filename: str,
-                                          index: int):
+                                          col: int, row: int):
         """Add a wallpaper button with a placeholder image."""
         image_width = 240
         image_height = 135
@@ -159,8 +198,7 @@ class WallpaperManager(WaylandWindow):
         image = Image(style_classes=["wallpaper-button-image"],)
         image.set_size_request(image_width, image_height)
 
-        # Use normal Python attributes instead of set_data
-        image.path = path  # Changed from set_data
+        image.path = path
 
         contents = Box(
             children=[
@@ -190,8 +228,8 @@ class WallpaperManager(WaylandWindow):
             style_classes=["wallpaper-button"],
         )
 
-        self.buttons_grid.attach(button, index % self.columns,
-                                 index // self.columns, 1, 1)
+        # Use the provided row and column positions
+        self.buttons_grid.attach(button, col, row, 1, 1)
 
     def _load_images_in_background(self, wallpapers):
         """Load images in a background thread to avoid UI freezes."""
@@ -232,31 +270,24 @@ class WallpaperManager(WaylandWindow):
 
         # Find all image widgets with this path
         for child in self.buttons_grid.get_children():
-            box = child.get_child()
-            if not box or not isinstance(box, Box):
+            if not isinstance(child, Button):
                 continue
 
+            box = child.get_child()
+
             for widget in box.get_children():
-                if (isinstance(widget, Image) and hasattr(widget, "path") and
-                        widget.path == path):
-                    # Found our image widget, update it
+                if isinstance(widget, Image) and hasattr(
+                        widget, 'path') and widget.path == path:
+                    # Update the image
                     widget.set_from_pixbuf(pixbuf)
 
-                    # Make the placeholder invisible and show the image
-                    placeholder = None
-                    for sibling in box.get_children():
-                        if isinstance(sibling, Gtk.Box) and not isinstance(
-                                sibling, Image):
-                            placeholder = sibling
-                            break
-
-                    if placeholder:
-                        placeholder.hide()
-
+                    # Hide the placeholder and show the actual image
+                    placeholder = box.get_children()[0]
+                    placeholder.hide()
                     widget.show()
-                    return False  # Remove this idle callback
 
-        return False  # Remove this idle callback
+                    # Exit the loop after finding the matching image
+                    return
 
     def _on_window_show(self, widget):
         """Called when the window is shown - ensure proper image visibility."""
@@ -287,6 +318,8 @@ class WallpaperManager(WaylandWindow):
     def toggle(self):
         if self.is_visible():
             self.hide()
+            self.entry.set_text("")
+            self._refresh_wallpapers()
         else:
             self.show_all()
             self.present()
@@ -295,7 +328,7 @@ class WallpaperManager(WaylandWindow):
         """
         List all wallpapers in the wallpapers directory.
         """
-        wallpapers_dir = os.path.expanduser(self.wallpaper_location)
+        wallpapers_dir = self.wallpaper_location
         if not os.path.exists(wallpapers_dir):
             return []
 

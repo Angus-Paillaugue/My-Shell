@@ -1,13 +1,11 @@
 import json
 import math
-import operator
 import os
 import re
 import subprocess
 import numpy as np
 import services.config as config
 from collections.abc import Iterator
-from fabric.widgets.wayland import WaylandWindow
 from fabric.utils import DesktopApp, get_desktop_applications, idle_add, remove_handler
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
@@ -19,9 +17,10 @@ from gi.repository import Gdk, GLib
 from services.logger import logger
 import modules.icons as icons
 from modules.dock import pinned_aps_location
+from modules.dismissible_window import DismissibleWindow
 
 
-class AppLauncher(WaylandWindow):
+class AppLauncher(DismissibleWindow):
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -29,7 +28,6 @@ class AppLauncher(WaylandWindow):
             visible=False,
             exclusivity="auto",
             keyboard_mode="exclusive",
-            all_visible=False,
             **kwargs,
         )
         self.selected_index = -1
