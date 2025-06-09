@@ -1,18 +1,16 @@
-autopep8==2.3.2
-certifi==2025.4.26
-charset-normalizer==3.4.2
-click==8.2.1
-fabric @ git+https://github.com/Fabric-Development/fabric.git@c24c19c74bd66cd353741b32fe303dd62fe86d9f
-idna==3.10
-loguru==0.7.3
-numpy==2.3.0
-platformdirs==4.3.8
-psutil==7.0.0
-pycairo==1.28.0
-pycodestyle==2.13.0
-PyGObject==3.50.0
-requests==2.32.3
-setproctitle==1.3.6
-toml==0.10.2
-urllib3==2.4.0
-yapf @ git+https://github.com/google/yapf.git@12005095296072751e3e4c1f33a047d41b0ce18d
+certifi==2025.4.26 ; python_version >= "3.13" and python_version < "4.0"
+charset-normalizer==3.4.2 ; python_version >= "3.13" and python_version < "4.0"
+click==8.2.1 ; python_version >= "3.13" and python_version < "4.0"
+colorama==0.4.6 ; python_version >= "3.13" and python_version < "4.0" and (platform_system == "Windows" or sys_platform == "win32")
+fabric @ git+https://github.com/Fabric-Development/fabric.git@c24c19c74bd66cd353741b32fe303dd62fe86d9f ; python_version >= "3.13" and python_version < "4.0"
+idna==3.10 ; python_version >= "3.13" and python_version < "4.0"
+loguru==0.7.3 ; python_version >= "3.13" and python_version < "4.0"
+numpy==2.3.0 ; python_version >= "3.13" and python_version < "4.0"
+psutil==7.0.0 ; python_version >= "3.13" and python_version < "4.0"
+pycairo==1.28.0 ; python_version >= "3.13" and python_version < "4.0"
+pygobject==3.50.0 ; python_version >= "3.13" and python_version < "4.0"
+requests==2.32.3 ; python_version >= "3.13" and python_version < "4.0"
+setproctitle==1.3.6 ; python_version >= "3.13" and python_version < "4.0"
+toml==0.10.2 ; python_version >= "3.13" and python_version < "4.0"
+urllib3==2.4.0 ; python_version >= "3.13" and python_version < "4.0"
+win32-setctime==1.2.0 ; python_version >= "3.13" and python_version < "4.0" and sys_platform == "win32"

@@ -1,0 +1,41 @@
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+yapf = "^0.43.0"
+
+[project]
+name = "my-shell"
+version = "0.0.3"
+description = "An all-in-one Wayland shell implementation"
+readme = "README.md"
+requires-python = ">=3.13,<4.0"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Angus-Paillaugue",email = "angus.paillaugue40@gmail.com"}
+]
+dependencies = [
+    "fabric @ git+https://github.com/Fabric-Development/fabric.git@c24c19c74bd66cd353741b32fe303dd62fe86d9f",
+    "requests (>=2.32.3,<3.0.0)",
+    "toml (>=0.10.2,<0.11.0)",
+    "setproctitle (>=1.3.6,<2.0.0)",
+    "psutil (>=7.0.0,<8.0.0)",
+    "numpy (>=2.3.0,<3.0.0)"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project.urls]
+"Homepage" = "https://github.com/Angus-Paillaugue/My-Shell"
+"Bug Tracker" = "https://github.com/Angus-Paillaugue/My-Shell/issues"
+
+[tool.yapf]
+based_on_style = "google"
+spaces_before_comment = 2
+split_before_logical_operator = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
