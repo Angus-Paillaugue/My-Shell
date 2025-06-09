@@ -56,6 +56,8 @@ temperature: str = "&#xeb38;"
 disk: str = "&#xea88;"
 # Launcher
 cancel: str = "&#xf640;"
+pin_off: str = "&#xec9c;"
+pin_on: str = "&#xf68d;"
 # Power profile
 performance: str = "&#xea38;"
 eco: str = "&#xed4f;"

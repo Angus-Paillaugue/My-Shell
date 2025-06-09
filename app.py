@@ -11,6 +11,7 @@ from modules.wallpaper import WallpaperManager
 from modules.clipboard import ClipboardManager
 from modules.notification import NotificationPopup
 from modules.corners import Corners
+from modules.dock import Dock
 
 if __name__ == "__main__":
     setproctitle.setproctitle(config.APP_NAME)
@@ -20,6 +21,7 @@ if __name__ == "__main__":
     clipboard_manager = ClipboardManager()
     notification = NotificationPopup()
     corners = Corners()
+    dock = Dock()
     app = Application(
         config.APP_NAME,
         bar,
@@ -28,6 +30,7 @@ if __name__ == "__main__":
         clipboard_manager,
         notification,
         corners,
+        dock,
     )
 
     def apply_stylesheet(*_):
