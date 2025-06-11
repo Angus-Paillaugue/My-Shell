@@ -16,7 +16,7 @@ class CalendarDropdown(DismissibleWindow):
 
     def __init__(self, parent_button, **kwargs):
         super().__init__(
-            anchor="top left",
+            anchor="top center",
             exclusivity="none",
             visible=False,
             margin="6px 0 0 8px",
@@ -201,20 +201,6 @@ class CalendarDropdown(DismissibleWindow):
 
 class Time(Button):
 
-    @Property(tuple[str, ...], "read-write")
-    def formatters(self):
-        return self._formatters
-
-    @formatters.setter
-    def formatters(self, value: str | Iterable[str]):
-        if isinstance(value, (tuple, list)):
-            self._formatters = tuple(value)
-        elif isinstance(value, str):
-            self._formatters = (value,)
-        if len(self._formatters) < 1:
-            self._formatters = ("%I:%M %p", "%d-%m-%Y")
-        return
-
     @Property(int, "read-write")
     def interval(self):
         return self._interval
@@ -224,9 +210,8 @@ class Time(Button):
         self._interval = value
         if self._repeater_id:
             GLib.source_remove(self._repeater_id)
-        self._repeater_id = invoke_repeater(self._interval,
-                                            self.do_update_label)
-        self.do_update_label()
+        self._repeater_id = invoke_repeater(self._interval, self.do_update_time)
+        self.do_update_time()
         return
 
     def __init__(
@@ -240,19 +225,34 @@ class Time(Button):
             **kwargs,
         )
 
+        self.time_label = Label(
+            name="time-label",
+            label="",
+            h_align="center",
+            v_align="center",
+        )
+        self.date_label = Label(
+            name="date-label",
+            label="",
+            h_align="center",
+            v_align="center",
+        )
+        self.add(
+            Box(
+                orientation="h",
+                spacing=8,
+                children=[self.date_label, self.time_label],
+            ))
+
         self.add_events(Gdk.EventMask.SCROLL_MASK)
-        self._formatters: tuple[str, ...] = tuple()
-        self._current_index: int = 0
         self._interval: int = interval
         self._repeater_id: int | None = None
-
-        self.formatters = ("%H:%M:%S", "%d-%m-%Y")
         self.interval = interval
 
         # Connect events first
         self.connect(
             "button-press-event",
-            lambda *args: self.do_handle_press(*args),  # to allow overriding
+            lambda *args: self.toggle_calendar(),  # to allow overriding
         )
         self.connect("scroll-event", lambda *args: self.do_handle_scroll(*args))
 
@@ -273,48 +273,12 @@ class Time(Button):
             GLib.timeout_add(100,
                              lambda: self.calendar_dropdown.toggle_visibility())
 
-    def update_time(self):
+    def set_button_label(self):
         current_time = time.strftime("%H:%M:%S", time.localtime())
+        current_date = time.strftime("%b %d", time.localtime())
         self.time_label.set_label(current_time)
+        self.date_label.set_label(current_date)
 
-    def do_format(self) -> str:
-        return time.strftime(self._formatters[self._current_index])
-
-    def do_update_label(self):
-        self.set_label(self.do_format())
+    def do_update_time(self):
+        self.set_button_label()
         return True
-
-    def do_check_invalid_index(self, index: int) -> bool:
-        return (index < 0) or (index > (len(self.formatters) - 1))
-
-    def do_cycle_next(self):
-        self._current_index = self._current_index + 1
-        if self.do_check_invalid_index(self._current_index):
-            self._current_index = 0  # reset tags
-
-        return self.do_update_label()
-
-    def do_cycle_prev(self):
-        self._current_index = self._current_index - 1
-        if self.do_check_invalid_index(self._current_index):
-            self._current_index = len(self.formatters) - 1
-
-        return self.do_update_label()
-
-    def do_handle_press(self, _, event, *args):
-        match event.button:
-            case 1:  # left click
-                self.toggle_calendar()
-            case 2:  # middle click
-                self.do_cycle_next()
-            case 3:  # right click
-                self.do_cycle_prev()
-        return
-
-    def do_handle_scroll(self, _, event, *args):
-        match event.direction:
-            case Gdk.ScrollDirection.UP:  # scrolling up
-                self.do_cycle_next()
-            case Gdk.ScrollDirection.DOWN:  # scrolling down
-                self.do_cycle_prev()
-        return

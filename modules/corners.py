@@ -34,12 +34,12 @@ class CornerContainer(Box):
             h_expand=False,
             v_expand=False,
             style_classes=["corner-container"],
-            **kwargs,
             orientation="h",
         )
         self._name = name
         self._children = children
         self._position = position
+        self.kwargs = kwargs
 
         if not "left" in corners:
             self._add_children()
@@ -69,11 +69,13 @@ class CornerContainer(Box):
                     "Invalid corner specified, must be 'left' or 'right'")
 
     def _add_children(self):
+        kwargs = self.kwargs.copy()
+        kwargs["h_align"] = kwargs.get("h_align", "fill")
+        kwargs["v_align"] = kwargs.get("v_align", "fill")
+        kwargs["orientation"] = kwargs.get("orientation", "h")
         self.inner = Box(
             name=f"{self._name}-inner",
-            orientation="h",
-            h_align="fill",
-            v_align="fill",
+            **self.kwargs,
         )
         self.add(self.inner)
         for child in self._children:
@@ -85,7 +87,7 @@ class Corners(Window):
     def __init__(self):
         super().__init__(
             name="corners",
-            layer="top",
+            layer="overlay",
             anchor="top bottom left right",
             margin="-56px 0 0 0",
             exclusivity="normal",

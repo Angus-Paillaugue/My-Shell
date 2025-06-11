@@ -12,14 +12,25 @@ from modules.clipboard import ClipboardManager
 from modules.notification import NotificationPopup
 from modules.corners import Corners
 from modules.dock import Dock
+from fabric.notifications.service import Notifications
+from modules.notification import NotificationHistory
 
 if __name__ == "__main__":
     setproctitle.setproctitle(config.APP_NAME)
-    bar = Bar()
+    notification_server = Notifications()
+    notification_history = NotificationHistory(
+        notification_server=notification_server)
+    notification = NotificationPopup(
+        notification_server=notification_server,
+        notification_history=notification_history,
+    )
+    bar = Bar(
+        notification_server=notification_server,
+        notification_history=notification_history,
+    )
     launcher = AppLauncher()
     wallpaper_manager = WallpaperManager()
     clipboard_manager = ClipboardManager()
-    notification = NotificationPopup()
     corners = Corners()
     dock = Dock()
     app = Application(
