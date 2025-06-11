@@ -2,6 +2,7 @@
 
 # Variables
 app_name="My-Shell"
+app_name_lower=$(echo "$app_name" | tr '[:upper:]' '[:lower:]')
 project_dir="$HOME/.config/my-shell"
 release_branch="main"
 

@@ -4,7 +4,7 @@ here="$HOME/.config/my-shell"
 . ./.venv/bin/activate
 . "$here/workflows/shared.sh"
 python "$here/init.py"
-pkill $app_name
+pkill $app_name_lower
 uwsm app -- python "$here/app.py" >/dev/null 2>&1 &
 disown
 
