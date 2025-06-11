@@ -2,7 +2,7 @@
 
 requiredCommands=("yapf" "prettier" "shfmt")
 
-projectRoot="~/.config/my-shell"
+projectRoot="$HOME/.config/my-shell"
 cd "$projectRoot" || exit 1
 
 checkCommands() {

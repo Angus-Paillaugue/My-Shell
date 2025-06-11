@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-here=$(dirname "$(readlink -f "$0")")
+here="$HOME/.config/my-shell"
 . ./.venv/bin/activate
 . "$here/workflows/shared.sh"
 python "$here/init.py"

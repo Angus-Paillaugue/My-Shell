@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-project_dir="~/.config/my-shell"
+project_dir="$HOME/.config/my-shell"
 . "$project_dir/workflows/shared.sh"
 notification_app_name="󰚰 $app_name Updater"
 

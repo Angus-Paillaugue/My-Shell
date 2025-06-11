@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-project_dir="~/.config/my-shell"
+project_dir="$HOME/.config/my-shell"
 . "$project_dir/workflows/shared.sh"
 
 current_local_version=$(get_local_version)

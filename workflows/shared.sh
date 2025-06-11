@@ -2,13 +2,12 @@
 
 # Variables
 app_name="My-Shell"
-project_dir="~/.config/my-shell"
+project_dir="$HOME/.config/my-shell"
 release_branch="main"
 
 get_latest_version() {
   local latest_version
   latest_version=$(curl -s "https://raw.githubusercontent.com/Angus-Paillaugue/$app_name/refs/heads/$release_branch/VERSION")
-  echo "Latest version fetched: $latest_version"
   strip_latest_version="$(echo "$latest_version" | grep -Eo '^[0-9]+\.[0-9]+\.[0-9]+')"
   echo "$strip_latest_version"
 }
