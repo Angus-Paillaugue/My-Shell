@@ -224,8 +224,6 @@ class NotificationBox(Box):
     def get_container(self):
         return self._container
 
-    # Keep all other methods the same
-
     def close_notification(self):
         if not self._destroyed:
             # Add exit animation
@@ -519,7 +517,6 @@ class NotificationHistory(Box):
 
         self.LIMITED_APPS_HISTORY = ["Spotify"]
         self._server = notification_server
-        self._server.connect("notification-added", self.on_new_notification)
 
     def on_event(self, func):
         self.on_event = func
@@ -1007,6 +1004,7 @@ class NotificationHistory(Box):
         self.rebuild_with_separators()
         self._append_persistent_notification(notification_box,
                                              container.arrival_time)
+        self.emit("notification-added")
 
     def _append_persistent_notification(self, notification_box, arrival_time):
         print("Appending persistent notification")
@@ -1108,21 +1106,6 @@ class NotificationHistory(Box):
         ]
         self._save_persistent_history()
         self.rebuild_with_separators()
-
-    def on_new_notification(self, fabric_notif, id):
-        """Handles new notifications from the server."""
-        notification = fabric_notif.get_notification_from_id(id)
-        if not notification:
-            logger.warning(f"Notification with ID {id} not found.")
-            return
-
-        # Create a new NotificationBox for the notification
-        new_box = NotificationBox(notification)
-        new_box.set_container(self)
-
-        # Add the new notification to the history
-        self.add_notification(new_box)
-        self.emit("notification-added")
 
 
 class NotificationHistoryIndicator(Button):
@@ -1354,9 +1337,21 @@ class NotificationContainer(Box):
                 else:
                     notif_box.destroy()
 
-            elif (reason_str == "NotificationCloseReason.EXPIRED" or
-                  reason_str == "NotificationCloseReason.CLOSED" or
-                  reason_str == "NotificationCloseReason.UNDEFINED"):
+                # Don't add dismissed notifications to history
+                # And make sure they're not in history already (could have been added by another process)
+                notification_id = notification.id
+                for container in list(notification_history_instance.containers):
+                    if (hasattr(container, 'notification_box') and hasattr(
+                            container.notification_box, 'notification') and
+                            hasattr(container.notification_box.notification,
+                                    'id') and
+                            str(container.notification_box.notification.id)
+                            == str(notification_id)):
+                        notification_history_instance.delete_historical_notification(
+                            notification_id, container)
+                        break
+
+            elif (reason_str == "NotificationCloseReason.EXPIRED"):
                 logger.info(
                     f"Adding notification {notification.id} to history (reason: {reason_str})"
                 )
@@ -1366,8 +1361,27 @@ class NotificationContainer(Box):
                     self.visible_notifications.remove(notif_box)
                     self._animate_notification_removal(notif_box)
 
+                # Add to history only when expired naturally
                 notif_box.set_is_history(True)
                 notif_box.stop_timeout()
+
+                # Add the notification to history
+                notification_history_instance.add_notification(notif_box)
+
+            elif (reason_str == "NotificationCloseReason.CLOSED" or
+                  reason_str == "NotificationCloseReason.UNDEFINED"):
+                logger.info(
+                    f"Processing notification {notification.id} with reason: {reason_str}"
+                )
+
+                # Remove from visible_notifications
+                if notif_box in self.visible_notifications:
+                    self.visible_notifications.remove(notif_box)
+                    self._animate_notification_removal(notif_box)
+
+                # Don't add to history for these cases - user likely closed it
+                # from somewhere else in the system
+                notif_box.destroy()
             else:
                 logger.warning(
                     f"Unknown close reason: {reason_str} for notification {notification.id}. Defaulting to destroy."
