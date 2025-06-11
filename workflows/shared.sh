@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 # Variables
-here=$(dirname "$(readlink -f "$0")")
-project_dir=$(realpath "$here/..")
-app_name=$(cat $project_dir/services/config.py | grep -E "^APP_NAME\s*=" | sed -E "s/^APP_NAME\s*=\s*['\"]?([^'\"]+)['\"]?/\1/")
+app_name="My-Shell"
+project_dir="~/.config/my-shell"
 release_branch="main"
 
 get_latest_version() {
   local latest_version
-  latest_version=$(curl -s "https://raw.githubusercontent.com/Angus-Paillaugue/My-Shell/refs/heads/$release_branch/VERSION")
+  latest_version=$(curl -s "https://raw.githubusercontent.com/Angus-Paillaugue/$app_name/refs/heads/$release_branch/VERSION")
+  echo "Latest version fetched: $latest_version"
   strip_latest_version="$(echo "$latest_version" | grep -Eo '^[0-9]+\.[0-9]+\.[0-9]+')"
   echo "$strip_latest_version"
 }

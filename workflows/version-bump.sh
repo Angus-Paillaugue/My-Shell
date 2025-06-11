@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-here=$(dirname "$(readlink -f "$0")")
-project_dir=$(realpath "$here/..")
+project_dir="~/.config/my-shell"
 . "$project_dir/workflows/shared.sh"
 
 current_local_version=$(get_local_version)

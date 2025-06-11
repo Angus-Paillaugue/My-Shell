@@ -2,8 +2,7 @@
 
 requiredCommands=("yapf" "prettier" "shfmt")
 
-here=$(dirname "$(readlink -f "$0")")
-projectRoot=$(realpath "$here/..")
+projectRoot="~/.config/my-shell"
 cd "$projectRoot" || exit 1
 
 checkCommands() {

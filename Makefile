@@ -1,7 +1,7 @@
 requirements:
 	poetry export -f requirements.txt --without-hashes -o requirements.txt
 dev:
-	GTK_DEBUG=interactive DEV_MODE=true python ./app.py	
+	GTK_DEBUG=interactive DEV_MODE=true python app.py
 init:
 	python init.py
 venv:
@@ -11,7 +11,7 @@ install:
 install-dev:
 	poetry install --with dev
 run:
-	python app.py
+	./run.sh
 version-bump:
 	./workflows/version-bump.sh
 format:
