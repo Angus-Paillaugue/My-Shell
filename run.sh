@@ -5,7 +5,8 @@ here=$(dirname "$(readlink -f "$0")")
 . "$here/workflows/shared.sh"
 python "$here/init.py"
 pkill $app_name
-uwsm app -- python "$here/app.py" >/dev/null 2>&1 & disown
+uwsm app -- python "$here/app.py" >/dev/null 2>&1 &
+disown
 
 # Run update script
 bash "$here/workflows/update.sh"

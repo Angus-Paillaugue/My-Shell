@@ -53,16 +53,14 @@ class WeatherWorker(Service):
                 self.update_thread_active = True
                 return
             elements_list = [el for el in res.text.split(" ") if el != ""]
-            if (
-                not all(isinstance(item, str) for item in elements_list)
-                or len(elements_list) != 2
-            ):
+            if (not all(isinstance(item, str) for item in elements_list) or
+                    len(elements_list) != 2):
                 logger.error("Weather data format is incorrect.")
                 self._weather.set_weather(icon=None, temperature=None)
             else:
-                self._weather.set_weather(
-                    icon=elements_list[0], temperature=elements_list[1].replace("+", "")
-                )
+                self._weather.set_weather(icon=elements_list[0],
+                                          temperature=elements_list[1].replace(
+                                              "+", ""))
                 logger.info(f"Weather updated: {self._weather}")
             self.update_thread_active = True
 
@@ -103,9 +101,8 @@ class WeatherButton(Button):
         self.weather_fabricator = Fabricator(
             poll_from=lambda v: self.weather_worker.update_weather(),
             on_changed=lambda f, v: self._build(),
-            interval=1000
-            * 60
-            * update_interval,  # Update every update_interval (10) minutes
+            interval=1000 * 60 *
+            update_interval,  # Update every update_interval (10) minutes
             stream=False,
             default_value=0,
         )

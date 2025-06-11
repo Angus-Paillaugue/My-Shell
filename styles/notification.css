@@ -46,10 +46,6 @@
   min-width: 330px;
 }
 
-#notification-navigation {
-  padding: 16px;
-}
-
 #notif-close-button {
   background-color: var(--surface);
   border-radius: 8px;
@@ -74,36 +70,14 @@
   color: var(--shadow);
 }
 
-#nav-button {
+/* Notification history window */
+#notification-history {
+  background-color: var(--shadow);
+  border: 1px solid var(--surface-bright);
   padding: 8px;
-  border-radius: 8px;
-  background: var(--shadow);
-  border: 2px solid var(--surface);
-  margin-top: -12px;
-}
-
-#nav-button:hover {
-  background: var(--surface-bright);
-}
-
-#nav-button:disabled #nav-button-label {
-  color: var(--surface-bright);
-}
-
-#nav-button-label {
-  font-size: 16px;
-}
-
-#nav-button-label.close {
-  color: var(--red-dim);
-}
-
-#nav-button:hover #nav-button-label {
-  color: var(--primary);
-}
-
-#nav-button:hover #nav-button-label.close {
-  color: var(--red-dim);
+  border-radius: 12px;
+  min-width: 700px;
+  min-height: 500px;
 }
 
 #notification-history scrollbar {
@@ -211,4 +185,49 @@
   opacity: 0;
   margin-left: 20px;
   transition: all 250ms ease-in;
+}
+
+/* Button indicator */
+#notification-history-indicator {
+  padding: 8px;
+  font-weight: bold;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#notification-history-indicator:hover,
+#notification-history-indicator:focus {
+  border-radius: 20px;
+  background-color: var(--surface-bright);
+}
+#notification-counter {
+  background-color: var(--red-dim);
+  color: var(--foreground);
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 14px;
+  min-height: 14px;
+  border-radius: 50%;
+  padding: 2px;
+  margin-left: -8px;
+  margin-bottom: 8px;
+}
+
+#notification-history-indicator:hover #notification-history-icon {
+  color: var(--primary);
+}
+#notification-history-indicator:active {
+  background-color: var(--primary);
+}
+#notification-history-indicator:active #notification-history-icon {
+  color: var(--shadow);
+}
+#notification-history-icon {
+  font-size: 18px;
+}
+#notification-history-indicator.notification-indicator-active {
+  background-color: var(--primary);
+  border-radius: 20px;
+}
+#notification-history-indicator.notification-indicator-active
+  #notification-history-icon {
+  color: var(--shadow);
 }

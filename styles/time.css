@@ -19,6 +19,12 @@
 #time:active label {
   color: var(--shadow);
 }
+#time-label,
+#date-label {
+  color: var(--foreground);
+  font-size: 16px;
+  font-weight: bold;
+}
 
 #calendar-container {
   background-color: var(--shadow);

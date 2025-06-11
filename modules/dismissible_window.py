@@ -49,3 +49,12 @@ class DismissibleWindow(Window):
     def hide(self):
         self.inner_window.hide()
         super().hide()
+
+    def is_visible(self):
+        return self.inner_window.get_visible()
+
+    def toggle(self):
+        if self.is_visible():
+            self.hide()
+        else:
+            self.show()

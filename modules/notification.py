@@ -15,6 +15,7 @@ from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import GdkPixbuf, GLib, Gtk
 from fabric.widgets.wayland import WaylandWindow
 from services.logger import logger
+from modules.dismissible_window import DismissibleWindow
 
 import modules.icons as icons
 from services.config import APP_NAME
@@ -155,7 +156,7 @@ class ActionButton(Button):
 
 class NotificationBox(Box):
 
-    def __init__(self, notification: Notification, timeout_ms=50000, **kwargs):
+    def __init__(self, notification: Notification, timeout_ms=5000, **kwargs):
         super().__init__(
             name="notification-box",
             orientation="v",
@@ -450,7 +451,10 @@ class HistoricalNotification(object):
 
 class NotificationHistory(Box):
 
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 notification_server: Notifications,
+                 on_event=None,
+                 **kwargs):
         super().__init__(name="notification-history", orientation="v", **kwargs)
 
         self.containers = []
@@ -460,24 +464,29 @@ class NotificationHistory(Box):
             h_align="start",
             h_expand=True,
         )
-        self.header_switch = Gtk.Switch(name="dnd-switch")
-        self.header_switch.set_vexpand(False)
-        self.header_switch.set_valign(Gtk.Align.CENTER)
-        self.header_switch.set_active(False)
+        self.dnd_switch_label = Label(
+            name="dnd-switch-label",
+            markup=icons.notification,
+        )
+        self.dnd_switch = Button(
+            name="dnd-switch",
+            style_classes=["bar-action-button"],
+            child=self.dnd_switch_label,
+            on_clicked=lambda *_: self.on_do_not_disturb_changed(),
+            tooltip_text="Enable Do Not Disturb",
+        )
         self.header_clean = Button(
             name="nhh-button",
             child=Label(name="nhh-button-label", markup=icons.trash),
             on_clicked=self.clear_history,
         )
+        self.on_event = on_event
         self.do_not_disturb_enabled = False
-        self.header_switch.connect("notify::active",
-                                   self.on_do_not_disturb_changed)
-        self.dnd_label = Label(name="dnd-label", markup=icons.notifications_off)
 
         self.history_header = CenterBox(
             name="notification-history-header",
             spacing=8,
-            start_children=[self.header_switch, self.dnd_label],
+            start_children=[self.dnd_switch],
             center_children=[self.header_label],
             end_children=[self.header_clean],
         )
@@ -490,23 +499,6 @@ class NotificationHistory(Box):
             h_align="fill",
             v_align="fill",
         )
-        self.no_notifications_label = Label(
-            name="no-notif",
-            markup=icons.notifications_clear,
-            v_align="fill",
-            h_align="fill",
-            v_expand=True,
-            h_expand=True,
-            justification="center",
-        )
-        self.no_notifications_box = Box(
-            name="no-notifications-box",
-            v_align="fill",
-            h_align="fill",
-            v_expand=True,
-            h_expand=True,
-            children=[self.no_notifications_label],
-        )
         self.scrolled_window = ScrolledWindow(
             name="notification-history-scrolled-window",
             orientation="v",
@@ -517,12 +509,7 @@ class NotificationHistory(Box):
             propagate_width=False,
             propagate_height=False,
         )
-        self.scrolled_window_viewport_box = Box(
-            orientation="v",
-            children=[self.notifications_list, self.no_notifications_box],
-        )
-        self.scrolled_window.add_with_viewport(
-            self.scrolled_window_viewport_box)
+        self.scrolled_window.add_with_viewport(self.notifications_list)
         self.persistent_notifications = []
         self.add(self.history_header)
         self.add(self.scrolled_window)
@@ -531,6 +518,14 @@ class NotificationHistory(Box):
         self.schedule_midnight_update()
 
         self.LIMITED_APPS_HISTORY = ["Spotify"]
+        self._server = notification_server
+        self._server.connect("notification-added", self.on_new_notification)
+
+    def on_event(self, func):
+        self.on_event = func
+
+    def emit(self, signal_name, *args):
+        self.on_event(signal_name, *args)
 
     def get_ordinal(self, n):
         if 11 <= (n % 100) <= 13:
@@ -617,13 +612,17 @@ class NotificationHistory(Box):
                     self.notifications_list.remove(child)
 
         self.notifications_list.show_all()
-        self.update_no_notifications_label_visibility()
 
-    def on_do_not_disturb_changed(self, switch, pspec):
-        self.do_not_disturb_enabled = switch.get_active()
+    def on_do_not_disturb_changed(self):
+        self.do_not_disturb_enabled = not self.do_not_disturb_enabled
         logger.info(
             f"Do Not Disturb mode {'enabled' if self.do_not_disturb_enabled else 'disabled'}"
         )
+        self.dnd_switch_label.set_markup(icons.notification if not self.
+                                         do_not_disturb_enabled else icons.dnd)
+        self.dnd_switch.set_tooltip_text(
+            "Disable Do Not Disturb" if self.
+            do_not_disturb_enabled else "Enable Do Not Disturb")
 
     def clear_history(self, *args):
         for child in self.notifications_list.get_children()[:]:
@@ -645,6 +644,7 @@ class NotificationHistory(Box):
         self.persistent_notifications = []
         self.containers = []
         self.rebuild_with_separators()
+        self.emit("notification-deleted")
 
     def _load_persistent_history(self):
         if not os.path.exists(PERSISTENT_DIR):
@@ -657,46 +657,78 @@ class NotificationHistory(Box):
                     self._add_historical_notification(note)
             except Exception as e:
                 logger.error(f"Error loading persistent history: {e}")
-        GLib.idle_add(self.update_no_notifications_label_visibility)
-
-    def _save_persistent_history(self):
-        try:
-            with open(PERSISTENT_HISTORY_FILE, "w") as f:
-                json.dump(self.persistent_notifications, f)
-        except Exception as e:
-            logger.error(f"Error saving persistent history: {e}")
 
     def delete_historical_notification(self, note_id, container):
+        """Delete a historical notification and remove it from persistent storage."""
+        # Convert note_id to string for consistent comparison
+        target_note_id_str = str(note_id)
+        logger.debug(
+            f"Attempting to delete notification {target_note_id_str} from history"
+        )
+
+        # First cleanup notification box resources
         if hasattr(container, "notification_box"):
             notif_box = container.notification_box
             notif_box.destroy(from_history_delete=True)
 
-        target_note_id_str = str(note_id)
-
+        # Create new list excluding the notification to delete
         new_persistent_notifications = []
         removed_from_list = False
+
         for note_in_list in self.persistent_notifications:
             current_note_id_str = str(note_in_list.get("id"))
             if current_note_id_str == target_note_id_str:
                 removed_from_list = True
-
+                logger.debug(
+                    f"Found notification {target_note_id_str} in persistent list, removing"
+                )
                 continue
             new_persistent_notifications.append(note_in_list)
 
+        # Update the list and save if changed
         if removed_from_list:
             self.persistent_notifications = new_persistent_notifications
             logger.info(
-                f"Notification with ID {target_note_id_str} was marked for removal from persistent_notifications list."
-            )
-        else:
-            logger.warning(
-                f"Notification with ID {target_note_id_str} was NOT found in persistent_notifications list. The list remains unchanged."
+                f"Notification {target_note_id_str} removed from persistent_notifications list"
             )
 
-        self._save_persistent_history()
-        container.destroy()
+            self._save_persistent_history()
+        else:
+            logger.warning(
+                f"Notification {target_note_id_str} NOT found in persistent_notifications list"
+            )
+
+        # Remove from containers list
         self.containers = [c for c in self.containers if c != container]
+
+        # Ensure the container is removed from the UI
+        parent = container.get_parent()
+        if parent:
+            parent.remove(container)
+        container.destroy()
+
+        # Update UI
         self.rebuild_with_separators()
+
+        # Notify about deletion for counter update
+        self.emit("notification-deleted")
+
+    def _save_persistent_history(self):
+        """Improved persistent history saving with atomic writes."""
+        try:
+            # Ensure directory exists
+            os.makedirs(PERSISTENT_DIR, exist_ok=True)
+
+            # Write to a temporary file first
+            temp_file = f"{PERSISTENT_HISTORY_FILE}.tmp"
+            with open(temp_file, "w") as f:
+                json.dump(self.persistent_notifications, f)
+
+            # Then atomically move it to the target file
+            os.replace(temp_file, PERSISTENT_HISTORY_FILE)
+            logger.debug("Persistent notification history saved successfully")
+        except Exception as e:
+            logger.error(f"Error saving persistent history: {e}")
 
     def _add_historical_notification(self, note):
         hist_notif = HistoricalNotification(
@@ -829,7 +861,6 @@ class NotificationHistory(Box):
         container.add(content_box)
         self.containers.insert(0, container)
         self.rebuild_with_separators()
-        self.update_no_notifications_label_visibility()
 
     def add_notification(self, notification_box):
         app_name = notification_box.notification.app_name
@@ -855,23 +886,21 @@ class NotificationHistory(Box):
                     )
             oldest_container.destroy()
 
-        def on_container_destroy(container):
-            if (hasattr(container, "_timestamp_timer_id") and
-                    container._timestamp_timer_id):
-                GLib.source_remove(container._timestamp_timer_id)
-            if hasattr(container, "notification_box"):
-                notif_box = container.notification_box
-            container.destroy()
-            self.containers.remove(container)
-            self.rebuild_with_separators()
-            self.update_no_notifications_label_visibility()
-
         container = Box(
             name="notification-container",
             orientation="v",
             h_align="fill",
             h_expand=True,
         )
+
+        def on_container_destroy(container, notification_box):
+            if (hasattr(container, "_timestamp_timer_id") and
+                    container._timestamp_timer_id):
+                GLib.source_remove(container._timestamp_timer_id)
+            self.delete_historical_notification(notification_box.uuid,
+                                                container)
+            self.rebuild_with_separators()
+
         container.arrival_time = datetime.now()
 
         def compute_time_label(arrival_time):
@@ -947,7 +976,8 @@ class NotificationHistory(Box):
         self.current_notif_close_button = Button(
             name="notif-close-button",
             child=Label(name="notif-close-label", markup=icons.cancel),
-            on_clicked=lambda *_: on_container_destroy(container),
+            on_clicked=lambda *_: on_container_destroy(container,
+                                                       notification_box),
         )
         self.current_notif_close_button_box = Box(
             orientation="v",
@@ -972,16 +1002,14 @@ class NotificationHistory(Box):
             h_expand=True,
         )
         hist_box.add(content_box)
-        content_box.get_children()[2].get_children()[0].connect(
-            "clicked", lambda *_: on_container_destroy(container))
         container.add(hist_box)
         self.containers.insert(0, container)
         self.rebuild_with_separators()
         self._append_persistent_notification(notification_box,
                                              container.arrival_time)
-        self.update_no_notifications_label_visibility()
 
     def _append_persistent_notification(self, notification_box, arrival_time):
+        print("Appending persistent notification")
         note = {
             "id": notification_box.uuid,
             "app_icon": notification_box.notification.app_icon,
@@ -1042,11 +1070,6 @@ class NotificationHistory(Box):
             logger.info(
                 "Orphan cached image cleanup finished. No orphan images found.")
 
-    def update_no_notifications_label_visibility(self):
-        has_notifications = bool(self.containers)
-        self.no_notifications_box.set_visible(not has_notifications)
-        self.notifications_list.set_visible(has_notifications)
-
     def clear_history_for_app(self, app_name):
         """Clears all notifications in history for a specific app."""
         containers_to_remove = []
@@ -1085,7 +1108,87 @@ class NotificationHistory(Box):
         ]
         self._save_persistent_history()
         self.rebuild_with_separators()
-        self.update_no_notifications_label_visibility()
+
+    def on_new_notification(self, fabric_notif, id):
+        """Handles new notifications from the server."""
+        notification = fabric_notif.get_notification_from_id(id)
+        if not notification:
+            logger.warning(f"Notification with ID {id} not found.")
+            return
+
+        # Create a new NotificationBox for the notification
+        new_box = NotificationBox(notification)
+        new_box.set_container(self)
+
+        # Add the new notification to the history
+        self.add_notification(new_box)
+        self.emit("notification-added")
+
+
+class NotificationHistoryIndicator(Button):
+
+    def __init__(self, notification_history: NotificationHistory, **kwargs):
+        super().__init__(
+            name="notification-history-indicator",
+            h_align="center",
+            v_align="center",
+            **kwargs,
+        )
+        self.set_tooltip_text("Notification History")
+
+        # Create notification history component
+        self.notification_history = notification_history
+        self.notification_history.on_event = self.on_notification_history_event
+
+        # Create dismissible window to hold the history
+        self.history_window = DismissibleWindow(anchor="top center",)
+
+        # Create container for icon and counter
+        self._container = Box(
+            name="notification-history-container",
+            spacing=0,
+        )
+
+        # Bell icon
+        self.icon = Label(name="notification-history-icon",
+                          markup=icons.notification)
+
+        # Add components to container
+        self.add(self.icon)
+
+        self.history_window.add(self.notification_history)
+
+        # Track notification count
+        self.notification_count = len(
+            self.notification_history.persistent_notifications)
+        self.update_counter()
+        self.connect("clicked", self.toggle_history_window)
+
+    def toggle_history_window(self, *args):
+        """Toggle notification history window visibility."""
+        self.history_window.toggle()
+
+    def on_notification_history_event(self, signal_name, *args):
+        """Handle notification history events with proper count management."""
+        self.notification_count = len(
+            self.notification_history.persistent_notifications)
+        match signal_name:
+            case "notification-added":
+                self.update_counter()
+            case "notification-deleted":
+                self.update_counter()
+            case _:
+                logger.warning(
+                    f"Unhandled notification history event: {signal_name}")
+
+    def update_counter(self):
+        """Update notification counter display with proper state management."""
+
+        # Update UI based on count
+        if self.notification_count > 0:
+            self.add_style_class("notification-indicator-active")
+        else:
+            self.remove_style_class("notification-indicator-active")
 
 
 class NotificationContainer(Box):
@@ -1101,7 +1204,7 @@ class NotificationContainer(Box):
                          spacing=4)
         self.notification_history = notification_history_instance
 
-        self._server = Notifications()
+        self._server = self.notification_history._server
         self._server.connect("notification-added", self.on_new_notification)
         self._pending_removal = False
         self._is_destroying = False
@@ -1124,7 +1227,7 @@ class NotificationContainer(Box):
         self.main_revealer = Revealer(
             name="notification-main-revealer",
             transition_type=revealer_transition_type,
-            transition_duration=300,  # Slightly longer animation
+            transition_duration=300,
             child_revealed=False,
             child=self.notification_box_container,
         )
@@ -1145,7 +1248,6 @@ class NotificationContainer(Box):
             new_box = NotificationBox(notification)
             if notification.image_pixbuf:
                 cache_notification_pixbuf(new_box)
-            notification_history_instance.add_notification(new_box)
             return
 
         notification = fabric_notif.get_notification_from_id(id)
@@ -1265,7 +1367,6 @@ class NotificationContainer(Box):
                     self._animate_notification_removal(notif_box)
 
                 notif_box.set_is_history(True)
-                notification_history_instance.add_notification(notif_box)
                 notif_box.stop_timeout()
             else:
                 logger.warning(
@@ -1335,7 +1436,8 @@ class NotificationContainer(Box):
 
 class NotificationPopup(WaylandWindow):
 
-    def __init__(self, **kwargs):
+    def __init__(self, notification_server: Notifications,
+                 notification_history: NotificationHistory, **kwargs):
         y_pos = "top"
         x_pos = "right"
 
@@ -1350,9 +1452,9 @@ class NotificationPopup(WaylandWindow):
         )
 
         self.widgets = kwargs.get("widgets", None)
+        self._notification_server = notification_server
 
-        self.notification_history = (self.widgets.notification_history
-                                     if self.widgets else NotificationHistory())
+        self.notification_history = notification_history
         self.notification_container = NotificationContainer(
             notification_history_instance=self.notification_history,
             revealer_transition_type="slide-down"
