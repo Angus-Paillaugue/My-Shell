@@ -12,6 +12,7 @@ class SystemTray(Box):
         super().__init__(
             name="systray",
             orientation=Gtk.Orientation.HORIZONTAL,
+            style_classes=["bar-item"],
             spacing=8,
             **kwargs,
         )

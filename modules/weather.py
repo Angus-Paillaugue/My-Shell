@@ -74,6 +74,7 @@ class WeatherButton(Button):
     def __init__(self, update_interval=10, **kwargs):
         super().__init__(
             name="weather-button",
+            style_classes=["bar-item"],
             **kwargs,
         )
         self.weather_worker = WeatherWorker()

@@ -1,16 +1,13 @@
-
-
-/* Bar height items are 40px ! */
 #bar-start-container,
 #bar-end-container {
   padding: 8px;
   padding-bottom: 0;
 }
-#bar-start-container-inner,
-#bar-end-container-inner {
+.bar-item {
   background-color: var(--shadow);
   border-radius: 20px;
-  padding: 4px;
+  padding: 0 10px;
+  min-height: 46px;
 }
 #bar-center-container-inner {
   background-color: var(--shadow);

@@ -1,18 +1,26 @@
-from modules.time import Time
-from modules.corners import CornerContainer
-from modules.notification import NotificationHistoryIndicator, NotificationHistory
-from gi.repository import Gdk
+import json
+from gi.repository import Gtk, Gdk, GLib
+
+from fabric.hyprland.widgets import get_hyprland_connection
+from fabric.hyprland.service import HyprlandEvent
+from fabric.utils.helpers import get_desktop_applications
 from fabric.widgets.eventbox import EventBox
-from services.logger import logger
 from fabric.widgets.stack import Stack
-from modules.time import CalendarBox as Calendar
 from fabric.widgets.wayland import WaylandWindow
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.revealer import Revealer
-from gi.repository import Gtk
 from fabric.widgets.box import Box
+from fabric.widgets.image import Image
 from fabric.widgets.button import Button
+from fabric.widgets.label import Label
+from fabric.widgets.centerbox import CenterBox
+
+from services.logger import logger
+
+from modules.corners import CornerContainer
+from modules.notification import NotificationHistory, NotificationHistoryIndicator
+from modules.time import CalendarBox as Calendar
 from modules.bluetooth import BluetoothButton
 from modules.battery import Battery
 from modules.brightness import BrightnessRow
@@ -23,21 +31,23 @@ from modules.wifi import WifiModule
 from modules.wired import Wired
 from modules.screenshot import ScreenshotButton
 from modules.screen_record import ScreenRecordButton
-from fabric.widgets.centerbox import CenterBox
 from modules.wallpaper import WallpaperManager
 from modules.launcher import AppLauncher
 
+
 class NotchWidgetPicker(Revealer):
+    """Buttons at the top of the notch used to switch tab (launcher, networking, wallpaper, etc.)"""
+
     def __init__(self, notch):
         super().__init__(
-            transition_duration=300,
+            transition_duration=400,
             transition_type="slide-right",
             child_revealed=False,
             visible=True,
             all_visible=True,
         )
         self.revealer_2 = Revealer(
-            transition_duration=300,
+            transition_duration=400,
             transition_type="slide-down",
             child_revealed=False,
             visible=True,
@@ -83,12 +93,12 @@ class NotchWidgetPicker(Revealer):
         self.add(self.revealer_2)
 
     def show(self):
-        self.set_reveal_child(True)
         self.revealer_2.set_reveal_child(True)
+        self.set_reveal_child(True)
 
     def hide(self):
-        self.set_reveal_child(False)
         self.revealer_2.set_reveal_child(False)
+        self.set_reveal_child(False)
         if hasattr(self.notch.inner._contents.get_visible_child(), "cleanup"):
             # If the visible child has a collapse_slots method, call it
             self.notch.inner._contents.get_visible_child().cleanup()
@@ -102,10 +112,12 @@ class NotchWidgetPicker(Revealer):
                 else:
                     button.remove_style_class("active")
         else:
-            logger.error(f"Index {index} is out of range for NotchWidgetPicker buttons.")
+            logger.error(
+                f"Index {index} is out of range for NotchWidgetPicker buttons.")
 
 
 class NotchWidgetDefaultExpanded(Box):
+    """Default widget when hovering the notch, showing various modules like wifi, bluetooth, volume, etc."""
 
     def __init__(self, notification_history: NotificationHistory):
         super().__init__(
@@ -118,7 +130,8 @@ class NotchWidgetDefaultExpanded(Box):
         self.battery = Battery()
         self.power_profile = PowerProfile()
         self.power_menu_actions = PowerMenuActions()
-        self.power_menu_button = PowerMenuButton(power_actions=self.power_menu_actions)
+        self.power_menu_button = PowerMenuButton(
+            power_actions=self.power_menu_actions)
         self.bluetooth_devices_dropdown_slot = Box()
         self.wifi_networks_dropdown_slot = Box()
         self.audio_outputs_dropdown_slot = Box()
@@ -126,7 +139,8 @@ class NotchWidgetDefaultExpanded(Box):
         self.wired_networks_dropdown_slot = Box()
         self.mic_module = MicRow(slot=self.mic_inputs_dropdown_slot)
         self.volume_module = VolumeRow(slot=self.audio_outputs_dropdown_slot)
-        self.bluetooth = BluetoothButton(slot=self.bluetooth_devices_dropdown_slot)
+        self.bluetooth = BluetoothButton(
+            slot=self.bluetooth_devices_dropdown_slot)
         self.wifi_module = WifiModule(slot=self.wifi_networks_dropdown_slot)
         self.network_module = Wired(slot=self.wired_networks_dropdown_slot)
         self.screenshot_button = ScreenshotButton()
@@ -192,9 +206,7 @@ class NotchWidgetDefaultExpanded(Box):
             self.settings_container.add(item)
         self.add(self.settings_container)
 
-        self.second_row = Box(
-            spacing=8,
-        )
+        self.second_row = Box(spacing=8,)
         self.notification_history = notification_history
         self.calendar = Calendar()
         self.second_row.add(self.calendar)
@@ -213,20 +225,186 @@ class NotchWidgetDefaultExpanded(Box):
 
 
 class NotchWidgetDefault(Box):
-    def __init__(self, notification_history: NotificationHistory):
+    """Default widget for the notch (when not hovering the notch, this will be displayed), showing the current active window and its icon"""
+
+    def __init__(self):
         super().__init__(
             orientation="h",
             spacing=8,
+            v_align="center",
+            h_align="center",
+            name="notch-widget-default",
         )
-        self.notification_history_indicator = NotificationHistoryIndicator(
-            notification_history=notification_history
+        self.update_app_map()
+        self.conn = get_hyprland_connection()
+        self._current_window_class = self._get_current_window_class()
+        self.conn.connect("event::activewindow", self.on_active_window_changed)
+        self.active_window = Label(
+            h_expand=False,
+            label=" ",
+            h_align="start",
+            v_align="center",
         )
-        self.time = Time()
-        self.add(self.notification_history_indicator)
-        self.add(self.time)
+        self.window_icon = Image(
+            name="notch-window-icon",
+            icon_name="application-x-executable",
+            v_align="center",
+            h_align="center",
+            icon_size=20,
+        )
+        self.add(self.window_icon)
+        self.add(self.active_window)
+
+    def update_window_icon(self, *args):
+        """Update the window icon based on the current active window title"""
+
+        label_widget = self.active_window
+        if not isinstance(label_widget, Gtk.Label):
+            return
+        self.window_icon.set_visible(True)
+
+        conn = get_hyprland_connection()
+        if conn:
+            try:
+                active_window_json = conn.send_command(
+                    "j/activewindow").reply.decode()
+                active_window_data = json.loads(active_window_json)
+                app_id = active_window_data.get(
+                    "initialClass", "") or active_window_data.get("class", "")
+
+                icon_size = 20
+                desktop_app = self.find_app(app_id)
+
+                icon_pixbuf = None
+                if desktop_app:
+                    icon_pixbuf = desktop_app.get_icon_pixbuf(size=icon_size)
+
+                if icon_pixbuf:
+                    self.window_icon.set_from_pixbuf(icon_pixbuf)
+                else:
+
+                    try:
+                        self.window_icon.set_from_icon_name(
+                            "application-x-executable", 20)
+                    except:
+
+                        self.window_icon.set_from_icon_name(
+                            "application-x-executable-symbolic", 20)
+            except Exception as e:
+                logger.error(f"Error updating window icon: {e}")
+                try:
+                    self.window_icon.set_from_icon_name(
+                        "application-x-executable", 20)
+                except:
+                    self.window_icon.set_from_icon_name(
+                        "application-x-executable-symbolic", 20)
+        else:
+            try:
+                self.window_icon.set_from_icon_name("application-x-executable",
+                                                    20)
+            except:
+                self.window_icon.set_from_icon_name(
+                    "application-x-executable-symbolic", 20)
+
+    def on_active_window_changed(self, _, event: HyprlandEvent):
+        if len(event.data) < 2:
+            return
+
+        def center_string(s, max_length=20):
+            """Center a string within a given length."""
+            if len(s) >= max_length:
+                return s[:max_length]
+            padding = (max_length - len(s)) // 2
+            return ' ' * padding + s + ' ' * (max_length - len(s) - padding)
+
+        class_name = event.data[0]
+        title = event.data[1]
+        if not class_name or not title:
+            self.active_window.set_label(center_string('Desktop'))
+        elif class_name != self._current_window_class:
+            self._current_window_class = class_name
+            window_name = f"{class_name[0].upper() + class_name[1:]} - {title}"
+            self.active_window.set_label(center_string(window_name))
+        self.update_window_icon()
+
+    def _get_current_window_class(self):
+        """Get the class of the currently active window"""
+        try:
+
+            conn = get_hyprland_connection()
+            if conn:
+                import json
+
+                active_window_json = conn.send_command(
+                    "j/activewindow").reply.decode()
+                active_window_data = json.loads(active_window_json)
+                return active_window_data.get(
+                    "initialClass", "") or active_window_data.get("class", "")
+        except Exception as e:
+            logger.error(f"Error getting window class: {e}")
+        return ""
+
+    def find_app(self, app_identifier):
+        if not app_identifier:
+            return None
+        if isinstance(app_identifier, dict):
+            for key in [
+                    "window_class",
+                    "executable",
+                    "command_line",
+                    "name",
+                    "display_name",
+            ]:
+                if key in app_identifier and app_identifier[key]:
+                    app = self.find_app_by_key(app_identifier[key])
+                    if app:
+                        return app
+            return None
+        return self.find_app_by_key(app_identifier)
+
+    def find_app_by_key(self, key_value):
+        if not key_value:
+            return None
+        normalized_id = str(key_value).lower()
+        if normalized_id in self.app_identifiers:
+            return self.app_identifiers[normalized_id]
+        for app in self._all_apps:
+            if app.name and normalized_id in app.name.lower():
+                return app
+            if app.display_name and normalized_id in app.display_name.lower():
+                return app
+            if app.window_class and normalized_id in app.window_class.lower():
+                return app
+            if app.executable and normalized_id in app.executable.lower():
+                return app
+            if app.command_line and normalized_id in app.command_line.lower():
+                return app
+        return None
+
+    def update_app_map(self):
+        self._all_apps = get_desktop_applications()
+        self.app_map = {app.name: app for app in self._all_apps if app.name}
+        self.app_identifiers = self._build_app_identifiers_map()
+
+    def _build_app_identifiers_map(self):
+        identifiers = {}
+        for app in self._all_apps:
+            if app.name:
+                identifiers[app.name.lower()] = app
+            if app.display_name:
+                identifiers[app.display_name.lower()] = app
+            if app.window_class:
+                identifiers[app.window_class.lower()] = app
+            if app.executable:
+                identifiers[app.executable.split("/")[-1].lower()] = app
+            if app.command_line:
+                identifiers[app.command_line.split()[0].split("/")
+                            [-1].lower()] = app
+        return identifiers
 
 
 class NotchInner(CornerContainer):
+    """Container for the notch widgets, allowing switching between them"""
 
     def __init__(
         self,
@@ -234,12 +412,9 @@ class NotchInner(CornerContainer):
         notch_widget_picker: NotchWidgetPicker,
     ):
         self.notch_widget_picker = notch_widget_picker
-        self.notch_widget_default = NotchWidgetDefault(
-            notification_history=notification_history
-        )
+        self.notch_widget_default = NotchWidgetDefault()
         self.notch_widget_default_expanded = NotchWidgetDefaultExpanded(
-            notification_history=notification_history
-        )
+            notification_history=notification_history)
         self.launcher = AppLauncher()
         self.notch_widget_wallpaper = WallpaperManager()
 
@@ -253,17 +428,19 @@ class NotchInner(CornerContainer):
                 self.notch_widget_wallpaper,
             ],
             interpolate_size=True,
-            h_expand=False
+            h_expand=False,
         )
         self._contents.set_homogeneous(False)
-        self._contents.set_visible_child(self._contents.get_children()[0])  # Show the default widget initially
-
+        self._contents.set_visible_child(
+            self._contents.get_children()
+            [0])  # Show the default widget initially
 
         super().__init__(
             name="bar-center-container",
             corners=["left", "right"],
             height=30,
             v_align="center",
+            h_align="center",
             orientation="v",
             children=[self.notch_widget_picker, self._contents],
         )
@@ -286,6 +463,7 @@ class NotchInner(CornerContainer):
 
 
 class Notch(EventBox):
+    """Main notch widget that contains the notch inner and the widget picker"""
 
     def __init__(self, notification_history: NotificationHistory):
         self.notch_widget_picker = NotchWidgetPicker(self)
@@ -293,10 +471,14 @@ class Notch(EventBox):
             notification_history=notification_history,
             notch_widget_picker=self.notch_widget_picker,
         )
+        self.notification_history_indicator = NotificationHistoryIndicator(
+            notification_history=notification_history)
         self.hovered = False
 
         super().__init__(
-            child=self.inner,
+            child=Box(
+                orientation='h',
+                children=[self.notification_history_indicator, self.inner]),
             events=["leave-notify", "enter-notify"],
         )
         self.connect("enter-notify-event", self._on_mouse_enter)
@@ -307,7 +489,10 @@ class Notch(EventBox):
             self.hovered = True
             self.inner.add_style_class("hovered")
             self.notch_widget_picker.show()
-            if self.inner._contents.get_visible_child() is self.inner.notch_widget_default: # if we are still showing the default widget, move to the expanded one
+            self.notification_history_indicator.add_style_class("hidden")
+            self.notification_history_indicator.add_style_class("hovered")
+            if self.inner._contents.get_visible_child(
+            ) is self.inner.notch_widget_default:  # if we are still showing the default widget, move to the expanded one
                 self.inner.show_widget("default-expanded")
         return False  # Allow event propagation
 
@@ -319,8 +504,15 @@ class Notch(EventBox):
         if self.hovered:
             self.hovered = False
             self.inner.remove_style_class("hovered")
-            self.show_widget("default-expanded")
             self.notch_widget_picker.hide()
+            self.notification_history_indicator.remove_style_class("hovered")
+            # Show notification bell if has pending notifications to read
+            if self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd:
+                GLib.timeout_add(
+                    500,
+                    lambda *_: self.notification_history_indicator.
+                    remove_style_class("hidden"),
+                )
         return False  # Allow event propagation
 
     def show_widget(self, widget_name: str):
@@ -328,6 +520,8 @@ class Notch(EventBox):
 
 
 class NotchWindow(WaylandWindow):
+    """Window that contains the notch, used to display it on top of the screen"""
+
     def __init__(self, notification_history: NotificationHistory):
         super().__init__(
             anchor="top center",
@@ -338,8 +532,7 @@ class NotchWindow(WaylandWindow):
         self.notch = Notch(notification_history=notification_history)
         self._container = Box(
             name="notch-container",
-            orientation="v",
-            spacing=8,
+            orientation="h",
         )
         self._container.add(self.notch)
         self.add(self._container)

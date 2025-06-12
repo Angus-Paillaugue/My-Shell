@@ -318,8 +318,7 @@ class Wired(Box):
                     ),
                     self.wired_status_text,
                 ],
-            )
-        )
+            ))
         self.add(self.left_button)
         self.add(self.wired_networks_open_button)
 

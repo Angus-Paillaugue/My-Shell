@@ -32,25 +32,20 @@ class Bar(WaylandWindow):
 
         self.start_box = Box(
             name="bar-start-container",
-            children=Box(
-                name="bar-start-container-inner",
-                children=[
-                    self.workspaces,
-                    self.weather_button,
-                    self.metrics,
-                ],
-            ),
+            spacing=8,
+            children=[
+                self.workspaces,
+                self.weather_button,
+                self.metrics,
+            ],
         )
-        self.end_box = Box(
-            name="bar-end-container",
-            children=Box(
-                name="bar-end-container-inner",
-                children=[
-                    self.system_tray,
-                    self.language,
-                ],
-            ),
-        )
+        self.end_box = Box(name="bar-end-container",
+                           spacing=8,
+                           children=[
+                               self.system_tray,
+                               self.language,
+                               self.time,
+                           ])
 
         self.bar_inner = CenterBox(
             name="bar-inner",

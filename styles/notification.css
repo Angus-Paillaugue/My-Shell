@@ -144,7 +144,7 @@
   padding: 16px;
   border: 2px solid var(--surface);
   background-color: var(--shadow);
-  border-radius: 8px;
+  border-radius: 16px;
   margin-bottom: 4px;
   transition: all 250ms ease-in-out;
 }
@@ -168,31 +168,25 @@
 #notification-history-indicator {
   padding: 8px;
   font-weight: bold;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-#notification-history-indicator:hover,
-#notification-history-indicator:focus {
   border-radius: 20px;
-  background-color: var(--surface-bright);
+  margin-right: -15px;
+  background-color: var(--shadow);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 1;
 }
-
-#notification-history-indicator:hover #notification-history-icon {
-  color: var(--primary);
-}
-#notification-history-indicator:active {
+#notification-history-indicator.active:not(.dnd) {
   background-color: var(--primary);
 }
-#notification-history-indicator:active #notification-history-icon {
-  color: var(--shadow);
+#notification-history-indicator.hidden {
+  opacity: 0;
 }
 #notification-history-icon {
   font-size: 18px;
-}
-#notification-history-indicator.notification-indicator-active {
-  background-color: var(--primary);
-  border-radius: 20px;
-}
-#notification-history-indicator.notification-indicator-active
-  #notification-history-icon {
   color: var(--shadow);
+}
+#notification-history-indicator.active #notification-history-icon {
+  color: var(--on-primary);
+}
+#notification-history-indicator.dnd #notification-history-icon {
+  color: var(--primary);
 }

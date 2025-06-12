@@ -11,10 +11,12 @@ import modules.icons as icons
 
 
 class CalendarBox(Box):
+
     def __init__(self, **kwargs):
-        super().__init__(
-            name="calendar-container", orientation="v", spacing=8, **kwargs
-        )
+        super().__init__(name="calendar-container",
+                         orientation="v",
+                         spacing=8,
+                         **kwargs)
 
         self.current_date = datetime.now()
 
@@ -28,7 +30,8 @@ class CalendarBox(Box):
         self.prev_month_btn = Button(
             name="calendar-nav-button",
             style_classes=["bar-action-button", "small"],
-            child=Label(name="calendar-nav-button-icon", markup=icons.chevron_left),
+            child=Label(name="calendar-nav-button-icon",
+                        markup=icons.chevron_left),
             on_clicked=self.prev_month,
             h_align="start",
         )
@@ -43,7 +46,8 @@ class CalendarBox(Box):
         self.next_month_btn = Button(
             name="calendar-nav-button",
             style_classes=["bar-action-button", "small"],
-            child=Label(name="calendar-nav-button-icon", markup=icons.chevron_right),
+            child=Label(name="calendar-nav-button-icon",
+                        markup=icons.chevron_right),
             on_clicked=self.next_month,
             h_align="end",
         )
@@ -67,8 +71,7 @@ class CalendarBox(Box):
                     label=day,
                     h_align="center",
                     h_expand=True,
-                )
-            )
+                ))
 
         # Calendar grid - convert from Box to Gtk.Grid
         self.calendar_grid = Gtk.Grid(
@@ -93,11 +96,8 @@ class CalendarBox(Box):
         # Get calendar data
         year = self.current_date.year
         month = self.current_date.month
-        today = (
-            datetime.now().day
-            if datetime.now().year == year and datetime.now().month == month
-            else -1
-        )
+        today = (datetime.now().day if datetime.now().year == year and
+                 datetime.now().month == month else -1)
 
         # Update month label
         self.month_label.set_label(self.current_date.strftime("%B %Y"))
@@ -181,7 +181,7 @@ class Time(Button):
         **kwargs,
     ):
         super().__init__(
-            name="time",
+            style_classes=["bar-item"],
             **kwargs,
         )
 
@@ -205,8 +205,7 @@ class Time(Button):
                 spacing=8,
                 v_expand=False,
                 children=[self.date_label, self.time_label],
-            )
-        )
+            ))
 
         self.add_events(Gdk.EventMask.SCROLL_MASK)
         self._interval: int = interval

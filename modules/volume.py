@@ -493,7 +493,8 @@ class MicRow(Box):
             v_expand=True,
             h_align="center",
             v_align="center",
-            on_clicked=lambda _: (self.inputs_box.toggle(), self.notify_inputs()),
+            on_clicked=lambda _:
+            (self.inputs_box.toggle(), self.notify_inputs()),
         )
 
         self.mic_slider = MicSlider(self.audio)

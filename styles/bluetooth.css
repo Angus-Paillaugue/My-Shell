@@ -10,7 +10,10 @@
   color: var(--foreground);
 }
 
-#bluetooth-button-label, #wifi-button-label, #wired-button-label, #pp-button-label {
+#bluetooth-button-label,
+#wifi-button-label,
+#wired-button-label,
+#pp-button-label {
   font-size: 16px;
   font-weight: bold;
   color: var(--surface);

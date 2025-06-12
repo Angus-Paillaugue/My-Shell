@@ -1,4 +1,3 @@
-
 .notch-widget-selector-button {
   padding: 4px 8px;
   border-radius: 20px;
@@ -22,7 +21,7 @@
 
 /* Settings container transitions */
 #settings-container {
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .notch-widget-selector-button {
@@ -43,4 +42,8 @@
 .notch-widget-selector-button.active label {
   color: var(--primary);
   font-weight: bold;
+}
+
+#notch-widget-default {
+  padding: 5px 10px;
 }

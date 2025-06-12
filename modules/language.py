@@ -14,6 +14,7 @@ class Language(Button):
     def __init__(self, **kwargs):
         super().__init__(
             name="language",
+            style_classes=["bar-item"],
             h_align="center",
             v_align="center",
             **kwargs,

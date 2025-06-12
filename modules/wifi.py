@@ -381,8 +381,7 @@ class WifiModule(Box):
                     ),
                     self.wifi_status_text,
                 ],
-            )
-        )
+            ))
         self.add(self.left_button)
         self.add(self.wifi_networks_open_button)
 

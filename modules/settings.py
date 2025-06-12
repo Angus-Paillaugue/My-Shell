@@ -3,9 +3,16 @@ from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 import modules.icons as icons
 
+
 class SettingsButton(Box):
 
-    def __init__(self, label, slot, dropdown, icon, left_button_click=lambda *_: None, **kwargs):
+    def __init__(self,
+                 label,
+                 slot,
+                 dropdown,
+                 icon,
+                 left_button_click=lambda *_: None,
+                 **kwargs):
         super().__init__(
             name=f"{label}-button",
             h_expand=True,
@@ -31,14 +38,18 @@ class SettingsButton(Box):
         )
 
         self.slot = slot
-        self.status_text = Label(
-            name="bluetooth-status", label=self.label, all_visible=True, visible=True,
-            h_align="start", v_align="center", ellipsization="end"
-        )
+        self.status_text = Label(name="bluetooth-status",
+                                 label=self.label,
+                                 all_visible=True,
+                                 visible=True,
+                                 h_align="start",
+                                 v_align="center",
+                                 ellipsization="end")
         self.icon = Label(name="bluetooth-icon", markup=icon)
         self.devices_open_button = Button(
             style_classes=["expand-button-caret"],
-            child=Label(name="bluetooth-open-label", markup=icons.chevron_right),
+            child=Label(name="bluetooth-open-label",
+                        markup=icons.chevron_right),
         )
         self.slot.add(self.dropdown)
 
@@ -56,16 +67,12 @@ class SettingsButton(Box):
                     ),
                     self.status_text,
                 ],
-            )
-        )
+            ))
         self.add(self.left_button)
         self.add(self.devices_open_button)
         self.devices_open_button.connect(
             "clicked",
-            lambda *_: (
-                self.dropdown.toggle_visibility()
-                if self.dropdown.enabled
-                else None
-            ),
+            lambda *_: (self.dropdown.toggle_visibility()
+                        if self.dropdown.enabled else None),
         )
         self.left_button.connect("clicked", lambda *_: self.left_button_click())

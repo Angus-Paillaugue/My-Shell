@@ -296,11 +296,10 @@ class AppLauncher(Box):
 
                     if text.strip() == "" and self.selected_index == -1:
                         return
-                    selected_index = (
-                        self.selected_index if self.selected_index != -1 else 0
-                    )
+                    selected_index = (self.selected_index
+                                      if self.selected_index != -1 else 0)
                     if 0 <= selected_index < len(children):
-                        children[selected_index].clicked()
+                        children[selected_index].get_children()[0].clicked()
 
     def on_search_entry_key_press(self, widget, event):
         text = widget.get_text()

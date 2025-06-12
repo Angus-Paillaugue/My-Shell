@@ -158,18 +158,18 @@ class BluetoothDevicesDropdown(Revealer):
         if self.client.enabled:
             self.get_label("status_text").set_label("Enabled")
             for i in [
-                self.get_label("button"),
-                self.get_label("status_text"),
-                self.get_label("icon"),
+                    self.get_label("button"),
+                    self.get_label("status_text"),
+                    self.get_label("icon"),
             ]:
                 i.remove_style_class("disabled")
             self.get_label("icon").set_markup(icons.bluetooth)
         else:
             self.get_label("status_text").set_label("Disabled")
             for i in [
-                self.get_label("button"),
-                self.get_label("status_text"),
-                self.get_label("icon"),
+                    self.get_label("button"),
+                    self.get_label("status_text"),
+                    self.get_label("icon"),
             ]:
                 i.add_style_class("disabled")
             self.get_label("icon").set_markup(icons.bluetooth_off)
@@ -214,7 +214,8 @@ class BluetoothButton(SettingsButton):
 
     def __init__(self, slot=None, **kwargs):
         self.labels = dict()
-        self.bluetooth_devices_dropdown = BluetoothDevicesDropdown(labels=self.labels)
+        self.bluetooth_devices_dropdown = BluetoothDevicesDropdown(
+            labels=self.labels)
         super().__init__(
             label="Bluetooth",
             slot=slot,
@@ -222,11 +223,8 @@ class BluetoothButton(SettingsButton):
             icon=icons.bluetooth,
             left_button_click=lambda *_: (
                 self.bluetooth_devices_dropdown.client.toggle_power(),
-                (
-                    self.bluetooth_devices_dropdown.toggle_visibility()
-                    if self.bluetooth_devices_dropdown.shown
-                    else None
-                ),
+                (self.bluetooth_devices_dropdown.toggle_visibility()
+                 if self.bluetooth_devices_dropdown.shown else None),
             ),
             **kwargs,
         )

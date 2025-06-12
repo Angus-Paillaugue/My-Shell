@@ -9,6 +9,7 @@ class Workspaces(BaseWorkspaces):
     def __init__(self):
         super().__init__(
             name="workspaces",
+            style_classes=["bar-item"],
             invert_scroll=True,
             empty_scroll=True,
             v_align="fill",
