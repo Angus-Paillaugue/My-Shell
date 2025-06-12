@@ -5,37 +5,18 @@ from fabric.utils.helpers import invoke_repeater
 import time
 import calendar
 from datetime import datetime
-from gi.repository import Gdk, GLib
-from collections.abc import Iterable
+from gi.repository import Gdk, GLib, Gtk
 from fabric.core.service import Property
-from modules.dismissible_window import DismissibleWindow
 import modules.icons as icons
 
 
-class CalendarDropdown(DismissibleWindow):
-
-    def __init__(self, parent_button, **kwargs):
+class CalendarBox(Box):
+    def __init__(self, **kwargs):
         super().__init__(
-            anchor="top center",
-            exclusivity="none",
-            visible=False,
-            margin="6px 0 0 8px",
-            name="calendar-dropdown",
-            **kwargs,
+            name="calendar-container", orientation="v", spacing=8, **kwargs
         )
-
-        self.parent_button = parent_button
-        self.parent_box = parent_button.get_parent()
 
         self.current_date = datetime.now()
-
-        # Create main container with background styling
-        self.calendar_container = Box(
-            name="calendar-container",
-            orientation="v",
-            spacing=8,
-            margin=12,  # Increased margin for better visual appearance
-        )
 
         # Month navigation bar
         self.month_nav = Box(
@@ -46,34 +27,31 @@ class CalendarDropdown(DismissibleWindow):
 
         self.prev_month_btn = Button(
             name="calendar-nav-button",
-            child=Label(name="calendar-nav-button-icon",
-                        markup=icons.chevron_left),
+            style_classes=["bar-action-button", "small"],
+            child=Label(name="calendar-nav-button-icon", markup=icons.chevron_left),
             on_clicked=self.prev_month,
-            h_align="start",  # Align to the left edge
+            h_align="start",
         )
 
         self.month_label = Label(
             name="month-year-label",
             label=self.current_date.strftime("%B %Y"),
-            h_align="center",  # Center the text
-            h_expand=True,  # Make the label expand to fill available space
+            h_align="center",
+            h_expand=True,
         )
 
         self.next_month_btn = Button(
             name="calendar-nav-button",
-            child=Label(name="calendar-nav-button-icon",
-                        markup=icons.chevron_right),
+            style_classes=["bar-action-button", "small"],
+            child=Label(name="calendar-nav-button-icon", markup=icons.chevron_right),
             on_clicked=self.next_month,
-            h_align="end",  # Align to the right edge
+            h_align="end",
         )
 
         # Add elements to the container with appropriate packing
-        self.month_nav.pack_start(self.prev_month_btn, False, False,
-                                  0)  # Don't expand or fill
-        self.month_nav.pack_start(self.month_label, True, True,
-                                  0)  # Expand and fill
-        self.month_nav.pack_start(self.next_month_btn, False, False,
-                                  0)  # Don't expand or fill
+        self.month_nav.pack_start(self.prev_month_btn, False, False, 0)
+        self.month_nav.pack_start(self.month_label, True, True, 0)
+        self.month_nav.pack_start(self.next_month_btn, False, False, 0)
 
         # Days of week header
         self.days_header = Box(
@@ -89,23 +67,22 @@ class CalendarDropdown(DismissibleWindow):
                     label=day,
                     h_align="center",
                     h_expand=True,
-                ))
+                )
+            )
 
-        # Calendar grid
-        self.calendar_grid = Box(
+        # Calendar grid - convert from Box to Gtk.Grid
+        self.calendar_grid = Gtk.Grid(
             name="calendar-grid",
-            orientation="v",
-            spacing=4,
+            column_spacing=4,
+            row_spacing=4,
+            column_homogeneous=True,
+            row_homogeneous=True,
         )
 
         # Add containers to main calendar container
-        self.calendar_container.add(self.month_nav)
-        self.calendar_container.add(self.days_header)
-        self.calendar_container.add(self.calendar_grid)
-
-        self.add(self.calendar_container)
-
-        # Render initial calendar
+        self.add(self.month_nav)
+        self.add(self.days_header)
+        self.add(self.calendar_grid)
         self.render_calendar()
 
     def render_calendar(self):
@@ -116,8 +93,11 @@ class CalendarDropdown(DismissibleWindow):
         # Get calendar data
         year = self.current_date.year
         month = self.current_date.month
-        today = (datetime.now().day if datetime.now().year == year and
-                 datetime.now().month == month else -1)
+        today = (
+            datetime.now().day
+            if datetime.now().year == year and datetime.now().month == month
+            else -1
+        )
 
         # Update month label
         self.month_label.set_label(self.current_date.strftime("%B %Y"))
@@ -125,20 +105,14 @@ class CalendarDropdown(DismissibleWindow):
         # Get calendar matrix
         cal = calendar.monthcalendar(year, month)
 
-        # Create calendar grid with days
-        for week in cal:
-            week_box = Box(
-                name="week-row",
-                orientation="h",
-                spacing=4,
-            )
-
-            for day in week:
+        # Create calendar grid with days - use grid positioning instead of week boxes
+        for row_idx, week in enumerate(cal):
+            for col_idx, day in enumerate(week):
                 if day == 0:
                     # Empty day
                     day_btn = Button(
                         name="empty-day",
-                        label=" ",
+                        child=Label(name="empty-day-label", markup=icons.point),
                         h_expand=True,
                     )
                 elif day == today:
@@ -156,9 +130,8 @@ class CalendarDropdown(DismissibleWindow):
                         h_expand=True,
                     )
 
-                week_box.add(day_btn)
-
-            self.calendar_grid.add(week_box)
+                # Attach the button to the grid at the specific position
+                self.calendar_grid.attach(day_btn, col_idx, row_idx, 1, 1)
 
         self.calendar_grid.show_all()
 
@@ -186,18 +159,6 @@ class CalendarDropdown(DismissibleWindow):
         self.current_date = self.current_date.replace(year=year, month=month)
         self.render_calendar()
 
-    def toggle_visibility(self):
-        if self.is_visible():
-            self.hide()
-        else:
-            # Update parent_box reference if it was None initially
-            if not self.parent_box and self.parent_button:
-                self.parent_box = self.parent_button.get_parent()
-
-            self.show_all()
-            # Make sure window has focus
-            self.present()
-
 
 class Time(Button):
 
@@ -221,19 +182,20 @@ class Time(Button):
     ):
         super().__init__(
             name="time",
-            style_classes=["bar-action-button"],
             **kwargs,
         )
 
         self.time_label = Label(
             name="time-label",
             label="",
+            v_expand=False,
             h_align="center",
             v_align="center",
         )
         self.date_label = Label(
             name="date-label",
             label="",
+            v_expand=False,
             h_align="center",
             v_align="center",
         )
@@ -241,37 +203,15 @@ class Time(Button):
             Box(
                 orientation="h",
                 spacing=8,
+                v_expand=False,
                 children=[self.date_label, self.time_label],
-            ))
+            )
+        )
 
         self.add_events(Gdk.EventMask.SCROLL_MASK)
         self._interval: int = interval
         self._repeater_id: int | None = None
         self.interval = interval
-
-        # Connect events first
-        self.connect(
-            "button-press-event",
-            lambda *args: self.toggle_calendar(),  # to allow overriding
-        )
-        self.connect("scroll-event", lambda *args: self.do_handle_scroll(*args))
-
-        # Create calendar dropdown with a delay to ensure the button is realized
-        GLib.timeout_add(100, self.setup_calendar_dropdown)
-
-    def setup_calendar_dropdown(self):
-        # Create calendar dropdown after button is realized
-        self.calendar_dropdown = CalendarDropdown(self)
-        return False  # Stop the timeout
-
-    def toggle_calendar(self):
-        if hasattr(self, "calendar_dropdown"):
-            self.calendar_dropdown.toggle_visibility()
-        else:
-            # If calendar isn't ready yet, create it now
-            self.calendar_dropdown = CalendarDropdown(self)
-            GLib.timeout_add(100,
-                             lambda: self.calendar_dropdown.toggle_visibility())
 
     def set_button_label(self):
         current_time = time.strftime("%H:%M:%S", time.localtime())

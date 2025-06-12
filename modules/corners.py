@@ -89,7 +89,7 @@ class Corners(Window):
             name="corners",
             layer="overlay",
             anchor="top bottom left right",
-            margin="-56px 0 0 0",
+            margin="-54px 0 0 0",
             exclusivity="normal",
             pass_through=True,
             visible=False,

@@ -1,10 +1,4 @@
-#launcher-box {
-  background-color: var(--shadow);
-  padding: 14px;
-  min-width: 700px;
-  min-height: 350px;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1);
-}
+
 #search-entry {
   font-weight: bold;
   background-color: var(--surface);
@@ -44,11 +38,12 @@
   color: var(--shadow);
 }
 
-#scrolled-window {
-  border-radius: 16px;
+#notch-scrolled-window {
+  min-height: 400px;
+  min-width: 700px;
 }
 
-#scrolled-window scrollbar,
+#notch-scrolled-window scrollbar,
 #bluetooth-devices scrollbar,
 #network-ap-scrolled-window scrollbar {
   border-radius: 10px;
@@ -57,7 +52,7 @@
   margin-left: 6px;
 }
 
-#scrolled-window slider,
+#notch-scrolled-window slider,
 #bluetooth-devices slider,
 #network-ap-scrolled-window slider {
   border-radius: 8px;

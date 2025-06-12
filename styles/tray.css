@@ -5,7 +5,7 @@
 /* Context menu */
 menu {
   background-color: var(--shadow);
-  border: 1px solid var(--surface-bright);
+  border: 2px solid var(--surface);
   padding: 4px;
 }
 

@@ -1,10 +1,4 @@
-#wallpaper-manager-container {
-  background-color: var(--shadow);
-  padding: 14px;
-  min-width: 700px;
-  min-height: 350px;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1);
-}
+
 #no-wallpapers-label {
   font-size: 20px;
   color: var(--foreground);

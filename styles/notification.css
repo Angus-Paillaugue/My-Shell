@@ -37,15 +37,6 @@
   margin-top: 8px;
 }
 
-#notification-stack-box {
-  padding: 16px;
-  border: 2px solid var(--surface);
-  background-color: var(--shadow);
-  margin: 8px;
-  margin-bottom: 4px;
-  min-width: 330px;
-}
-
 #notif-close-button {
   background-color: var(--surface);
   border-radius: 8px;
@@ -73,11 +64,9 @@
 /* Notification history window */
 #notification-history {
   background-color: var(--shadow);
-  border: 1px solid var(--surface-bright);
+  border: 2px solid var(--surface);
   padding: 8px;
   border-radius: 12px;
-  min-width: 700px;
-  min-height: 500px;
 }
 
 #notification-history scrollbar {
@@ -108,28 +97,15 @@
 }
 
 #notification-history-header {
-  border: 2px solid var(--surface);
   padding: 4px;
+  border-radius: 12px;
+  border: 2px solid var(--surface);
   margin-bottom: 4px;
 }
 
 #nhh {
   font-weight: bold;
-}
-
-#nhh-button {
-  border-radius: 8px;
-  background-color: var(--surface);
-  padding: 4px;
-}
-
-#nhh-button:hover {
-  background-color: var(--surface-bright);
-}
-
-#nhh-button-label {
-  color: var(--red-dim);
-  font-size: 20px;
+  font-size: 14px;
 }
 
 #dnd-label {
@@ -162,6 +138,7 @@
   border: none;
   margin: 8px;
   min-width: 380px;
+  padding: 16px;
 }
 #notification-box {
   padding: 16px;
@@ -197,18 +174,6 @@
 #notification-history-indicator:focus {
   border-radius: 20px;
   background-color: var(--surface-bright);
-}
-#notification-counter {
-  background-color: var(--red-dim);
-  color: var(--foreground);
-  font-size: 10px;
-  font-weight: bold;
-  min-width: 14px;
-  min-height: 14px;
-  border-radius: 50%;
-  padding: 2px;
-  margin-left: -8px;
-  margin-bottom: 8px;
 }
 
 #notification-history-indicator:hover #notification-history-icon {

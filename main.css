@@ -13,6 +13,7 @@
 @import url("./styles/power-profile.css");
 @import url("./styles/screenshot.css");
 @import url("./styles/settings.css");
+@import url("./styles/notch.css");
 @import url("./styles/time.css");
 @import url("./styles/tray.css");
 @import url("./styles/volume.css");
@@ -55,4 +56,8 @@ tooltip > * {
 tooltip label {
   font-size: 14px;
   font-weight: bold;
+}
+#bar-center-container.hovered #bar-center-container-inner {
+  padding: 15px;
+  min-width: 750px;
 }

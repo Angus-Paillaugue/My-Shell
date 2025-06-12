@@ -29,11 +29,15 @@
 #calendar-container {
   background-color: var(--shadow);
   color: var(--foreground);
-  padding: 20px;
+  border: 2px solid var(--surface);
+  padding: 8px;
   border-radius: 12px;
 }
 
 #month-navigation {
+  padding: 4px;
+  border-radius: 12px;
+  border: 2px solid var(--surface);
   margin-bottom: 8px;
 }
 
@@ -48,27 +52,6 @@
   font-weight: bold;
 }
 
-/* Calendar navigation */
-#calendar-nav-button {
-  min-height: 20px;
-  min-width: 20px;
-  padding: 4px;
-  border-radius: 4px;
-  background-color: var(--surface);
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-#calendar-nav-button label {
-  color: var(--foreground);
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-#calendar-nav-button:hover {
-  border-radius: 15px;
-  background-color: var(--surface-bright);
-}
-#calendar-nav-button:hover label {
-  color: var(--primary);
-}
-
 /* Days buttons/labels */
 #day-button,
 #today-button,
@@ -77,16 +60,13 @@
   min-width: 30px;
   padding: 2px;
   margin: 1px;
-  border-radius: 4px;
-}
-#day-button {
-  background-color: var(--surface);
 }
 #day-button label {
   color: var(--foreground);
 }
 #today-button {
   background-color: var(--primary);
+  border-radius: 40px;
   font-weight: bold;
 }
 #today-button label {
@@ -95,4 +75,8 @@
 #empty-day {
   background-color: transparent;
   border: none;
+}
+#empty-day-label {
+  color: var(--surface-bright);
+  font-size: 16px;
 }

@@ -5,7 +5,7 @@
 /* Power menu dropdown styling */
 #power-menu-dropdown {
   background-color: var(--shadow);
-  border: 1px solid var(--surface-bright);
+  border: 2px solid var(--surface);
   padding: 4px;
 }
 

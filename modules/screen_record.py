@@ -6,7 +6,7 @@ import modules.icons as icons
 
 class ScreenRecordButton(Button):
 
-    def __init__(self, close_settings=None):
+    def __init__(self):
         super().__init__(
             tooltip_text="Screen Record",
             orientation="h",
@@ -18,10 +18,8 @@ class ScreenRecordButton(Button):
             child=Label(markup=icons.screen_record),
             on_clicked=self.screen_record,
         )
-        self.close_settings = close_settings
 
     def screen_record(self, *args):
-        self.close_settings()
         script_location = get_relative_path("../services/screen-record.sh")
         exec_shell_command_async(
             f"bash -c 'nohup bash {script_location} > /dev/null 2>&1 & disown'")

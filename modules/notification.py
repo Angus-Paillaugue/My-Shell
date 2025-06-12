@@ -453,7 +453,7 @@ class NotificationHistory(Box):
                  notification_server: Notifications,
                  on_event=None,
                  **kwargs):
-        super().__init__(name="notification-history", orientation="v", **kwargs)
+        super().__init__(name="notification-history", orientation="v", h_expand=True, **kwargs)
 
         self.containers = []
         self.header_label = Label(
@@ -468,13 +468,14 @@ class NotificationHistory(Box):
         )
         self.dnd_switch = Button(
             name="dnd-switch",
-            style_classes=["bar-action-button"],
+            style_classes=["bar-action-button", "small"],
             child=self.dnd_switch_label,
             on_clicked=lambda *_: self.on_do_not_disturb_changed(),
             tooltip_text="Enable Do Not Disturb",
         )
         self.header_clean = Button(
             name="nhh-button",
+            style_classes=["bar-action-button", "small", "danger"],
             child=Label(name="nhh-button-label", markup=icons.trash),
             on_clicked=self.clear_history,
         )
@@ -1007,7 +1008,6 @@ class NotificationHistory(Box):
         self.emit("notification-added")
 
     def _append_persistent_notification(self, notification_box, arrival_time):
-        print("Appending persistent notification")
         note = {
             "id": notification_box.uuid,
             "app_icon": notification_box.notification.app_icon,
@@ -1139,17 +1139,10 @@ class NotificationHistoryIndicator(Button):
         # Add components to container
         self.add(self.icon)
 
-        self.history_window.add(self.notification_history)
-
         # Track notification count
         self.notification_count = len(
             self.notification_history.persistent_notifications)
         self.update_counter()
-        self.connect("clicked", self.toggle_history_window)
-
-    def toggle_history_window(self, *args):
-        """Toggle notification history window visibility."""
-        self.history_window.toggle()
 
     def on_notification_history_event(self, signal_name, *args):
         """Handle notification history events with proper count management."""

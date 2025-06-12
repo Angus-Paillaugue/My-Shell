@@ -10,6 +10,14 @@
   color: var(--foreground);
 }
 
+#bluetooth-button-label, #wifi-button-label, #wired-button-label, #pp-button-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--surface);
+}
+#bluetooth-left-button.disabled #bluetooth-button-label {
+  color: var(--foreground);
+}
 #bluetooth-open-button {
   border-radius: 2px 12px 12px 2px;
   background-color: var(--surface);

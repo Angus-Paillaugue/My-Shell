@@ -1,7 +1,7 @@
 #clipboard-manager-container {
   padding: 12px;
   background-color: var(--shadow);
-  border: 1px solid var(--surface-bright);
+  border: 2px solid var(--surface);
   min-height: 420px;
   min-width: 978px;
 }

@@ -11,7 +11,7 @@ class DismissibleWindow(Window):
             anchor="top bottom left right",
             exclusivity="none",
             keyboard_mode="none",
-            margin="-56px 0 0 0",
+            margin="-54px 0 0 0",
             visible=visible,
         )
         kwargs = dict(
