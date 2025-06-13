@@ -37,7 +37,6 @@
 /* Main dropdown */
 #settings-container {
   background-color: var(--shadow);
-  padding: 20px;
   min-width: 800px;
 }
 

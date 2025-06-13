@@ -17,7 +17,6 @@ from gi.repository import Gdk, GLib
 from services.logger import logger
 import modules.icons as icons
 from modules.dock import pinned_aps_location
-from modules.dismissible_window import DismissibleWindow
 
 
 class AppLauncher(Box):

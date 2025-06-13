@@ -24,7 +24,7 @@ from modules.time import CalendarBox as Calendar
 from modules.bluetooth import BluetoothButton
 from modules.battery import Battery
 from modules.brightness import BrightnessRow
-from modules.power import PowerMenuActions, PowerMenuButton
+from modules.power import PowerMenuActions
 from modules.power_profile import PowerProfile
 from modules.volume import VolumeRow, MicRow
 from modules.wifi import WifiModule
@@ -33,6 +33,7 @@ from modules.screenshot import ScreenshotButton
 from modules.screen_record import ScreenRecordButton
 from modules.wallpaper import WallpaperManager
 from modules.launcher import AppLauncher
+from modules.clipboard import ClipboardManager
 
 
 class NotchWidgetPicker(Revealer):
@@ -77,6 +78,11 @@ class NotchWidgetPicker(Revealer):
                 "on_click": lambda *_: notch.show_widget("wallpaper"),
                 "name": "notch-widget-button-wallpaper",
             },
+            {
+                "label": "Power",
+                "on_click": lambda *_: notch.show_widget("power"),
+                "name": "notch-widget-button-power",
+            },
         ]
         self.buttons = []
         for i, a in enumerate(self.actions):
@@ -112,7 +118,7 @@ class NotchWidgetPicker(Revealer):
                 else:
                     button.remove_style_class("active")
         else:
-            logger.error(
+            logger.warning(
                 f"Index {index} is out of range for NotchWidgetPicker buttons.")
 
 
@@ -129,9 +135,6 @@ class NotchWidgetDefaultExpanded(Box):
         self.brightness_module = BrightnessRow()
         self.battery = Battery()
         self.power_profile = PowerProfile()
-        self.power_menu_actions = PowerMenuActions()
-        self.power_menu_button = PowerMenuButton(
-            power_actions=self.power_menu_actions)
         self.bluetooth_devices_dropdown_slot = Box()
         self.wifi_networks_dropdown_slot = Box()
         self.audio_outputs_dropdown_slot = Box()
@@ -176,7 +179,6 @@ class NotchWidgetDefaultExpanded(Box):
             children=[
                 self.screen_record_button,
                 self.screenshot_button,
-                self.power_menu_button,
             ],
             v_align="center",
             h_align="center",
@@ -189,7 +191,6 @@ class NotchWidgetDefaultExpanded(Box):
                 end_children=self.end_children,
                 orientation="h",
             ),
-            self.power_menu_actions,
             self.buttons_grid,
             self.wifi_networks_dropdown_slot,
             self.wired_networks_dropdown_slot,
@@ -241,7 +242,7 @@ class NotchWidgetDefault(Box):
         self.conn.connect("event::activewindow", self.on_active_window_changed)
         self.active_window = Label(
             h_expand=False,
-            label=" ",
+            label=self._center_string("Desktop"),
             h_align="start",
             v_align="center",
         )
@@ -306,28 +307,28 @@ class NotchWidgetDefault(Box):
                 self.window_icon.set_from_icon_name(
                     "application-x-executable-symbolic", 20)
 
-    def on_active_window_changed(self, _, event: HyprlandEvent):
+    def _center_string(self, s: str, max_length: int = 20) -> str:
+        """Center a string within a given length."""
+        if len(s) >= max_length:
+            return s[:max_length]
+        padding = (max_length - len(s)) // 2
+        return ' ' * padding + s + ' ' * (max_length - len(s) - padding)
+
+    def on_active_window_changed(self, _, event: HyprlandEvent) -> None:
         if len(event.data) < 2:
             return
-
-        def center_string(s, max_length=20):
-            """Center a string within a given length."""
-            if len(s) >= max_length:
-                return s[:max_length]
-            padding = (max_length - len(s)) // 2
-            return ' ' * padding + s + ' ' * (max_length - len(s) - padding)
 
         class_name = event.data[0]
         title = event.data[1]
         if not class_name or not title:
-            self.active_window.set_label(center_string('Desktop'))
+            self.active_window.set_label(self._center_string('Desktop'))
         elif class_name != self._current_window_class:
             self._current_window_class = class_name
             window_name = f"{class_name[0].upper() + class_name[1:]} - {title}"
-            self.active_window.set_label(center_string(window_name))
+            self.active_window.set_label(self._center_string(window_name))
         self.update_window_icon()
 
-    def _get_current_window_class(self):
+    def _get_current_window_class(self) -> str:
         """Get the class of the currently active window"""
         try:
 
@@ -386,7 +387,7 @@ class NotchWidgetDefault(Box):
         self.app_map = {app.name: app for app in self._all_apps if app.name}
         self.app_identifiers = self._build_app_identifiers_map()
 
-    def _build_app_identifiers_map(self):
+    def _build_app_identifiers_map(self) -> dict:
         identifiers = {}
         for app in self._all_apps:
             if app.name:
@@ -411,12 +412,18 @@ class NotchInner(CornerContainer):
         notification_history: NotificationHistory,
         notch_widget_picker: NotchWidgetPicker,
     ):
+        self.widgets_labels = [
+            'default', 'default-expanded', 'launcher', 'wallpaper', 'power',
+            'clipboard'
+        ]
         self.notch_widget_picker = notch_widget_picker
         self.notch_widget_default = NotchWidgetDefault()
         self.notch_widget_default_expanded = NotchWidgetDefaultExpanded(
             notification_history=notification_history)
         self.launcher = AppLauncher()
         self.notch_widget_wallpaper = WallpaperManager()
+        self.power = PowerMenuActions()
+        self.clipboard = ClipboardManager()
 
         self._contents = Stack(
             transition_type="slide-up-down",
@@ -426,6 +433,8 @@ class NotchInner(CornerContainer):
                 self.notch_widget_default_expanded,
                 self.launcher,
                 self.notch_widget_wallpaper,
+                self.power,
+                self.clipboard,
             ],
             interpolate_size=True,
             h_expand=False,
@@ -447,19 +456,17 @@ class NotchInner(CornerContainer):
 
     def show_widget(self, widget_name: str, *_):
         widgets = self._contents.get_children()
-        if widget_name == "default":
-            index = 0
-        elif widget_name == "default-expanded":
-            index = 1
-        elif widget_name == "launcher":
-            index = 2
-        elif widget_name == "wallpaper":
-            index = 3
-        else:
+        if widget_name not in self.widgets_labels:
             logger.error(f"Unknown widget name: {widget_name}")
             return
+
+        index = self.widgets_labels.index(widget_name)
+        if self._contents.get_visible_child() is widgets[index]:
+            index = 0
+
         self.notch_widget_picker.set_active_index(index - 1 if index > 0 else 0)
         self._contents.set_visible_child(widgets[index])
+        return index == 0
 
 
 class Notch(EventBox):
@@ -474,6 +481,7 @@ class Notch(EventBox):
         self.notification_history_indicator = NotificationHistoryIndicator(
             notification_history=notification_history)
         self.hovered = False
+        self.show_picker = True
 
         super().__init__(
             child=Box(
@@ -488,7 +496,8 @@ class Notch(EventBox):
         if not self.hovered:
             self.hovered = True
             self.inner.add_style_class("hovered")
-            self.notch_widget_picker.show()
+            if self.show_picker:
+                self.notch_widget_picker.show()
             self.notification_history_indicator.add_style_class("hidden")
             self.notification_history_indicator.add_style_class("hovered")
             if self.inner._contents.get_visible_child(
@@ -503,6 +512,7 @@ class Notch(EventBox):
 
         if self.hovered:
             self.hovered = False
+            self.show_picker = True
             self.inner.remove_style_class("hovered")
             self.notch_widget_picker.hide()
             self.notification_history_indicator.remove_style_class("hovered")
@@ -515,8 +525,9 @@ class Notch(EventBox):
                 )
         return False  # Allow event propagation
 
-    def show_widget(self, widget_name: str):
-        self.inner.show_widget(widget_name)
+    def show_widget(self, widget_name: str, show_picker: bool = True):
+        self.show_picker = show_picker
+        return self.inner.show_widget(widget_name)
 
 
 class NotchWindow(WaylandWindow):
@@ -537,6 +548,9 @@ class NotchWindow(WaylandWindow):
         self._container.add(self.notch)
         self.add(self._container)
 
-    def show_widget(self, widget_name: str):
-        self.notch.show_widget(widget_name)
-        self.notch.inner.add_style_class("hovered")
+    def show_widget(self, widget_name: str, show_picker: bool = True):
+        is_default = self.notch.show_widget(widget_name, show_picker)
+        if is_default:
+            self.notch.inner.remove_style_class("hovered")
+        else:
+            self.notch.inner.add_style_class("hovered")

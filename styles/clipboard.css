@@ -1,18 +1,3 @@
-#clipboard-manager-container {
-  padding: 12px;
-  background-color: var(--shadow);
-  border: 2px solid var(--surface);
-  min-height: 420px;
-  min-width: 978px;
-}
-
-#clipboard-manager-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--foreground);
-  margin-bottom: 10px;
-}
-
 .clipboard-item-button {
   padding: 8px;
   border-radius: 8px;

@@ -8,6 +8,7 @@
   border-radius: 20px;
   padding: 0 10px;
   min-height: 46px;
+  font-weight: bold;
 }
 #bar-center-container-inner {
   background-color: var(--shadow);

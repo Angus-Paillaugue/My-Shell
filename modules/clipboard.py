@@ -1,41 +1,24 @@
 import subprocess
 from fabric.utils import exec_shell_command_async
-from fabric.widgets.wayland import WaylandWindow
-from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from gi.repository import Gtk, Gdk
 from fabric.widgets.scrolledwindow import ScrolledWindow
-import modules.icons as icons
 
 
-class ClipboardManager(WaylandWindow):
+class ClipboardManager(Box):
 
     def __init__(self, **kwargs):
         super().__init__(
-            layer="overlay",
-            anchor="center center",
-            exclusivity="exclusive",
-            keyboard_mode="exclusive",
-            visible=False,
+            name="clipboard-manager",
+            orientation="v",
+            spacing=12,
+            h_expand=True,
+            v_expand=True,
+            h_align="fill",
+            v_align="fill",
             **kwargs,
-        )
-
-        # Make title more visible with markup
-        self.title_label = Label(label="Clipboard Manager",
-                                 name="clipboard-manager-title")
-        self.header = CenterBox(
-            name="clipboard-manager-header",
-            orientation="h",
-            start_children=[self.title_label],
-            end_children=[
-                Button(
-                    child=Label(markup=icons.cancel),
-                    on_clicked=lambda btn: self.toggle(),
-                    style_classes=["close-button"],
-                )
-            ],
         )
 
         # Create a grid that will adapt to its contents
@@ -51,28 +34,18 @@ class ClipboardManager(WaylandWindow):
 
         # Configure scrolled window to allow vertical scrolling as needed
         self.scrollable_area = ScrolledWindow(
-            child=self.clipboard_items,
-            h_expand=True,
-            v_expand=True,
-            h_scroll_policy=Gtk.PolicyType.
-            NEVER,  # Never show horizontal scrollbar
-            v_scroll_policy=Gtk.PolicyType.
-            AUTOMATIC,  # Show vertical scrollbar when needed
-        )
-
-        # Make sure container has explicit minimum size but can grow
-        self.main_container = Box(
-            name="clipboard-manager-container",
-            orientation="v",
-            spacing=12,
+            name="notch-scrolled-window",
+            spacing=10,
             h_expand=True,
             v_expand=True,
             h_align="fill",
             v_align="fill",
-            children=[self.header, self.scrollable_area],
+            child=self.clipboard_items,
+            propagate_width=False,
+            propagate_height=False,
         )
 
-        self.add(self.main_container)
+        self.add(self.scrollable_area)
         self._build_list()
         self.connect("key-press-event", self.on_key_press)
 
@@ -87,13 +60,6 @@ class ClipboardManager(WaylandWindow):
 
         # Let Tab navigation work normally
         return False
-
-    def toggle(self):
-        if self.is_visible():
-            self.hide()
-        else:
-            self.show_all()
-            self.present()
 
     def _clear_items(self):
         for child in self.clipboard_items.get_children():
@@ -140,6 +106,5 @@ class ClipboardManager(WaylandWindow):
                                 capture_output=True,
                                 check=True)
         subprocess.run(["wl-copy"], input=result.stdout, check=True)
-        exec_shell_command_async(
-            "notify-send 'Clipboard' 'Copied to clipboard!'")
-        self.toggle()  # Close the manager after copying
+        # exec_shell_command_async(
+        # "notify-send -e 'Clipboard' 'Copied to clipboard!'")

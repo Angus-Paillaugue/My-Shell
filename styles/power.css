@@ -1,18 +1,20 @@
+#power-button {
+  padding: 0 14px;
+}
 #power-options-container {
   margin-top: 12px;
-  background-color: var(--surface);
 }
-/* Power menu dropdown styling */
-#power-menu-dropdown {
-  background-color: var(--shadow);
-  border: 2px solid var(--surface);
-  padding: 4px;
-}
-
 #power-option-button {
   border-radius: 8px;
-  padding: 8px;
+  padding: 16px;
+  background-color: var(--surface);
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#option-label {
+  font-size: 20px;
+}
+#option-icon {
+  font-size: 40px;
 }
 
 #power-option-button:hover {
@@ -23,22 +25,11 @@
   background-color: var(--primary);
 }
 
-#option-icon {
-  font-size: 18px;
-  min-width: 24px;
-}
-
-#option-label {
-  font-size: 14px;
-}
-
-#power-option-button:hover #option-icon,
-#power-option-button:hover #option-label {
+#power-option-button:hover label {
   color: var(--primary);
 }
 
-#power-option-button:active #option-icon,
-#power-option-button:active #option-label {
+#power-option-button:active label {
   color: var(--shadow);
 }
 
@@ -52,8 +43,6 @@
 }
 
 #power-confirm-box {
-  background-color: var(--surface);
-  min-width: 320px;
   padding: 16px;
 }
 

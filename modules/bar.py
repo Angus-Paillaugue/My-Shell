@@ -9,6 +9,7 @@ from modules.tray import SystemTray
 from modules.weather import WeatherButton
 from modules.workspaces import Workspaces
 from modules.language import Language
+from modules.power import PowerButton
 
 
 class Bar(WaylandWindow):
@@ -29,6 +30,7 @@ class Bar(WaylandWindow):
         self.system_tray = SystemTray()
         self.weather_button = (WeatherButton() if not os.environ.get("DEV_MODE")
                                else Box(visible=False))
+        self.power_button = PowerButton()
 
         self.start_box = Box(
             name="bar-start-container",
@@ -39,13 +41,13 @@ class Bar(WaylandWindow):
                 self.metrics,
             ],
         )
-        self.end_box = Box(name="bar-end-container",
-                           spacing=8,
-                           children=[
-                               self.system_tray,
-                               self.language,
-                               self.time,
-                           ])
+        self.end_box = Box(
+            name="bar-end-container",
+            spacing=8,
+            children=[
+                self.system_tray, self.language, self.time, self.power_button
+            ],
+        )
 
         self.bar_inner = CenterBox(
             name="bar-inner",

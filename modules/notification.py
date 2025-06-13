@@ -15,7 +15,6 @@ from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import GdkPixbuf, GLib, Gtk
 from fabric.widgets.wayland import WaylandWindow
 from services.logger import logger
-from modules.dismissible_window import DismissibleWindow
 
 import modules.icons as icons
 from services.config import APP_NAME
@@ -1128,9 +1127,6 @@ class NotificationHistoryIndicator(Button):
         self.notification_history = notification_history
         self.notification_history.on_event = self.on_notification_history_event
         self.dnd = self.notification_history.do_not_disturb_enabled
-
-        # Create dismissible window to hold the history
-        self.history_window = DismissibleWindow(anchor="top center",)
 
         # Create container for icon and counter
         self._container = Box(
