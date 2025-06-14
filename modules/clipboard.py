@@ -3,13 +3,13 @@ from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import Gtk, Gdk
+from gi.repository import Gdk
 from fabric.widgets.scrolledwindow import ScrolledWindow
 
 
 class ClipboardManager(Box):
 
-    def __init__(self, **kwargs):
+    def __init__(self, notch_inner, **kwargs):
         super().__init__(
             name="clipboard-manager",
             orientation="v",
@@ -20,6 +20,8 @@ class ClipboardManager(Box):
             v_align="fill",
             **kwargs,
         )
+        self.max_items_to_show = 50
+        self.notch_inner = notch_inner
 
         # Create a grid that will adapt to its contents
         self.clipboard_items = Box(
@@ -66,9 +68,9 @@ class ClipboardManager(Box):
             self.clipboard_items.remove(child)
 
     def _build_list(self, filter_text=""):
-        result = subprocess.run(["cliphist", "list"],
-                                capture_output=True,
-                                check=True)
+        result = subprocess.run(
+            ["cliphist", "list"], capture_output=True, check=True
+        )
         # Decode stdout with error handling
         stdout_str = result.stdout.decode("utf-8", errors="replace")
         lines = stdout_str.strip().split("\n")
@@ -77,6 +79,8 @@ class ClipboardManager(Box):
             if not line or "<meta http-equiv" in line:
                 continue
             items.append(line)
+            if len(items) >= self.max_items_to_show:
+                break
 
         filtered_items = []
         for item in items:
@@ -106,5 +110,6 @@ class ClipboardManager(Box):
                                 capture_output=True,
                                 check=True)
         subprocess.run(["wl-copy"], input=result.stdout, check=True)
-        # exec_shell_command_async(
-        # "notify-send -e 'Clipboard' 'Copied to clipboard!'")
+        self.notch_inner.show_widget(self.notch_inner.widgets_labels[0])
+        exec_shell_command_async(
+        "notify-send -e -t 2000 'Clipboard' 'Copied to clipboard!'")

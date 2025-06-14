@@ -8,6 +8,7 @@ from gi.repository import GLib
 import json
 from services.config import APP_NAME
 from modules.corners import CornerContainer
+from fabric.widgets.eventbox import EventBox
 from fabric.utils import DesktopApp, get_desktop_applications, monitor_file
 
 pinned_aps_location = os.path.expanduser(
@@ -63,22 +64,17 @@ class Dock(Window):
             v_expand=True,
             child=self.dock_container,
         )
-        self.mouse_area = Box(
-            name="dock-mouse-area",
-            orientation="h",
-            h_align="end",
-            v_align="end",
-            h_expand=True,
-            v_expand=True,
-            children=[self.revealer],
+        self.mouse_area = EventBox(
+            child=Box(name="dock-mouse-area", children=[self.revealer]),
+            events=["leave-notify", "enter-notify"],
         )
         self._add_applications()
         self.add(self.mouse_area)
         self.pinned_applications_monitor = monitor_file(pinned_aps_location)
         self.pinned_applications_monitor.connect(
             "changed", self._on_pinned_apps_file_changed)
-        self.connect("enter-notify-event", self._on_mouse_enter)
-        self.connect("leave-notify-event", self._on_mouse_leave)
+        self.mouse_area.connect("enter-notify-event", self._on_mouse_enter)
+        self.mouse_area.connect("leave-notify-event", self._on_mouse_leave)
 
     def _on_mouse_enter(self, widget, event):
         # Cancel any pending hide operations

@@ -35,4 +35,8 @@
 
 #notch-widget-default {
   padding: 5px 10px;
+  font-weight: 500;
+}
+#notch-widget-picker-grid {
+  margin-bottom: 20px;
 }

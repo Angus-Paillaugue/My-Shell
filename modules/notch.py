@@ -1,4 +1,5 @@
 import json
+import subprocess
 from gi.repository import Gtk, Gdk, GLib
 
 from fabric.hyprland.widgets import get_hyprland_connection
@@ -61,6 +62,7 @@ class NotchWidgetPicker(Revealer):
             column_spacing=8,
             row_spacing=8,
             visible=True,
+            name="notch-widget-picker-grid",
         )
         self.actions = [
             {
@@ -77,11 +79,6 @@ class NotchWidgetPicker(Revealer):
                 "label": "Wallpaper",
                 "on_click": lambda *_: notch.show_widget("wallpaper"),
                 "name": "notch-widget-button-wallpaper",
-            },
-            {
-                "label": "Power",
-                "on_click": lambda *_: notch.show_widget("power"),
-                "name": "notch-widget-button-power",
             },
         ]
         self.buttons = []
@@ -237,12 +234,12 @@ class NotchWidgetDefault(Box):
             name="notch-widget-default",
         )
         self.update_app_map()
-        self.conn = get_hyprland_connection()
-        self._current_window_class = self._get_current_window_class()
-        self.conn.connect("event::activewindow", self.on_active_window_changed)
+        self.desktop_string = "Desktop"
+        self.set_desktop_string()
+
         self.active_window = Label(
             h_expand=False,
-            label=self._center_string("Desktop"),
+            label=self._center_string(self.desktop_string),
             h_align="start",
             v_align="center",
         )
@@ -253,8 +250,32 @@ class NotchWidgetDefault(Box):
             h_align="center",
             icon_size=20,
         )
-        self.add(self.window_icon)
+        self.icon_revealer = Revealer(
+            child_revealed=False,
+            transition_duration=200,
+            transition_type="slide-right",
+            visible=True,
+            all_visible=True,
+            child=self.window_icon,
+        )
+        self.add(self.icon_revealer)
         self.add(self.active_window)
+        self.conn = get_hyprland_connection()
+        self._current_window_class = self._get_current_window_class()
+        self.conn.connect("event::activewindow", self.on_active_window_changed)
+
+    def set_desktop_string(self, update_ui=False):
+        """Set the desktop string to be displayed in the notch"""
+        username_result = subprocess.run(["whoami"], capture_output=True, check=True)
+        username = username_result.stdout.decode().strip()
+        hostname_result = subprocess.run(
+            ["hostname"], capture_output=True, check=True)
+        hostname = hostname_result.stdout.decode().strip()
+        self.desktop_string = f"{username}@{hostname}"
+        if update_ui:
+            self.active_window.set_label(
+                self._center_string(self.desktop_string, max_length=20)
+            )
 
     def update_window_icon(self, *args):
         """Update the window icon based on the current active window title"""
@@ -262,8 +283,7 @@ class NotchWidgetDefault(Box):
         label_widget = self.active_window
         if not isinstance(label_widget, Gtk.Label):
             return
-        self.window_icon.set_visible(True)
-
+        self._set_icon_visibility(True)
         conn = get_hyprland_connection()
         if conn:
             try:
@@ -283,29 +303,12 @@ class NotchWidgetDefault(Box):
                 if icon_pixbuf:
                     self.window_icon.set_from_pixbuf(icon_pixbuf)
                 else:
-
-                    try:
-                        self.window_icon.set_from_icon_name(
-                            "application-x-executable", 20)
-                    except:
-
-                        self.window_icon.set_from_icon_name(
-                            "application-x-executable-symbolic", 20)
+                    self._set_icon_visibility(False)
             except Exception as e:
                 logger.error(f"Error updating window icon: {e}")
-                try:
-                    self.window_icon.set_from_icon_name(
-                        "application-x-executable", 20)
-                except:
-                    self.window_icon.set_from_icon_name(
-                        "application-x-executable-symbolic", 20)
+                self._set_icon_visibility(False)
         else:
-            try:
-                self.window_icon.set_from_icon_name("application-x-executable",
-                                                    20)
-            except:
-                self.window_icon.set_from_icon_name(
-                    "application-x-executable-symbolic", 20)
+            self._set_icon_visibility(False)
 
     def _center_string(self, s: str, max_length: int = 20) -> str:
         """Center a string within a given length."""
@@ -321,12 +324,21 @@ class NotchWidgetDefault(Box):
         class_name = event.data[0]
         title = event.data[1]
         if not class_name or not title:
-            self.active_window.set_label(self._center_string('Desktop'))
+            self.show_default()
         elif class_name != self._current_window_class:
             self._current_window_class = class_name
             window_name = f"{class_name[0].upper() + class_name[1:]} - {title}"
             self.active_window.set_label(self._center_string(window_name))
-        self.update_window_icon()
+            self.update_window_icon()
+
+    def _set_icon_visibility(self, visible: bool):
+        """Set the visibility of the window icon"""
+        self.icon_revealer.set_reveal_child(visible)
+
+    def show_default(self):
+        """Show the default widget"""
+        self.active_window.set_label(self._center_string(self.desktop_string))
+        self._set_icon_visibility(False)
 
     def _get_current_window_class(self) -> str:
         """Get the class of the currently active window"""
@@ -423,7 +435,7 @@ class NotchInner(CornerContainer):
         self.launcher = AppLauncher()
         self.notch_widget_wallpaper = WallpaperManager()
         self.power = PowerMenuActions()
-        self.clipboard = ClipboardManager()
+        self.clipboard = ClipboardManager(notch_inner=self)
 
         self._contents = Stack(
             transition_type="slide-up-down",

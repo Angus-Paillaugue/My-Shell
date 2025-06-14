@@ -167,12 +167,7 @@ class NotificationBox(Box):
         self.max_lines = 5
         self.notification = notification
         self.uuid = str(uuid.uuid4())
-
-        if timeout_ms == 0:
-            self.timeout_ms = 0
-        else:
-            # Default timeout is 5 seconds
-            self.timeout_ms = timeout_ms
+        self.timeout_ms = timeout_ms if timeout_ms >= 0 else 5000
 
         self._timeout_id = None
         self._container = None
@@ -1243,7 +1238,11 @@ class NotificationContainer(Box):
                 "Do Not Disturb mode enabled: adding notification directly to history."
             )
             notification = fabric_notif.get_notification_from_id(id)
-            new_box = NotificationBox(notification)
+            print(notification.timeout)
+            new_box = NotificationBox(
+                notification,
+                timeout_ms=notification.timeout,
+            )
             if notification.image_pixbuf:
                 cache_notification_pixbuf(new_box)
 
@@ -1251,7 +1250,10 @@ class NotificationContainer(Box):
             return
 
         notification = fabric_notif.get_notification_from_id(id)
-        new_box = NotificationBox(notification)
+        new_box = NotificationBox(
+            notification,
+            timeout_ms=notification.timeout,
+        )
         new_box.set_container(self)
         notification.connect("closed", self.on_notification_closed)
 
@@ -1320,12 +1322,13 @@ class NotificationContainer(Box):
             return True
         return False
 
-    def on_notification_closed(self, notification, reason):
+    def on_notification_closed(self, notification:Notification, reason):
         if self._is_destroying:
             return
         if notification.id in self._destroyed_notifications:
             return
         self._destroyed_notifications.add(notification.id)
+        transient = notification.do_get_hint_entry("transient") or False
         try:
             logger.info(
                 f"Notification {notification.id} closing with reason: {reason}")
@@ -1383,7 +1386,8 @@ class NotificationContainer(Box):
                 notif_box.stop_timeout()
 
                 # Add the notification to history
-                notification_history_instance.add_notification(notif_box)
+                if not transient:
+                    notification_history_instance.add_notification(notif_box)
 
             elif (reason_str == "NotificationCloseReason.CLOSED" or
                   reason_str == "NotificationCloseReason.UNDEFINED"):

@@ -10,7 +10,6 @@ from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import GLib
-from modules.settings import SettingsButton
 
 import modules.icons as icons
 from services.network import NetworkClient

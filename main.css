@@ -28,7 +28,7 @@
   all: unset;
   color: var(--foreground);
   font-size: unset;
-  font-family: "JetBrains Mono", monospace;
+  font-family: "JetBrainsMono Nerd Font", monospace;
   border-radius: 12px;
   font-size: 18px;
 }
