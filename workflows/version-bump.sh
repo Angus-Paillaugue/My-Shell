@@ -68,7 +68,7 @@ main() {
   fi
   git checkout "$release_branch"
   git pull origin "$release_branch"
-  git branch -d "$bump_branch"
+  git branch -D "$bump_branch"
   git push origin --delete "$bump_branch"
   echo "Version bumped to $new_version and changes pushed to the release branch '$bump_branch'."
 }

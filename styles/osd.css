@@ -1,0 +1,9 @@
+#osd-contents {
+  background-color: var(--surface);
+  padding: 10px;
+  border-radius: 50px;
+}
+
+#osd-contents label {
+  color: var(--foreground);
+}
