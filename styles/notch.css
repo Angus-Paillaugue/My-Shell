@@ -1,0 +1,42 @@
+.notch-widget-selector-button {
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  transition: all 0.25s ease;
+}
+
+.notch-widget-selector-button label {
+  color: var(--foreground);
+  font-size: 20px;
+  transition: all 0.25s ease;
+}
+
+.notch-widget-selector-button.active {
+  background-color: var(--surface);
+}
+
+.notch-widget-selector-button.active label {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.notch-widget-selector-button label {
+  color: var(--foreground);
+}
+
+.notch-widget-selector-button.active {
+  background-color: var(--surface);
+}
+
+.notch-widget-selector-button.active label {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+#notch-widget-default {
+  padding: 5px 10px;
+  font-weight: 500;
+}
+#notch-widget-picker-grid {
+  margin-bottom: 20px;
+}

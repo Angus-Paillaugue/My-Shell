@@ -69,6 +69,8 @@ notification: str = "&#xea35;"
 notifications_off: str = "&#xece9;"
 # Screen record
 screen_record: str = "&#xfca8;"
+# Time
+point: str = "&#xf698;"
 # Others
 screenshot: str = "&#xf201;"
 loading: str = "&#xea95;"

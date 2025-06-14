@@ -348,6 +348,7 @@ class WifiModule(Box):
             name="wifi-status",
             label="Wi-Fi",
             all_visible=True,
+            h_align="start",
             visible=True,
             ellipsization="end",
         )
@@ -366,7 +367,20 @@ class WifiModule(Box):
 
         # Set up the UI elements
         self.left_button_childs.add(self.wifi_icon)
-        self.left_button_childs.add(self.wifi_status_text)
+        self.left_button_childs.add(
+            Box(
+                orientation="v",
+                h_align="start",
+                v_align="center",
+                children=[
+                    Label(
+                        label="Wifi",
+                        name="wifi-button-label",
+                        h_align="start",
+                    ),
+                    self.wifi_status_text,
+                ],
+            ))
         self.add(self.left_button)
         self.add(self.wifi_networks_open_button)
 

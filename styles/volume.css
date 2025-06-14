@@ -1,23 +1,19 @@
-#mic-outputs-open-button,
 .volume-outputs-open-button {
   background-color: var(--surface);
   padding: 4px;
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border-radius: 8px;
 }
-#mic-outputs-open-button label,
 .volume-outputs-open-button label {
   color: var(--foreground);
   font-size: 16px;
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-#mic-outputs-open-button:hover,
 .volume-outputs-open-button:hover {
   background-color: var(--primary);
   border-radius: 20px;
 }
-#mic-outputs-open-button:hover label,
 .volume-outputs-open-button:hover label {
   color: var(--on-primary);
 }

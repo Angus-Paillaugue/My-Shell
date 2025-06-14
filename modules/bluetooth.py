@@ -8,6 +8,7 @@ from fabric.widgets.revealer import Revealer
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.image import Image
 from fabric.widgets.scrolledwindow import ScrolledWindow
+from modules.settings import SettingsButton
 
 
 class BluetoothDeviceSlot(CenterBox):
@@ -68,7 +69,7 @@ class BluetoothDeviceSlot(CenterBox):
 
 class BluetoothDevicesDropdown(Revealer):
 
-    def __init__(self, labels, **kwargs):
+    def __init__(self, labels=dict(), **kwargs):
         super().__init__(
             name="bluetooth-devices-dropdown",
             transition_type="slide-down",
@@ -80,11 +81,9 @@ class BluetoothDevicesDropdown(Revealer):
 
         self.shown = False
         self.labels = labels
-        self.bt_status_text = self.labels["bluetooth_status_text"]
-        self.bt_button = self.labels["bluetooth_button"]
-        self.bt_icon = self.labels["bluetooth_icon"]
 
         self.client = BluetoothClient(on_device_added=self.on_device_added)
+        self.enabled = self.client.enabled
         self.scan_label = Label(name="bluetooth-scan-label", markup=icons.radar)
         self.scan_button = Button(
             name="bluetooth-scan",
@@ -135,6 +134,15 @@ class BluetoothDevicesDropdown(Revealer):
         self.client.notify("scanning")
         self.client.notify("enabled")
 
+    def get_label(self, label_name):
+        """Get the label for the Bluetooth devices dropdown."""
+        return self.labels.get(label_name, Label())
+
+    def set_labels(self, labels):
+        """Set the labels for the Bluetooth devices dropdown."""
+        self.labels = labels
+        self.status_label()
+
     def collapse(self):
         """Toggle the visibility of the Bluetooth devices dropdown."""
         self.shown = False
@@ -146,24 +154,25 @@ class BluetoothDevicesDropdown(Revealer):
         self.set_reveal_child(self.shown)
 
     def status_label(self):
+        self.enabled = self.client.enabled
         if self.client.enabled:
-            self.bt_status_text.set_label("Enabled")
+            self.get_label("status_text").set_label("Enabled")
             for i in [
-                    self.bt_button,
-                    self.bt_status_text,
-                    self.bt_icon,
+                    self.get_label("button"),
+                    self.get_label("status_text"),
+                    self.get_label("icon"),
             ]:
                 i.remove_style_class("disabled")
-            self.bt_icon.set_markup(icons.bluetooth)
+            self.get_label("icon").set_markup(icons.bluetooth)
         else:
-            self.bt_status_text.set_label("Disabled")
+            self.get_label("status_text").set_label("Disabled")
             for i in [
-                    self.bt_button,
-                    self.bt_status_text,
-                    self.bt_icon,
+                    self.get_label("button"),
+                    self.get_label("status_text"),
+                    self.get_label("icon"),
             ]:
                 i.add_style_class("disabled")
-            self.bt_icon.set_markup(icons.bluetooth_off)
+            self.get_label("icon").set_markup(icons.bluetooth_off)
 
     def on_device_added(self, client: BluetoothClient, address: str):
         if not (device := client.get_device(address)):
@@ -201,64 +210,25 @@ class BluetoothDevicesDropdown(Revealer):
             self.scan_button.set_tooltip_text("Scan for Bluetooth devices")
 
 
-class BluetoothButton(Box):
+class BluetoothButton(SettingsButton):
 
     def __init__(self, slot=None, **kwargs):
-        super().__init__(
-            name="bluetooth-button",
-            h_expand=True,
-            v_expand=True,
-            spacing=4,
-            orientation="h",
-            **kwargs,
-        )
-
-        self.left_button_childs = Box(
-            name="bluetooth-left-button-childs",
-            orientation="h",
-            spacing=8,
-        )
-        self.left_button = Button(
-            name="bluetooth-left-button",
-            h_expand=True,
-            child=self.left_button_childs,
-        )
-
-        self.slot = slot
-        self.bluetooth_status_text = Label(name="bluetooth-status",
-                                           label="Bluetooth",
-                                           all_visible=True,
-                                           visible=True)
-        self.bluetooth_icon = Label(name="bluetooth-icon",
-                                    markup=icons.bluetooth)
-        self.bluetooth_devices_open_button = Button(
-            style_classes=["expand-button-caret"],
-            child=Label(name="bluetooth-open-label",
-                        markup=icons.chevron_right),
-        )
         self.labels = dict()
-        self.labels["bluetooth_button"] = self.left_button
-        self.labels["bluetooth_status_text"] = self.bluetooth_status_text
-        self.labels["bluetooth_icon"] = self.bluetooth_icon
         self.bluetooth_devices_dropdown = BluetoothDevicesDropdown(
             labels=self.labels)
-        self.slot.add(self.bluetooth_devices_dropdown)
-
-        self.left_button_childs.add(self.bluetooth_icon)
-        self.left_button_childs.add(self.bluetooth_status_text)
-        self.add(self.left_button)
-        self.add(self.bluetooth_devices_open_button)
-        self.bluetooth_devices_open_button.connect(
-            "clicked",
-            lambda *_:
-            (self.bluetooth_devices_dropdown.toggle_visibility()
-             if self.bluetooth_devices_dropdown.client.enabled else None),
-        )
-        self.left_button.connect(
-            "clicked",
-            lambda *_: (
+        super().__init__(
+            label="Bluetooth",
+            slot=slot,
+            dropdown=self.bluetooth_devices_dropdown,
+            icon=icons.bluetooth,
+            left_button_click=lambda *_: (
                 self.bluetooth_devices_dropdown.client.toggle_power(),
                 (self.bluetooth_devices_dropdown.toggle_visibility()
                  if self.bluetooth_devices_dropdown.shown else None),
             ),
+            **kwargs,
         )
+        self.labels["button"] = self.left_button
+        self.labels["status_text"] = self.status_text
+        self.labels["icon"] = self.icon
+        self.bluetooth_devices_dropdown.set_labels(self.labels)

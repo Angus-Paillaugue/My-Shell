@@ -5,15 +5,13 @@ gi.require_version("GLib", "2.0")
 from fabric.utils import get_relative_path, monitor_file
 from fabric import Application
 from modules.bar import Bar
-from modules.launcher import AppLauncher
 import services.config as config
-from modules.wallpaper import WallpaperManager
-from modules.clipboard import ClipboardManager
 from modules.notification import NotificationPopup
 from modules.corners import Corners
 from modules.dock import Dock
 from fabric.notifications.service import Notifications
 from modules.notification import NotificationHistory
+from modules.notch import NotchWindow
 
 if __name__ == "__main__":
     setproctitle.setproctitle(config.APP_NAME)
@@ -24,21 +22,14 @@ if __name__ == "__main__":
         notification_server=notification_server,
         notification_history=notification_history,
     )
-    bar = Bar(
-        notification_server=notification_server,
-        notification_history=notification_history,
-    )
-    launcher = AppLauncher()
-    wallpaper_manager = WallpaperManager()
-    clipboard_manager = ClipboardManager()
+    bar = Bar()
     corners = Corners()
     dock = Dock()
+    notch = NotchWindow(notification_history=notification_history)
     app = Application(
         config.APP_NAME,
         bar,
-        launcher,
-        wallpaper_manager,
-        clipboard_manager,
+        notch,
         notification,
         corners,
         dock,

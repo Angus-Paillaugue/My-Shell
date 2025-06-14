@@ -41,14 +41,32 @@ class PowerProfile(Box):
         # Placeholder for WiFi module content
         self.profile_icon = Label(name="power-profile-icon",
                                   markup=self.active_profile["icon"])
-        self.profile_name = Label(name="power-profile-name",
-                                  label=self.active_profile["label"])
+        self.profile_name = Label(
+            name="power-profile-name",
+            label=self.active_profile["label"],
+            h_align="start",
+        )
 
         self.button = Button(
             name="power-profile-button",
             child=Box(
                 spacing=12,
-                children=[self.profile_icon, self.profile_name],
+                children=[
+                    self.profile_icon,
+                    Box(
+                        orientation="v",
+                        h_align="start",
+                        v_align="center",
+                        children=[
+                            Label(
+                                label="Power profile",
+                                name="pp-button-label",
+                                h_align="start",
+                            ),
+                            self.profile_name,
+                        ],
+                    ),
+                ],
                 orientation="h",
             ),
             on_clicked=lambda b: self.rotate_profile(),

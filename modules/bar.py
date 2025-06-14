@@ -4,21 +4,17 @@ from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.box import Box
 import os
 from modules.time import Time
-from modules.settings import Settings
 from modules.metrics import Metrics
 from modules.tray import SystemTray
 from modules.weather import WeatherButton
-from modules.corners import CornerContainer
 from modules.workspaces import Workspaces
 from modules.language import Language
-from modules.notification import NotificationHistoryIndicator, NotificationHistory
-from fabric.notifications.service import Notifications
+from modules.power import PowerButton
 
 
 class Bar(WaylandWindow):
 
-    def __init__(self, notification_server: Notifications,
-                 notification_history: NotificationHistory, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(name="bar",
                          layer="overlay",
                          anchor="left top right",
@@ -32,45 +28,25 @@ class Bar(WaylandWindow):
         self.metrics = Metrics()
         self.time = Time()
         self.system_tray = SystemTray()
-        self.settings = Settings()
-        self.notification_server = notification_server
-        self.notification_history_indicator = NotificationHistoryIndicator(
-            notification_history=notification_history,)
         self.weather_button = (WeatherButton() if not os.environ.get("DEV_MODE")
                                else Box(visible=False))
+        self.power_button = PowerButton()
 
         self.start_box = Box(
             name="bar-start-container",
-            children=Box(
-                name="bar-start-container-inner",
-                children=[
-                    self.workspaces,
-                    self.weather_button,
-                    self.metrics,
-                ],
-            ),
-        )
-        self.center_box = CornerContainer(
-            name="bar-center-container",
-            corners=["left", "right"],
-            height=30,
             spacing=8,
-            v_align="center",
             children=[
-                self.notification_history_indicator,
-                self.time,
+                self.workspaces,
+                self.weather_button,
+                self.metrics,
             ],
         )
         self.end_box = Box(
             name="bar-end-container",
-            children=Box(
-                name="bar-end-container-inner",
-                children=[
-                    self.system_tray,
-                    self.language,
-                    self.settings,
-                ],
-            ),
+            spacing=8,
+            children=[
+                self.system_tray, self.language, self.time, self.power_button
+            ],
         )
 
         self.bar_inner = CenterBox(
@@ -79,7 +55,6 @@ class Bar(WaylandWindow):
             h_align="fill",
             v_align="fill",
             start_children=self.start_box,
-            center_children=self.center_box,
             end_children=self.end_box,
         )
 

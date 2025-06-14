@@ -13,6 +13,7 @@ class Metrics(Button):
     def __init__(self, **kwargs):
         super().__init__(
             visible=True,
+            style_classes=["bar-item"],
             **kwargs,
         )
 

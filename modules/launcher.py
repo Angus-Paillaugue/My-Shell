@@ -17,17 +17,14 @@ from gi.repository import Gdk, GLib
 from services.logger import logger
 import modules.icons as icons
 from modules.dock import pinned_aps_location
-from modules.dismissible_window import DismissibleWindow
 
 
-class AppLauncher(DismissibleWindow):
+class AppLauncher(Box):
 
     def __init__(self, **kwargs):
         super().__init__(
-            anchor="center center",
-            visible=False,
-            exclusivity="auto",
-            keyboard_mode="exclusive",
+            spacing=10,
+            orientation="v",
             **kwargs,
         )
         self.selected_index = -1
@@ -61,7 +58,7 @@ class AppLauncher(DismissibleWindow):
         )
         self.search_entry.props.xalign = 0.5
         self.scrolled_window = ScrolledWindow(
-            name="scrolled-window",
+            name="notch-scrolled-window",
             spacing=10,
             h_expand=True,
             v_expand=True,
@@ -72,38 +69,8 @@ class AppLauncher(DismissibleWindow):
             propagate_height=False,
         )
 
-        self.header_box = Box(
-            name="header_box",
-            spacing=10,
-            orientation="h",
-            children=[
-                self.search_entry,
-                Button(
-                    child=Label(markup=icons.cancel),
-                    on_clicked=lambda *_: self.close_launcher(),
-                    style_classes=["close-button"],
-                ),
-            ],
-        )
-
-        self.launcher_box = Box(
-            name="launcher-box",
-            spacing=10,
-            h_expand=True,
-            orientation="v",
-            children=[
-                self.header_box,
-                self.scrolled_window,
-            ],
-        )
-
-        self.add(self.launcher_box)
-
-    def close_launcher(self):
-        self.search_entry.set_text("")
-        self.viewport.children = []
-        self.selected_index = -1
-        self.hide()
+        self.add(self.search_entry)
+        self.add(self.scrolled_window)
 
     def open_launcher(self):
         self._all_apps = get_desktop_applications()
@@ -213,10 +180,10 @@ class AppLauncher(DismissibleWindow):
                         v_align="center",
                         h_align="start",
                         h_expand=True,
-                    )
+                    ),
                 ],
             ),
-            on_clicked=lambda *_: (app.launch(), self.close_launcher()),
+            on_clicked=lambda *_: app.launch(),
         )
 
         # Create a container that holds both buttons side by side
@@ -331,7 +298,7 @@ class AppLauncher(DismissibleWindow):
                     selected_index = (self.selected_index
                                       if self.selected_index != -1 else 0)
                     if 0 <= selected_index < len(children):
-                        children[selected_index].clicked()
+                        children[selected_index].get_children()[0].clicked()
 
     def on_search_entry_key_press(self, widget, event):
         text = widget.get_text()
@@ -362,9 +329,6 @@ class AppLauncher(DismissibleWindow):
 
                     self.evaluate_calculator_expression(text)
                 return True
-            elif event.keyval == Gdk.KEY_Escape:
-                self.close_launcher()
-                return True
             return False
         if text.startswith(";"):
             if event.keyval == Gdk.KEY_Down:
@@ -372,9 +336,6 @@ class AppLauncher(DismissibleWindow):
                 return True
             elif event.keyval == Gdk.KEY_Up:
                 self.move_selection(-1)
-                return True
-            elif event.keyval == Gdk.KEY_Escape:
-                self.close_launcher()
                 return True
             return False
         else:
@@ -387,9 +348,6 @@ class AppLauncher(DismissibleWindow):
                 return True
             elif event.keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter) and (
                     event.state & Gdk.ModifierType.SHIFT_MASK):
-                return True
-            elif event.keyval == Gdk.KEY_Escape:
-                self.close_launcher()
                 return True
             return False
 

@@ -287,6 +287,7 @@ class Wired(Box):
             label="Ethernet",
             all_visible=True,
             visible=True,
+            h_align="start",
             ellipsization="end",
         )
         self.wired_icon = Label(name="wired-icon", markup=icons.ethernet_off)
@@ -304,7 +305,20 @@ class Wired(Box):
 
         # Set up the UI elements
         self.left_button_childs.add(self.wired_icon)
-        self.left_button_childs.add(self.wired_status_text)
+        self.left_button_childs.add(
+            Box(
+                orientation="v",
+                h_align="start",
+                v_align="center",
+                children=[
+                    Label(
+                        label="Wired",
+                        name="wired-button-label",
+                        h_align="start",
+                    ),
+                    self.wired_status_text,
+                ],
+            ))
         self.add(self.left_button)
         self.add(self.wired_networks_open_button)
 

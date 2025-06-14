@@ -15,7 +15,6 @@ from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import GdkPixbuf, GLib, Gtk
 from fabric.widgets.wayland import WaylandWindow
 from services.logger import logger
-from modules.dismissible_window import DismissibleWindow
 
 import modules.icons as icons
 from services.config import APP_NAME
@@ -168,12 +167,7 @@ class NotificationBox(Box):
         self.max_lines = 5
         self.notification = notification
         self.uuid = str(uuid.uuid4())
-
-        if timeout_ms == 0:
-            self.timeout_ms = 0
-        else:
-            # Default timeout is 5 seconds
-            self.timeout_ms = timeout_ms
+        self.timeout_ms = timeout_ms if timeout_ms >= 0 else 5000
 
         self._timeout_id = None
         self._container = None
@@ -453,7 +447,10 @@ class NotificationHistory(Box):
                  notification_server: Notifications,
                  on_event=None,
                  **kwargs):
-        super().__init__(name="notification-history", orientation="v", **kwargs)
+        super().__init__(name="notification-history",
+                         orientation="v",
+                         h_expand=True,
+                         **kwargs)
 
         self.containers = []
         self.header_label = Label(
@@ -468,13 +465,14 @@ class NotificationHistory(Box):
         )
         self.dnd_switch = Button(
             name="dnd-switch",
-            style_classes=["bar-action-button"],
+            style_classes=["bar-action-button", "small"],
             child=self.dnd_switch_label,
             on_clicked=lambda *_: self.on_do_not_disturb_changed(),
             tooltip_text="Enable Do Not Disturb",
         )
         self.header_clean = Button(
             name="nhh-button",
+            style_classes=["bar-action-button", "small", "danger"],
             child=Label(name="nhh-button-label", markup=icons.trash),
             on_clicked=self.clear_history,
         )
@@ -620,6 +618,7 @@ class NotificationHistory(Box):
         self.dnd_switch.set_tooltip_text(
             "Disable Do Not Disturb" if self.
             do_not_disturb_enabled else "Enable Do Not Disturb")
+        self.emit("do-not-disturb-changed")
 
     def clear_history(self, *args):
         for child in self.notifications_list.get_children()[:]:
@@ -1007,7 +1006,6 @@ class NotificationHistory(Box):
         self.emit("notification-added")
 
     def _append_persistent_notification(self, notification_box, arrival_time):
-        print("Appending persistent notification")
         note = {
             "id": notification_box.uuid,
             "app_icon": notification_box.notification.app_icon,
@@ -1115,6 +1113,7 @@ class NotificationHistoryIndicator(Button):
             name="notification-history-indicator",
             h_align="center",
             v_align="center",
+            style_classes=["hidden"],
             **kwargs,
         )
         self.set_tooltip_text("Notification History")
@@ -1122,9 +1121,7 @@ class NotificationHistoryIndicator(Button):
         # Create notification history component
         self.notification_history = notification_history
         self.notification_history.on_event = self.on_notification_history_event
-
-        # Create dismissible window to hold the history
-        self.history_window = DismissibleWindow(anchor="top center",)
+        self.dnd = self.notification_history.do_not_disturb_enabled
 
         # Create container for icon and counter
         self._container = Box(
@@ -1139,17 +1136,10 @@ class NotificationHistoryIndicator(Button):
         # Add components to container
         self.add(self.icon)
 
-        self.history_window.add(self.notification_history)
-
         # Track notification count
         self.notification_count = len(
             self.notification_history.persistent_notifications)
         self.update_counter()
-        self.connect("clicked", self.toggle_history_window)
-
-    def toggle_history_window(self, *args):
-        """Toggle notification history window visibility."""
-        self.history_window.toggle()
 
     def on_notification_history_event(self, signal_name, *args):
         """Handle notification history events with proper count management."""
@@ -1160,6 +1150,22 @@ class NotificationHistoryIndicator(Button):
                 self.update_counter()
             case "notification-deleted":
                 self.update_counter()
+            case "do-not-disturb-changed":
+                self.dnd = self.notification_history.do_not_disturb_enabled
+                style_context = self.get_style_context()
+                if self.dnd:
+                    self.icon.set_markup(icons.dnd)
+                    self.add_style_class("dnd")
+                    if not style_context.has_class("hovered"):
+                        self.remove_style_class("hidden")
+                    self.set_tooltip_text("Do Not Disturb Enabled")
+                else:
+                    self.icon.set_markup(icons.notification)
+                    self.remove_style_class("dnd")
+                    self.set_tooltip_text("")
+                    if self.notification_count > 0 and not style_context.has_class(
+                            "hovered"):
+                        self.remove_style_class("hidden")
             case _:
                 logger.warning(
                     f"Unhandled notification history event: {signal_name}")
@@ -1169,9 +1175,13 @@ class NotificationHistoryIndicator(Button):
 
         # Update UI based on count
         if self.notification_count > 0:
-            self.add_style_class("notification-indicator-active")
+            self.add_style_class("active")
+            style_context = self.get_style_context()
+            if not style_context.has_class("hovered"):
+                self.remove_style_class("hidden")
         else:
-            self.remove_style_class("notification-indicator-active")
+            self.remove_style_class("active")
+            self.add_style_class("hidden")
 
 
 class NotificationContainer(Box):
@@ -1228,13 +1238,22 @@ class NotificationContainer(Box):
                 "Do Not Disturb mode enabled: adding notification directly to history."
             )
             notification = fabric_notif.get_notification_from_id(id)
-            new_box = NotificationBox(notification)
+            print(notification.timeout)
+            new_box = NotificationBox(
+                notification,
+                timeout_ms=notification.timeout,
+            )
             if notification.image_pixbuf:
                 cache_notification_pixbuf(new_box)
+
+            notification_history_instance.add_notification(new_box)
             return
 
         notification = fabric_notif.get_notification_from_id(id)
-        new_box = NotificationBox(notification)
+        new_box = NotificationBox(
+            notification,
+            timeout_ms=notification.timeout,
+        )
         new_box.set_container(self)
         notification.connect("closed", self.on_notification_closed)
 
@@ -1303,12 +1322,13 @@ class NotificationContainer(Box):
             return True
         return False
 
-    def on_notification_closed(self, notification, reason):
+    def on_notification_closed(self, notification:Notification, reason):
         if self._is_destroying:
             return
         if notification.id in self._destroyed_notifications:
             return
         self._destroyed_notifications.add(notification.id)
+        transient = notification.do_get_hint_entry("transient") or False
         try:
             logger.info(
                 f"Notification {notification.id} closing with reason: {reason}")
@@ -1366,7 +1386,8 @@ class NotificationContainer(Box):
                 notif_box.stop_timeout()
 
                 # Add the notification to history
-                notification_history_instance.add_notification(notif_box)
+                if not transient:
+                    notification_history_instance.add_notification(notif_box)
 
             elif (reason_str == "NotificationCloseReason.CLOSED" or
                   reason_str == "NotificationCloseReason.UNDEFINED"):

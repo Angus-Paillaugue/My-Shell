@@ -5,7 +5,7 @@
 /* Context menu */
 menu {
   background-color: var(--shadow);
-  border: 1px solid var(--surface-bright);
+  border: 2px solid var(--surface);
   padding: 4px;
 }
 
@@ -15,7 +15,7 @@ menu > menuitem {
 }
 
 menu > menuitem:hover {
-  background-color: var(--surface-bright);
+  background-color: var(--surface);
 }
 menu > menuitem:hover label {
   color: var(--primary);

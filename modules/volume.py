@@ -154,7 +154,7 @@ class VolumeRow(Box):
         self.audio = Audio()
         self.outputs_box = VolumeOutputsRevealer()
         self.output_box_button = Button(
-            name="volume-outputs-open-button",
+            style_classes=["volume-outputs-open-button"],
             child=Label(markup=icons.chevron_right),
             v_expand=True,
             h_align="center",
@@ -480,7 +480,7 @@ class MicRow(Box):
             orientation="h",
             spacing=12,
             h_expand=True,
-            visible=False,  # Start hidden by default
+            visible=True,  # Start hidden by default
             **kwargs,
         )
 
@@ -488,7 +488,7 @@ class MicRow(Box):
         self.audio = Audio()
         self.inputs_box = MicInputsRevealer()
         self.input_box_button = Button(
-            name="mic-outputs-open-button",
+            style_classes=["volume-outputs-open-button"],
             child=Label(markup=icons.chevron_right),
             v_expand=True,
             h_align="center",

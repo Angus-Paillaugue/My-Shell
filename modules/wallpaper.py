@@ -8,23 +8,23 @@ from fabric.widgets.label import Label
 from gi.repository import Gtk, GdkPixbuf, Gio, Gdk, GLib
 from fabric.widgets.image import Image
 from fabric.widgets.scrolledwindow import ScrolledWindow
-import modules.icons as icons
 from services.logger import logger
-from modules.dismissible_window import DismissibleWindow
 
 
-class WallpaperManager(DismissibleWindow):
+class WallpaperManager(Box):
 
     def __init__(self, **kwargs):
         super().__init__(
-            anchor="center center",
-            exclusivity="exclusive",
-            keyboard_mode="exclusive",
-            visible=False,
+            orientation="v",
+            spacing=12,
+            h_expand=True,
+            v_expand=True,
+            h_align="fill",
+            v_align="fill",
             **kwargs,
         )
 
-        self.columns = 3
+        self.columns = 2
         self.wallpaper_location = os.path.expanduser("~/Pictures/wallpapers")
         self.image_cache = {}
         self.loaded_images = set()
@@ -36,71 +36,36 @@ class WallpaperManager(DismissibleWindow):
         # Create a grid that will adapt to its contents
         self.buttons_grid = Gtk.Grid(
             column_homogeneous=True,
-            row_homogeneous=False,
-            name="wallpaper-grid",
+            row_homogeneous=True,
             column_spacing=12,
             row_spacing=12,
         )
-
-        # Configure scrolled window to allow vertical scrolling as needed
         self.scrollable_area = ScrolledWindow(
-            child=self.buttons_grid,
-            h_expand=True,
-            v_expand=True,
-            h_scroll_policy=Gtk.PolicyType.
-            NEVER,  # Never show horizontal scrollbar
-            v_scroll_policy=Gtk.PolicyType.
-            AUTOMATIC,  # Show vertical scrollbar when needed
-        )
-        # Make sure container has explicit minimum size but can grow
-        self.main_container = Box(
-            name="wallpaper-manager-container",
-            orientation="v",
-            spacing=12,
+            name="notch-scrolled-window",
+            spacing=10,
             h_expand=True,
             v_expand=True,
             h_align="fill",
             v_align="fill",
+            propagate_width=False,
+            propagate_height=False,
+            child=self.buttons_grid,
         )
 
         self.entry = Entry(
-            name="search-entry",
             placeholder="Search Wallpapers...",
             h_expand=True,
             h_align="fill",
             notify_text=self.notify_text,
+            name="search-entry",
         )
         self.entry.props.xalign = 0.5
-
-        self.header = Box(
-            name="wallpaper-manager-header",
-            orientation="h",
-            spacing=10,
-            children=[
-                self.entry,
-                Button(
-                    child=Label(markup=icons.cancel),
-                    on_clicked=lambda btn: self.toggle(),
-                    style_classes=["close-button"],
-                ),
-            ],
-        )
-        self.main_container.add(self.header)
-        self.main_container.add(self.scrollable_area)
-
-        # Set a minimum size that accommodates 3 columns
-        # Calculate based on image width (300px) * 3 + padding/spacing
-        min_width = ((300 * self.columns) + (12 * (self.columns + 1)) + 30
-                    )  # Images + spacing + padding
-        min_height = 420
-
-        self.main_container.set_size_request(min_width, min_height)
-        self.add(self.main_container)
+        self.add(self.entry)
+        self.add(self.scrollable_area)
 
         self._refresh_wallpapers()
         self.setup_file_monitor()
         self.connect("key-press-event", self.on_key_press)
-        self.connect("show", self._on_window_show)
 
     def notify_text(self, entry, *_):
         """Handle text changes in the search entry"""
@@ -181,13 +146,13 @@ class WallpaperManager(DismissibleWindow):
             self._load_images_in_background(filtered_wallpapers)
 
         # Ensure everything is visible
-        self.main_container.show_all()
+        self.show_all()
 
     def _add_wallpaper_button_placeholder(self, path: str, filename: str,
                                           col: int, row: int):
         """Add a wallpaper button with a placeholder image."""
-        image_width = 240
-        image_height = 135
+        image_width = 330
+        image_height = image_width * 3 // 4  # 16:9 aspect ratio
 
         # Create a placeholder image (gray rectangle)
         placeholder = Gtk.Box()
@@ -195,8 +160,7 @@ class WallpaperManager(DismissibleWindow):
         placeholder.get_style_context().add_class("wallpaper-placeholder")
 
         # Create image widget that will be updated later
-        image = Image(style_classes=["wallpaper-button-image"],)
-        image.set_size_request(image_width, image_height)
+        image = Image(style_classes=["wallpaper-button-image"])
 
         image.path = path
 
@@ -223,8 +187,7 @@ class WallpaperManager(DismissibleWindow):
 
         button = Button(
             child=contents,
-            on_clicked=lambda btn, wp=path:
-            (self.set_wallpaper(wp), self.toggle()),
+            on_clicked=lambda btn, wp=path: self.set_wallpaper(wp),
             style_classes=["wallpaper-button"],
         )
 
@@ -288,41 +251,6 @@ class WallpaperManager(DismissibleWindow):
 
                     # Exit the loop after finding the matching image
                     return
-
-    def _on_window_show(self, widget):
-        """Called when the window is shown - ensure proper image visibility."""
-        # Go through all loaded images and ensure placeholders are hidden
-        if self.loaded_images:
-            for child in self.buttons_grid.get_children():
-                box = child.get_child()
-                if not box or not isinstance(box, Box):
-                    continue
-
-                for widget in box.get_children():
-                    if (isinstance(widget, Image) and
-                            hasattr(widget, "path") and
-                            widget.path in self.loaded_images):
-                        # This image has been loaded, update visibilities
-                        placeholder = None
-                        for sibling in box.get_children():
-                            if isinstance(sibling, Gtk.Box) and not isinstance(
-                                    sibling, Image):
-                                placeholder = sibling
-                                break
-
-                        if placeholder:
-                            placeholder.hide()
-
-                        widget.show()
-
-    def toggle(self):
-        if self.is_visible():
-            self.hide()
-            self.entry.set_text("")
-            self._refresh_wallpapers()
-        else:
-            self.show_all()
-            self.present()
 
     def _list_wallpapers(self):
         """
