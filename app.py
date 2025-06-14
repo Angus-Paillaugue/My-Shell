@@ -12,6 +12,7 @@ from modules.dock import Dock
 from fabric.notifications.service import Notifications
 from modules.notification import NotificationHistory
 from modules.notch import NotchWindow
+from modules.osd import OSD
 
 if __name__ == "__main__":
     setproctitle.setproctitle(config.APP_NAME)
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     corners = Corners()
     dock = Dock()
     notch = NotchWindow(notification_history=notification_history)
+    osd = OSD()
     app = Application(
         config.APP_NAME,
         bar,
@@ -33,6 +35,7 @@ if __name__ == "__main__":
         notification,
         corners,
         dock,
+        osd,
     )
 
     def apply_stylesheet(*_):

@@ -12,7 +12,7 @@ import modules.icons as icons
 from gi.repository import GLib
 from fabric.utils import exec_shell_command_async
 from services.logger import logger
-
+from modules.settings import SettingsBroker
 
 class VolumeSlider(Scale):
 
@@ -34,6 +34,7 @@ class VolumeSlider(Scale):
         self.connect("value-changed", self.on_value_changed)
         self.add_style_class("vol")
         self.on_speaker_changed()
+        self.settings_notifier = SettingsBroker()
 
     def on_new_speaker(self, *args):
         if self.audio.speaker:
@@ -48,7 +49,11 @@ class VolumeSlider(Scale):
     def on_speaker_changed(self, *_):
         if not self.audio.speaker:
             return
-        self.value = self.audio.speaker.volume / 100
+
+        if self.value == round(self.audio.speaker.volume / 100, 2):
+            return
+        self.value = round(self.audio.speaker.volume / 100, 2)
+        self.settings_notifier.notify_listeners("volume-changed", round(self.value * 100))
 
         if self.audio.speaker.muted:
             self.add_style_class("muted")
@@ -371,6 +376,7 @@ class MicSlider(Scale):
             **kwargs,
         )
         self.audio = audio
+        self.settings_notifier = SettingsBroker()
         self.audio.connect("notify::microphone", self.on_new_microphone)
         if self.audio.microphone:
             self.audio.microphone.connect("changed", self.on_microphone_changed)
@@ -390,7 +396,11 @@ class MicSlider(Scale):
     def on_microphone_changed(self, *_):
         if not self.audio.microphone:
             return
-        self.value = self.audio.microphone.volume / 100
+
+        if self.value == round(self.audio.microphone.volume / 100, 2):
+            return
+        self.value = round(self.audio.microphone.volume / 100, 2)
+        self.settings_notifier.notify_listeners("mic-changed", round(self.value * 100))
 
         if self.audio.microphone.muted:
             self.add_style_class("muted")

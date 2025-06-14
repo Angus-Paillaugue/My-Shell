@@ -327,7 +327,7 @@ class NotchWidgetDefault(Box):
             self.show_default()
         elif class_name != self._current_window_class:
             self._current_window_class = class_name
-            window_name = f"{class_name[0].upper() + class_name[1:]} - {title}"
+            window_name = f"{class_name[0].upper() + class_name[1:]}"
             self.active_window.set_label(self._center_string(window_name))
             self.update_window_icon()
 

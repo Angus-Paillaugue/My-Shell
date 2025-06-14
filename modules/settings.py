@@ -3,6 +3,30 @@ from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 import modules.icons as icons
 
+def singleton(class_):
+    instances = {}
+    def getinstance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        return instances[class_]
+    return getinstance
+
+@singleton
+class SettingsBroker():
+
+    def register_listener(self, listener):
+        if not hasattr(self, '_listeners'):
+            self._listeners = []
+        self._listeners.append(listener)
+
+    def notify_listeners(self, event, *args, **kwargs):
+        for listener in getattr(self, '_listeners', []):
+            listener(event, *args, **kwargs)
+
+    def unregister_listener(self, listener):
+        if hasattr(self, '_listeners'):
+            self._listeners.remove(listener)
+
 
 class SettingsButton(Box):
 

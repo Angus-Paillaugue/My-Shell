@@ -6,6 +6,7 @@ from fabric.widgets.scale import Scale
 from fabric.utils import exec_shell_command_async, monitor_file
 from gi.repository import GLib
 import modules.icons as icons
+from modules.settings import SettingsBroker
 from services.logger import logger
 
 # Discover screen backlight device
@@ -112,11 +113,15 @@ class BrightnessSlider(Scale):
 
         self._pending_value = None
         self._update_source_id = None
+        self.settings_notifier = SettingsBroker()
 
         self.connect("change-value", self.on_scale_move)
         self.client.connect("screen", self.on_brightness_changed)
 
     def on_brightness_changed(self, client, _):
+        self.settings_notifier.notify_listeners(
+            "brightness-changed", round((self.client.screen_brightness / self.client.max_screen) * 100)
+        )
         self.set_value(self.client.screen_brightness)
 
     def on_scale_move(self, widget, scroll, moved_pos):
