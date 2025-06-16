@@ -1,6 +1,9 @@
 #metrics-main-box {
   font-weight: bold;
-  padding: 4px 12px;
+  padding: 0 12px;
+}
+#metrics-main-box.vertical {
+  padding: 12px 4px;
 }
 
 #ram-label {

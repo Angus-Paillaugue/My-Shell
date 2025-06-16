@@ -1,15 +1,42 @@
 #dock-mouse-area {
-  padding: 10px;
-  padding-bottom: 0;
   border-radius: 0;
+  padding: 10px;
+}
+#dock-mouse-area.top {
+  padding-top: 0;
+}
+#dock-mouse-area.bottom {
+  padding-bottom: 0;
+}
+#dock-mouse-area.left {
+  padding-left: 0;
+}
+#dock-mouse-area.right {
+  padding-right: 0;
 }
 
 #dock-items-container {
+  background-color: var(--shadow);
+}
+#dock-items-container.left {
+  min-width: 80px;
+  padding: 20px 0;
+  border-radius: 0 40px 40px 0;
+}
+#dock-items-container.right {
+  min-width: 80px;
+  padding: 20px 0;
+  border-radius: 40px 0 0 40px;
+}
+#dock-items-container.bottom {
   min-height: 80px;
   padding: 0 20px;
-  background-color: var(--shadow);
   border-radius: 40px 40px 0 0;
-  margin-bottom: 0;
+}
+#dock-items-container.top {
+  min-height: 80px;
+  padding: 0 20px;
+  border-radius: 0 0 40px 40px;
 }
 
 #dock-container {

@@ -9,7 +9,7 @@ import threading
 from services.logger import logger
 from fabric.core.fabricator import Fabricator
 from gi.repository import GLib
-
+from services.config import config
 
 class Weather:
 
@@ -74,12 +74,19 @@ class WeatherButton(Button):
     def __init__(self, update_interval=10, **kwargs):
         super().__init__(
             name="weather-button",
-            style_classes=["bar-item"],
+            style_classes=[
+                "bar-item",
+                (
+                    "horizontal"
+                    if config.BAR_POSITION in ["top", "bottom"]
+                    else "vertical"
+                ),
+            ],
             **kwargs,
         )
         self.weather_worker = WeatherWorker()
         self.main_container = Box(
-            orientation="h",
+            orientation="h" if config.BAR_POSITION in ["top", "bottom"] else "v",
             spacing=8,
         )
         self.loading_icon = Label(

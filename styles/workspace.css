@@ -1,6 +1,9 @@
 #workspaces {
   padding: 0 12px;
 }
+#workspaces.vertical {
+  padding: 12px 0;
+}
 
 #workspaces > button {
   min-width: 8px;

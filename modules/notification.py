@@ -17,9 +17,9 @@ from fabric.widgets.wayland import WaylandWindow
 from services.logger import logger
 
 import modules.icons as icons
-from services.config import APP_NAME
+from services.config import config
 
-PERSISTENT_DIR = f"/tmp/{APP_NAME}/notifications"
+PERSISTENT_DIR = f"/tmp/{config.APP_NAME}/notifications"
 PERSISTENT_HISTORY_FILE = os.path.join(PERSISTENT_DIR,
                                        "notification_history.json")
 MAX_VISIBLE_NOTIFICATIONS = 3
@@ -260,9 +260,9 @@ class NotificationBox(Box):
             icon_name="dialog-information-symbolic" or notification.app_icon,
             icon_size=24,
         ))
-        self.app_name_label_header = Label(notification.app_name,
-                                           name="notification-app-name",
-                                           h_align="start")
+        self.config.app_name_label_header = Label(
+            notification.config.app_name, name="notification-app-name", h_align="start"
+        )
         self.header_close_button = self.create_close_button()
 
         return CenterBox(
@@ -272,7 +272,7 @@ class NotificationBox(Box):
                     spacing=4,
                     children=[
                         self.app_icon_image,
-                        self.app_name_label_header,
+                        self.config.app_name_label_header,
                     ],
                 )
             ],
@@ -306,9 +306,9 @@ class NotificationBox(Box):
             notification_text_labels.append(label)
         self.notification_summary_label = Box(orientation="v",
                                               children=notification_text_labels)
-        self.notification_app_name_label_content = Label(
+        self.notification_config.app_name_label_content = Label(
             name="notification-app-name",
-            markup=notification.app_name,
+            markup=notification.config.app_name,
             h_align="start",
             max_chars_width=25,
             ellipsization="end",
@@ -332,7 +332,7 @@ class NotificationBox(Box):
                     name="notification-summary-box",
                     orientation="v",
                     children=[
-                        self.notification_app_name_label_content,
+                        self.notification_config.app_name_label_content,
                         self.notification_summary_label,
                         # Box(
                         #     name="notif-sep",
@@ -420,7 +420,7 @@ class NotificationBox(Box):
 
 
 class HistoricalNotification(object):
-
+    app_name = config.APP_NAME
     def __init__(self,
                  id,
                  app_icon,
@@ -433,7 +433,7 @@ class HistoricalNotification(object):
         self.app_icon = app_icon
         self.summary = summary
         self.body = body
-        self.app_name = app_name
+        self.config.app_name = config.app_name
         self.timestamp = timestamp
         self.cached_image_path = cached_image_path
         self.image_pixbuf = None
@@ -782,9 +782,9 @@ class NotificationHistory(Box):
             ellipsization="end",
         )
 
-        self.hist_notif_app_name_label = Label(
+        self.hist_notif_config.app_name_label = Label(
             name="notification-app-name",
-            markup=f"{hist_notif.app_name}",
+            markup=f"{hist_notif.config.app_name}",
             h_align="start",
             ellipsization="end",
         )
@@ -811,7 +811,7 @@ class NotificationHistory(Box):
                     h_align="center",
                     v_align="center",
                 ),
-                self.hist_notif_app_name_label,
+                self.hist_notif_config.app_name_label,
                 Box(
                     name="notif-sep",
                     h_expand=False,
@@ -859,9 +859,9 @@ class NotificationHistory(Box):
         self.rebuild_with_separators()
 
     def add_notification(self, notification_box):
-        app_name = notification_box.notification.app_name
-        if app_name in self.LIMITED_APPS_HISTORY:
-            self.clear_history_for_app(app_name)
+        config.app_name = notification_box.notification.config.app_name
+        if config.app_name in self.LIMITED_APPS_HISTORY:
+            self.clear_history_for_app(config.app_name)
 
         if len(self.containers) >= 50:
             oldest_container = self.containers.pop()
@@ -921,9 +921,9 @@ class NotificationHistory(Box):
             h_align="start",
             ellipsization="end",
         )
-        self.current_notif_app_name_label = Label(
+        self.current_notif_config.app_name_label = Label(
             name="notification-app-name",
-            markup=f"{notification_box.notification.app_name}",
+            markup=f"{notification_box.notification.config.app_name}",
             h_align="start",
             ellipsization="end",
         )
@@ -948,7 +948,7 @@ class NotificationHistory(Box):
                     h_align="center",
                     v_align="center",
                 ),
-                self.current_notif_app_name_label,
+                self.current_notif_config.app_name_label,
                 Box(
                     name="notif-sep",
                     h_expand=False,
@@ -1011,7 +1011,7 @@ class NotificationHistory(Box):
             "app_icon": notification_box.notification.app_icon,
             "summary": notification_box.notification.summary,
             "body": notification_box.notification.body,
-            "app_name": notification_box.notification.app_name,
+            "config.app_name": notification_box.notification.config.app_name,
             "timestamp": arrival_time.isoformat(),
             "cached_image_path": notification_box.cached_image_path,
         }
@@ -1238,7 +1238,6 @@ class NotificationContainer(Box):
                 "Do Not Disturb mode enabled: adding notification directly to history."
             )
             notification = fabric_notif.get_notification_from_id(id)
-            print(notification.timeout)
             new_box = NotificationBox(
                 notification,
                 timeout_ms=notification.timeout,
@@ -1257,14 +1256,14 @@ class NotificationContainer(Box):
         new_box.set_container(self)
         notification.connect("closed", self.on_notification_closed)
 
-        app_name = notification.app_name
-        if app_name in self.LIMITED_APPS:
-            notification_history_instance.clear_history_for_app(app_name)
+        config.app_name = notification.config.app_name
+        if config.app_name in self.LIMITED_APPS:
+            notification_history_instance.clear_history_for_app(config.app_name)
 
             # Remove existing notification for this LIMITED_APP if present
             existing_notification_index = -1
             for index, existing_box in enumerate(self.notifications):
-                if existing_box.notification.app_name == app_name:
+                if existing_box.notification.config.app_name == config.app_name:
                     existing_notification_index = index
                     break
 

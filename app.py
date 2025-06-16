@@ -5,7 +5,7 @@ gi.require_version("GLib", "2.0")
 from fabric.utils import get_relative_path, monitor_file
 from fabric import Application
 from modules.bar import Bar
-import services.config as config
+from services.config import config
 from modules.notification import NotificationPopup
 from modules.corners import Corners
 from modules.dock import Dock

@@ -8,7 +8,7 @@ from datetime import datetime
 from gi.repository import Gdk, GLib, Gtk
 from fabric.core.service import Property
 import modules.icons as icons
-
+from services.config import config
 
 class CalendarBox(Box):
 
@@ -181,7 +181,16 @@ class Time(Button):
         **kwargs,
     ):
         super().__init__(
-            style_classes=["bar-item"],
+            style_classes=[
+                "bar-item",
+                (
+                    "horizontal"
+                    if config.BAR_POSITION in ["top", "bottom"]
+                    else "vertical"
+                ),
+            ],
+            v_expand=True,
+            h_expand=True,
             **kwargs,
         )
 
@@ -195,17 +204,21 @@ class Time(Button):
         self.date_label = Label(
             name="date-label",
             label="",
-            v_expand=False,
             h_align="center",
             v_align="center",
+            visible=config.BAR_POSITION in ["top", "bottom"],
         )
         self.add(
             Box(
                 orientation="h",
                 spacing=8,
                 v_expand=False,
+                h_expand=False,
+                v_align="center",
+                h_align="center",
                 children=[self.date_label, self.time_label],
-            ))
+            )
+        )
 
         self.add_events(Gdk.EventMask.SCROLL_MASK)
         self._interval: int = interval
@@ -213,10 +226,14 @@ class Time(Button):
         self.interval = interval
 
     def set_button_label(self):
-        current_time = time.strftime("%H:%M:%S", time.localtime())
-        current_date = time.strftime("%b %d", time.localtime())
+        if config.BAR_POSITION in ["left", "right"]:
+            current_time = time.strftime("%H\n%M", time.localtime())
+        else:
+            current_time = time.strftime("%H:%M:%S", time.localtime())
+            current_date = time.strftime("%b %d", time.localtime())
+            self.date_label.set_label(current_date)
+
         self.time_label.set_label(current_time)
-        self.date_label.set_label(current_date)
 
     def do_update_time(self):
         self.set_button_label()

@@ -1,5 +1,8 @@
-#power-button {
-  padding: 0 14px;
+#power-button.horizontal {
+  padding: 0 12px;
+}
+#power-button.vertical {
+  padding: 12px 0;
 }
 #power-options-container {
   margin-top: 12px;

@@ -1,5 +1,8 @@
-#language {
+#language.horizontal {
   padding: 0 12px;
+}
+#language.vertical {
+  padding: 12px 4px;
 }
 #lang-label {
   color: var(--foreground);
