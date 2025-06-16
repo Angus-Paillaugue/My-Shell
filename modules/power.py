@@ -4,14 +4,21 @@ from fabric.widgets.label import Label
 from fabric.utils import exec_shell_command_async
 import modules.icons as icons
 from gi.repository import Gtk
-
+from services.config import config
 
 class PowerButton(Button):
 
     def __init__(self, **kwargs):
         super().__init__(
             name="power-button",
-            style_classes=["bar-item"],
+            style_classes=[
+                "bar-item",
+                (
+                    "horizontal"
+                    if config.BAR_POSITION in ["top", "bottom"]
+                    else "vertical"
+                ),
+            ],
             child=Label(markup=icons.shutdown),
             on_clicked=lambda *args: self.on_clicked(*args),
             **kwargs,

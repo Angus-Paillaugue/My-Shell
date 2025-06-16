@@ -6,14 +6,26 @@ import modules.icons as icons
 from services.metrics import shared_provider
 from fabric.core.fabricator import Fabricator
 from gi.repository import GLib
+from services.config import config
 
 
-class Metrics(Button):
+class Metrics(Box):
 
     def __init__(self, **kwargs):
+        orientation = (
+            "horizontal" if config.BAR_POSITION in ["top", "bottom"] else "vertical"
+        )
         super().__init__(
             visible=True,
-            style_classes=["bar-item"],
+            style_classes=[
+                "bar-item",
+                orientation,
+            ],
+            name="metrics-main-box",
+            spacing=12,
+            v_align="center",
+            h_align="center",
+            orientation=orientation,
             **kwargs,
         )
 
@@ -35,15 +47,6 @@ class Metrics(Button):
                 'danger': 85,
             },
         }
-
-        self.main_box = Box(
-            name="metrics-main-box",
-            orientation="h",
-            spacing=12,
-            v_align="center",
-            h_align="center",
-        )
-        self.add(self.main_box)
 
         self.cpu = CircularProgressBar(
             value=0,
@@ -76,9 +79,9 @@ class Metrics(Button):
             style_classes=['metrics-progress-bar'],
             child=Label(markup=icons.temperature),
         )
-        self.main_box.add(self.cpu)
-        self.main_box.add(self.ram)
-        self.main_box.add(self.temp)
+        self.add(self.cpu)
+        self.add(self.ram)
+        self.add(self.temp)
 
         self.metrics_fabricator = Fabricator(
             poll_from=lambda v: shared_provider.get_metrics(),

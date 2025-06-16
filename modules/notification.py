@@ -17,9 +17,9 @@ from fabric.widgets.wayland import WaylandWindow
 from services.logger import logger
 
 import modules.icons as icons
-from services.config import APP_NAME
+from services.config import config
 
-PERSISTENT_DIR = f"/tmp/{APP_NAME}/notifications"
+PERSISTENT_DIR = f"/tmp/{config.APP_NAME}/notifications"
 PERSISTENT_HISTORY_FILE = os.path.join(PERSISTENT_DIR,
                                        "notification_history.json")
 MAX_VISIBLE_NOTIFICATIONS = 3
@@ -260,9 +260,9 @@ class NotificationBox(Box):
             icon_name="dialog-information-symbolic" or notification.app_icon,
             icon_size=24,
         ))
-        self.app_name_label_header = Label(notification.app_name,
-                                           name="notification-app-name",
-                                           h_align="start")
+        self.app_name_label_header = Label(
+            notification.app_name, name="notification-app-name", h_align="start"
+        )
         self.header_close_button = self.create_close_button()
 
         return CenterBox(
@@ -306,7 +306,7 @@ class NotificationBox(Box):
             notification_text_labels.append(label)
         self.notification_summary_label = Box(orientation="v",
                                               children=notification_text_labels)
-        self.notification_app_name_label_content = Label(
+        self.notification.app_name_label_content = Label(
             name="notification-app-name",
             markup=notification.app_name,
             h_align="start",
@@ -332,7 +332,7 @@ class NotificationBox(Box):
                     name="notification-summary-box",
                     orientation="v",
                     children=[
-                        self.notification_app_name_label_content,
+                        self.notification.app_name_label_content,
                         self.notification_summary_label,
                         # Box(
                         #     name="notif-sep",
@@ -420,7 +420,6 @@ class NotificationBox(Box):
 
 
 class HistoricalNotification(object):
-
     def __init__(self,
                  id,
                  app_icon,
@@ -921,7 +920,7 @@ class NotificationHistory(Box):
             h_align="start",
             ellipsization="end",
         )
-        self.current_notif_app_name_label = Label(
+        self.current_notif_app_name_label    = Label(
             name="notification-app-name",
             markup=f"{notification_box.notification.app_name}",
             h_align="start",
@@ -948,7 +947,7 @@ class NotificationHistory(Box):
                     h_align="center",
                     v_align="center",
                 ),
-                self.current_notif_app_name_label,
+                self.current_notif_app_name_label   ,
                 Box(
                     name="notif-sep",
                     h_expand=False,
@@ -1238,7 +1237,6 @@ class NotificationContainer(Box):
                 "Do Not Disturb mode enabled: adding notification directly to history."
             )
             notification = fabric_notif.get_notification_from_id(id)
-            print(notification.timeout)
             new_box = NotificationBox(
                 notification,
                 timeout_ms=notification.timeout,
@@ -1473,8 +1471,9 @@ class NotificationPopup(WaylandWindow):
 
     def __init__(self, notification_server: Notifications,
                  notification_history: NotificationHistory, **kwargs):
-        y_pos = "top"
-        x_pos = "right"
+        pos = config.NOTIFICATION_POSITION
+        y_pos = pos.split("-")[0]
+        x_pos = pos.split("-")[1]
 
         super().__init__(
             name="notification-popup",

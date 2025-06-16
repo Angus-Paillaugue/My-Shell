@@ -7,13 +7,14 @@ from fabric.widgets.revealer import Revealer
 import os
 from gi.repository import GLib
 import json
-from services.config import APP_NAME
+from services.config import config
 from modules.corners import CornerContainer
 from fabric.widgets.eventbox import EventBox
 from fabric.utils import DesktopApp, get_desktop_applications, monitor_file
 
 pinned_aps_location = os.path.expanduser(
-    f"~/.config/{APP_NAME}/config/pinned_apps.json")
+    f"~/.config/{config.APP_NAME}/config/pinned_apps.json"
+)
 
 
 class Dock(Window):
@@ -22,13 +23,21 @@ class Dock(Window):
     """
 
     def __init__(self, *args, **kwargs):
+        anchor = {
+            "top": "top center",
+            "bottom": "bottom center",
+            "left": "left center",
+            "right": "right center",
+        }[config.DOCK_POSITION]
+        margin = f"{"-54px" if config.DOCK_POSITION == "top" else 0} 0 0 0"
         super().__init__(
             name="dock-overlay",
-            layer="top",
-            anchor="bottom center",
+            layer="overlay",
+            anchor=anchor,
             exclusivity="none",
             h_align="end",
             visible=True,
+            margin=margin,
             all_visible=True,
         )
 
@@ -39,34 +48,45 @@ class Dock(Window):
         self.hover_counter = 0
 
         self.pinned_apps = self._load_apps()
-
-        self.items_container = Box(name="dock-items-container",
-                                   h_align="center",
-                                   v_align="center",
-                                   h_expand=True,
-                                   orientation="h",
-                                   spacing=8)
+        orientation = (
+            "horizontal" if config.DOCK_POSITION in ["top", "bottom"] else "vertical"
+        )
+        self.items_container = Box(
+            name="dock-items-container",
+            style_classes=[config.DOCK_POSITION],
+            orientation=orientation,
+            spacing=8,
+        )
         self.dock_container = CornerContainer(
             name="dock-container",
-            position="bottom",
+            position=config.DOCK_POSITION,
+            orientation=orientation,
             height=45,
+            corners=(True, True),
             children=[self.items_container],
         )
+        transition_type = "slide-up"
+        if config.DOCK_POSITION == "left":
+            transition_type = "slide-right"
+        elif config.DOCK_POSITION == "bottom":
+            transition_type = "slide-down"
+        elif config.DOCK_POSITION == "right":
+            transition_type = "slide-left"
         self.revealer = Revealer(
-            transition_type="slide-up",
+            transition_type=transition_type,
             transition_duration=250,
             name="dock-revealer",
             visible=True,
             all_visible=True,
             child_revealed=False,
-            h_align="end",
-            v_align="end",
-            h_expand=True,
-            v_expand=True,
             child=self.dock_container,
         )
         self.mouse_area = EventBox(
-            child=Box(name="dock-mouse-area", children=[self.revealer]),
+            child=Box(
+                name="dock-mouse-area",
+                style_classes=[config.DOCK_POSITION],
+                children=[self.revealer],
+            ),
             events=["leave-notify", "enter-notify"],
         )
         self._add_applications()
@@ -89,7 +109,6 @@ class Dock(Window):
         return True  # Important: consume the event
 
     def _show_dock(self):
-        """New method to show the dock"""
         if not self.is_animating and not self.revealer.get_reveal_child():
             self.is_animating = True
             self.revealer.set_reveal_child(True)
@@ -102,7 +121,6 @@ class Dock(Window):
         return False  # Remove the source
 
     def _hide_dock(self):
-        # Only hide if not animating and currently shown
         if not self.is_animating and self.revealer.get_reveal_child():
             self.is_animating = True
             self.revealer.set_reveal_child(False)

@@ -1,5 +1,7 @@
 import gi
 
+from services.config import config
+
 gi.require_version("Gray", "0.1")
 from fabric.widgets.box import Box
 from gi.repository import Gdk, GdkPixbuf, GLib, Gray, Gtk
@@ -12,7 +14,14 @@ class SystemTray(Box):
         super().__init__(
             name="systray",
             orientation=Gtk.Orientation.HORIZONTAL,
-            style_classes=["bar-item"],
+            style_classes=[
+                "bar-item",
+                (
+                    "horizontal"
+                    if config.BAR_POSITION in ["top", "bottom"]
+                    else "vertical"
+                ),
+            ],
             spacing=8,
             **kwargs,
         )

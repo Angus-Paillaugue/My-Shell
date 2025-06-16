@@ -1,8 +1,8 @@
+from typing import Literal
 from fabric.widgets.box import Box
 from fabric.widgets.shapes import Corner
-
 from fabric.widgets.wayland import WaylandWindow as Window
-
+from services.config import config
 
 class MyCorner(Corner):
 
@@ -21,52 +21,84 @@ class CornerContainer(Box):
     def __init__(
         self,
         name=None,
-        position="top",
-        corners=["left", "right"],
+        position: Literal["top", "bottom", "left", "right"] = "top",
+        corners=(True, True),
         children=[],
         height=25,
         **kwargs,
     ):
+        is_vertical = position in ["left", "right"]
+
+        # Set orientation based on position
+        orientation = "v" if is_vertical else "h"
         super().__init__(
             name=name,
-            h_align="start" if position == "top" else "end",
-            v_align="start" if position == "top" else "end",
+            h_align=("start" if position != "right" else "end"),
+            v_align=("start" if position != "bottom" else "end"),
             h_expand=False,
             v_expand=False,
             style_classes=["corner-container"],
-            orientation="h",
+            orientation=orientation,
         )
         self._name = name
         self._children = children
-        self._position = position
+        self._position = position if position in ["top", "bottom"] else "top"
         self.kwargs = kwargs
+        self.is_vertical = is_vertical
 
-        if not "left" in corners:
-            self._add_children()
+        first_corner = None
+        second_corner = None
 
-        for corner in corners:
-            if corner == "right":
-                self.add(
-                    MyCorner(
-                        f"{self._position}-left",
-                        name=f"{self._name}-corner-right",
-                        size=height,
-                        h_align="start" if position == "top" else "end",
-                        v_align="start" if position == "top" else "end",
-                    ))
-            elif corner == "left":
-                self.add(
-                    MyCorner(
-                        f"{self._position}-right",
-                        name=f"{self._name}-corner-left",
-                        size=height,
-                        h_align="start" if position == "top" else "end",
-                        v_align="start" if position == "top" else "end",
-                    ))
-                self._add_children()
-            else:
-                raise ValueError(
-                    "Invalid corner specified, must be 'left' or 'right'")
+        if is_vertical:
+            first_corner = f"bottom-{position}"
+            second_corner = f"top-{position}"
+        else:
+            # Horizontal container (top/bottom dock)
+            first_corner = f"{position}-right"
+            second_corner = f"{position}-left"
+
+        # Add first corner if requested
+        if corners[0]:
+            self.add(
+                MyCorner(
+                    first_corner,
+                    name=f"{self._name}-corner-first",
+                    size=height,
+                    h_align=(
+                        "start"
+                        if position == "left"
+                        else "end" if position == "right" else "fill"
+                    ),
+                    v_align=(
+                        "start"
+                        if position == "top"
+                        else "end" if position == "bottom" else "fill"
+                    ),
+                )
+            )
+
+        # Add children
+        self._add_children()
+
+        # Add second corner if requested
+        if corners[1]:
+            self.add(
+                MyCorner(
+                    second_corner,
+                    name=f"{self._name}-corner-second",
+                    size=height,
+                    h_align=(
+                        "start"
+                        if position == "left"
+                        else "end" if position == "right" else "fill"
+                    ),
+                    v_align=(
+                        "start"
+                        if position == "top"
+                        else "end" if position == "bottom" else "fill"
+                    ),
+                )
+            )
 
     def _add_children(self):
         kwargs = self.kwargs.copy()
@@ -81,15 +113,30 @@ class CornerContainer(Box):
         for child in self._children:
             self.inner.add(child)
 
+        kwargs = self.kwargs.copy()
+        kwargs["h_align"] = kwargs.get("h_align", "fill")
+        kwargs["v_align"] = kwargs.get("v_align", "fill")
+        kwargs["h_expand"] = True if self.is_vertical else False
+        kwargs["v_expand"] = True if not self.is_vertical else False
+        kwargs["orientation"] = self.kwargs.get(
+            "inner_orientation", self.get_orientation()
+        )
+
+        self.inner = Box(
+            name=f"{self._name}-inner",
+            **kwargs,
+        )
+
 
 class Corners(Window):
 
     def __init__(self):
+        margin = f"{"-54px" if config.BAR_POSITION == "top" else "0"} {"-54px" if config.BAR_POSITION == "right" else "0"} {"-54px" if config.BAR_POSITION == "bottom" else "0"} {"-54px" if config.BAR_POSITION == "left" else "0"}"
         super().__init__(
             name="corners",
             layer="overlay",
             anchor="top bottom left right",
-            margin="-54px 0 0 0",
+            margin=margin,
             exclusivity="normal",
             pass_through=True,
             visible=False,

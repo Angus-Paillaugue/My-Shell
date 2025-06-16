@@ -1,10 +1,10 @@
-from services.config import APP_NAME
+from services.config import config
 import os
 from fabric.utils.helpers import exec_shell_command_async
 import toml
 import shutil
 
-app_location = os.path.expanduser(f"~/.config/{APP_NAME}")
+app_location = os.path.expanduser(f"~/.config/{config.APP_NAME}")
 
 
 def deep_update(target: dict, update: dict) -> dict:
@@ -86,14 +86,15 @@ def ensure_matugen_config():
                 "output_path":
                     os.path.join(app_location, "config/hypr/colors.conf"),
             },
-            f"{APP_NAME}": {
+            f"{config.APP_NAME}": {
                 "input_path":
-                    os.path.join(app_location,
-                                 f"config/matugen/templates/{APP_NAME}.css"),
+                    os.path.join(
+                        app_location,
+                        f"config/matugen/templates/{config.APP_NAME}.css"),
                 "output_path":
                     os.path.join(app_location, "styles/colors.css"),
                 "post_hook":
-                    f"fabric-cli exec {APP_NAME} 'app.apply_stylesheet()' &",
+                    f"fabric-cli exec {config.APP_NAME} 'app.apply_stylesheet()' &",
             },
             "kitty": {
                 "input_path":
@@ -177,7 +178,7 @@ def ensure_matugen_config():
 
 
 def generate_hypr_entrypoint():
-    contents = f"""source = ~/.config/{APP_NAME}/config/hypr/overrides.conf"""
+    contents = f"""source = ~/.config/{config.APP_NAME}/config/hypr/overrides.conf"""
     location = os.path.expanduser(f"~/.config/hypr/hyprland.conf")
     if not os.path.exists(location):
         raise FileNotFoundError(

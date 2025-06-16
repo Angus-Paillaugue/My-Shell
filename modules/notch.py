@@ -35,7 +35,7 @@ from modules.screen_record import ScreenRecordButton
 from modules.wallpaper import WallpaperManager
 from modules.launcher import AppLauncher
 from modules.clipboard import ClipboardManager
-
+from services.config import config
 
 class NotchWidgetPicker(Revealer):
     """Buttons at the top of the notch used to switch tab (launcher, networking, wallpaper, etc.)"""
@@ -460,7 +460,7 @@ class NotchInner(CornerContainer):
 
         super().__init__(
             name="bar-center-container",
-            corners=["left", "right"],
+            corners=(True, True),
             height=30,
             v_align="center",
             h_align="center",
@@ -548,10 +548,11 @@ class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
 
     def __init__(self, notification_history: NotificationHistory):
+        margin = f"{"-54px" if config.BAR_POSITION == "top" else 0} 0 0 0"
         super().__init__(
             anchor="top center",
             layer="overlay",
-            margin="-54px 0 0 0",
+            margin=margin,
             keyboard_mode="on_demand",
         )
         self.notch = Notch(notification_history=notification_history)

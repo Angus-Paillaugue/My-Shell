@@ -2,18 +2,23 @@ from fabric.hyprland.widgets import (
     WorkspaceButton,
     Workspaces as BaseWorkspaces,
 )
-
+from services.config import config
 
 class Workspaces(BaseWorkspaces):
 
     def __init__(self):
+        orientation = (
+            "horizontal" if config.BAR_POSITION in ["top", "bottom"] else "vertical"
+        )
         super().__init__(
             name="workspaces",
-            style_classes=["bar-item"],
+            style_classes=[
+                "bar-item",
+                orientation,
+            ],
             invert_scroll=True,
             empty_scroll=True,
-            v_align="fill",
-            orientation="h",
+            orientation=orientation,
             spacing=8,
             buttons=[
                 WorkspaceButton(
@@ -22,6 +27,8 @@ class Workspaces(BaseWorkspaces):
                     h_align="center",
                     v_align="center",
                     id=i,
-                ) for i in range(1, 5)
+                    style_classes=[orientation],
+                )
+                for i in range(1, 5)
             ],
         )

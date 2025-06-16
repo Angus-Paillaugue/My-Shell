@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import numpy as np
-import services.config as config
+from services.config import config
 from collections.abc import Iterator
 from fabric.utils import DesktopApp, get_desktop_applications, idle_add, remove_handler
 from fabric.widgets.box import Box
@@ -295,8 +295,9 @@ class AppLauncher(Box):
 
                     if text.strip() == "" and self.selected_index == -1:
                         return
-                    selected_index = (self.selected_index
-                                      if self.selected_index != -1 else 0)
+                    selected_index = (
+                        self.selected_index if self.selected_index != -1 else 0
+                    )
                     if 0 <= selected_index < len(children):
                         children[selected_index].get_children()[0].clicked()
 

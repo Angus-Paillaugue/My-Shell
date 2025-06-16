@@ -10,18 +10,29 @@ from modules.weather import WeatherButton
 from modules.workspaces import Workspaces
 from modules.language import Language
 from modules.power import PowerButton
+from services.config import config
 
 
 class Bar(WaylandWindow):
 
     def __init__(self, **kwargs):
-        super().__init__(name="bar",
-                         layer="overlay",
-                         anchor="left top right",
-                         exclusivity="auto",
-                         visible=True,
-                         all_visible=True,
-                         **kwargs)
+        anchors = {
+            "top": "left top right",
+            "bottom": "left bottom right",
+            "left": "top left bottom",
+            "right": "top right bottom",
+        }
+        orientation = ("horizontal" if config.BAR_POSITION in ["top", "bottom"]
+                       else "vertical")
+        super().__init__(
+            name="bar",
+            layer="overlay",
+            anchor=anchors[config.BAR_POSITION],
+            exclusivity="auto",
+            visible=True,
+            all_visible=True,
+            **kwargs,
+        )
 
         self.workspaces = Workspaces()
         self.language = Language()
@@ -34,7 +45,9 @@ class Bar(WaylandWindow):
 
         self.start_box = Box(
             name="bar-start-container",
+            style_classes=[config.BAR_POSITION],
             spacing=8,
+            orientation=orientation,
             children=[
                 self.workspaces,
                 self.weather_button,
@@ -43,7 +56,9 @@ class Bar(WaylandWindow):
         )
         self.end_box = Box(
             name="bar-end-container",
+            style_classes=[config.BAR_POSITION],
             spacing=8,
+            orientation=orientation,
             children=[
                 self.system_tray, self.language, self.time, self.power_button
             ],
@@ -51,7 +66,7 @@ class Bar(WaylandWindow):
 
         self.bar_inner = CenterBox(
             name="bar-inner",
-            orientation=(Gtk.Orientation.HORIZONTAL),
+            orientation=orientation,
             h_align="fill",
             v_align="fill",
             start_children=self.start_box,
