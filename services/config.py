@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Config(BaseConfig):
-  APP_NAME: str = "my-shell"
+    APP_NAME = "my-shell"
 
 
 config: ConfigInterface = Config()

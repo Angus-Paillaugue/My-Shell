@@ -6,6 +6,14 @@ class ConfigInterface(Protocol):
     APP_NAME: str
     BAR_POSITION: Literal["top", "left", "right", "bottom"]
     DOCK_POSITION: Literal["top", "left", "right", "bottom"]
+    NOTIFICATION_POSITION: Literal[
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+        "top-center",
+        "bottom-center",
+    ] = "top-right"
 
 
 @dataclass
