@@ -120,8 +120,9 @@ class BrightnessSlider(Scale):
 
     def on_brightness_changed(self, client, _):
         self.settings_notifier.notify_listeners(
-            "brightness-changed", round((self.client.screen_brightness / self.client.max_screen) * 100)
-        )
+            "brightness-changed",
+            round(
+                (self.client.screen_brightness / self.client.max_screen) * 100))
         self.set_value(self.client.screen_brightness)
 
     def on_scale_move(self, widget, scroll, moved_pos):

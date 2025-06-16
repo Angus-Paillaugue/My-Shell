@@ -1322,7 +1322,7 @@ class NotificationContainer(Box):
             return True
         return False
 
-    def on_notification_closed(self, notification:Notification, reason):
+    def on_notification_closed(self, notification: Notification, reason):
         if self._is_destroying:
             return
         if notification.id in self._destroyed_notifications:

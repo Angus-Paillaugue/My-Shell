@@ -129,7 +129,8 @@ class Dock(Window):
         This method can be overridden to implement custom logic.
         """
         for i, app in enumerate(self.pinned_apps):
-            system_app = next((a for a in get_desktop_applications() if a.name == app), None)
+            system_app = next(
+                (a for a in get_desktop_applications() if a.name == app), None)
             if not system_app:
                 continue
             if self._is_app_running(system_app):
@@ -144,7 +145,8 @@ class Dock(Window):
         Check if the application is currently running.
         This method can be overridden to implement custom logic.
         """
-        process_name = app.window_class.lower() if app.window_class else app.executable or app.name.lower()
+        process_name = app.window_class.lower(
+        ) if app.window_class else app.executable or app.name.lower()
         res = subprocess.run(["pidof", "-s", process_name], capture_output=True)
         return res.returncode == 0
 

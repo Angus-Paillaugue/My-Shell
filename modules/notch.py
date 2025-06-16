@@ -266,16 +266,18 @@ class NotchWidgetDefault(Box):
 
     def set_desktop_string(self, update_ui=False):
         """Set the desktop string to be displayed in the notch"""
-        username_result = subprocess.run(["whoami"], capture_output=True, check=True)
+        username_result = subprocess.run(["whoami"],
+                                         capture_output=True,
+                                         check=True)
         username = username_result.stdout.decode().strip()
-        hostname_result = subprocess.run(
-            ["hostname"], capture_output=True, check=True)
+        hostname_result = subprocess.run(["hostname"],
+                                         capture_output=True,
+                                         check=True)
         hostname = hostname_result.stdout.decode().strip()
         self.desktop_string = f"{username}@{hostname}"
         if update_ui:
             self.active_window.set_label(
-                self._center_string(self.desktop_string, max_length=20)
-            )
+                self._center_string(self.desktop_string, max_length=20))
 
     def update_window_icon(self, *args):
         """Update the window icon based on the current active window title"""

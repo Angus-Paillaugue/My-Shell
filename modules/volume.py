@@ -14,6 +14,7 @@ from fabric.utils import exec_shell_command_async
 from services.logger import logger
 from modules.settings import SettingsBroker
 
+
 class VolumeSlider(Scale):
 
     def __init__(self, audio, **kwargs):
@@ -47,8 +48,6 @@ class VolumeSlider(Scale):
     def on_speaker_changed(self, *_):
         if not self.audio.speaker:
             return
-        if self.value == round(self.audio.speaker.volume / 100, 2):
-            return
 
         if self.audio.speaker.muted:
             self.add_style_class("muted")
@@ -57,12 +56,13 @@ class VolumeSlider(Scale):
         if self.value == round(self.audio.speaker.volume / 100, 2):
             return
         self.value = round(self.audio.speaker.volume / 100, 2)
-        self.settings_notifier.notify_listeners("volume-changed", round(self.value * 100))
+        self.settings_notifier.notify_listeners("volume-changed",
+                                                round(self.value * 100))
 
 
 class VolumeIcon(Button):
 
-    def __init__(self, audio: Audio,**kwargs):
+    def __init__(self, audio: Audio, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
         self.audio = audio
         self.value = 0
@@ -395,15 +395,17 @@ class MicSlider(Scale):
     def on_microphone_changed(self, *_):
         if not self.audio.microphone:
             return
+
         if self.audio.microphone.muted:
             self.add_style_class("muted")
         else:
             self.remove_style_class("muted")
+
         if self.value == round(self.audio.microphone.volume / 100, 2):
             return
         self.value = round(self.audio.microphone.volume / 100, 2)
-        self.settings_notifier.notify_listeners("mic-changed", round(self.value * 100))
-
+        self.settings_notifier.notify_listeners("mic-changed",
+                                                round(self.value * 100))
 
 
 class MicIcon(Button):

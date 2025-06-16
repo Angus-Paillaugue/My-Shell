@@ -68,9 +68,9 @@ class ClipboardManager(Box):
             self.clipboard_items.remove(child)
 
     def _build_list(self, filter_text=""):
-        result = subprocess.run(
-            ["cliphist", "list"], capture_output=True, check=True
-        )
+        result = subprocess.run(["cliphist", "list"],
+                                capture_output=True,
+                                check=True)
         # Decode stdout with error handling
         stdout_str = result.stdout.decode("utf-8", errors="replace")
         lines = stdout_str.strip().split("\n")
@@ -112,4 +112,4 @@ class ClipboardManager(Box):
         subprocess.run(["wl-copy"], input=result.stdout, check=True)
         self.notch_inner.show_widget(self.notch_inner.widgets_labels[0])
         exec_shell_command_async(
-        "notify-send -e -t 2000 'Clipboard' 'Copied to clipboard!'")
+            "notify-send -e -t 2000 'Clipboard' 'Copied to clipboard!'")
