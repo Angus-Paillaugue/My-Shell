@@ -27,3 +27,6 @@
 .dock-item:hover {
   background-color: var(--surface);
 }
+.dock-item.running {
+  background-color: var(--surface);
+}

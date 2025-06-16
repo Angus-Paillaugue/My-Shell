@@ -18,3 +18,5 @@ format:
 	./workflows/format.sh
 update:
 	./workflows/update.sh
+kill:
+	pkill my-shell

@@ -16,7 +16,7 @@ from modules.settings import SettingsBroker
 
 class VolumeSlider(Scale):
 
-    def __init__(self, audio, notify=None, **kwargs):
+    def __init__(self, audio, **kwargs):
         super().__init__(
             name="control-slider",
             orientation="h",
@@ -27,13 +27,11 @@ class VolumeSlider(Scale):
             **kwargs,
         )
         self.audio = audio
-        self.notify = notify
         self.audio.connect("notify::speaker", self.on_new_speaker)
         if self.audio.speaker:
             self.audio.speaker.connect("changed", self.on_speaker_changed)
         self.connect("value-changed", self.on_value_changed)
         self.add_style_class("vol")
-        self.on_speaker_changed()
         self.settings_notifier = SettingsBroker()
 
     def on_new_speaker(self, *args):
@@ -44,26 +42,24 @@ class VolumeSlider(Scale):
     def on_value_changed(self, _):
         if self.audio.speaker:
             self.audio.speaker.volume = self.value * 100
-            self.notify()
 
     def on_speaker_changed(self, *_):
         if not self.audio.speaker:
             return
 
+        if self.audio.speaker.muted:
+            self.add_style_class("muted")
+        else:
+            self.remove_style_class("muted")
         if self.value == round(self.audio.speaker.volume / 100, 2):
             return
         self.value = round(self.audio.speaker.volume / 100, 2)
         self.settings_notifier.notify_listeners("volume-changed", round(self.value * 100))
 
-        if self.audio.speaker.muted:
-            self.add_style_class("muted")
-        else:
-            self.remove_style_class("muted")
-
 
 class VolumeIcon(Button):
 
-    def __init__(self, audio: Audio, **kwargs):
+    def __init__(self, audio: Audio,**kwargs):
         super().__init__(name="volume-icon", **kwargs)
         self.audio = audio
         self.value = 0
@@ -171,7 +167,7 @@ class VolumeRow(Box):
         if self.audio.speaker:
             self.audio.speaker.connect("changed", self.notify)
 
-        self.volume_slider = VolumeSlider(self.audio, notify=self.notify)
+        self.volume_slider = VolumeSlider(self.audio)
         self.volume_icon = VolumeIcon(self.audio)
 
         self.add(self.volume_icon)
@@ -397,15 +393,15 @@ class MicSlider(Scale):
         if not self.audio.microphone:
             return
 
+        if self.audio.microphone.muted:
+            self.add_style_class("muted")
+        else:
+            self.remove_style_class("muted")
         if self.value == round(self.audio.microphone.volume / 100, 2):
             return
         self.value = round(self.audio.microphone.volume / 100, 2)
         self.settings_notifier.notify_listeners("mic-changed", round(self.value * 100))
 
-        if self.audio.microphone.muted:
-            self.add_style_class("muted")
-        else:
-            self.remove_style_class("muted")
 
 
 class MicIcon(Button):
