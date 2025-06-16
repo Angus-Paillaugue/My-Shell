@@ -32,6 +32,7 @@ class VolumeSlider(Scale):
             self.audio.speaker.connect("changed", self.on_speaker_changed)
         self.connect("value-changed", self.on_value_changed)
         self.add_style_class("vol")
+        self.on_speaker_changed()
         self.settings_notifier = SettingsBroker()
 
     def on_new_speaker(self, *args):
@@ -45,6 +46,8 @@ class VolumeSlider(Scale):
 
     def on_speaker_changed(self, *_):
         if not self.audio.speaker:
+            return
+        if self.value == round(self.audio.speaker.volume / 100, 2):
             return
 
         if self.audio.speaker.muted:
@@ -392,7 +395,6 @@ class MicSlider(Scale):
     def on_microphone_changed(self, *_):
         if not self.audio.microphone:
             return
-
         if self.audio.microphone.muted:
             self.add_style_class("muted")
         else:
