@@ -1,3 +1,4 @@
+import subprocess
 from fabric.widgets.wayland import WaylandWindow as Window
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
@@ -75,6 +76,7 @@ class Dock(Window):
             "changed", self._on_pinned_apps_file_changed)
         self.mouse_area.connect("enter-notify-event", self._on_mouse_enter)
         self.mouse_area.connect("leave-notify-event", self._on_mouse_leave)
+        GLib.timeout_add(1000, self.check_running_apps)
 
     def _on_mouse_enter(self, widget, event):
         # Cancel any pending hide operations
@@ -120,6 +122,31 @@ class Dock(Window):
         # Use a longer delay to prevent accidental hiding
         self.hide_timer = GLib.timeout_add(500, self._hide_dock)
         return True
+
+    def check_running_apps(self):
+        """
+        Check if pinned applications are running and update their state.
+        This method can be overridden to implement custom logic.
+        """
+        for i, app in enumerate(self.pinned_apps):
+            system_app = next((a for a in get_desktop_applications() if a.name == app), None)
+            if not system_app:
+                continue
+            if self._is_app_running(system_app):
+                self.items_container.children[i].add_style_class("running")
+            else:
+                self.items_container.children[i].remove_style_class("running")
+
+        return True
+
+    def _is_app_running(self, app: DesktopApp) -> bool:
+        """
+        Check if the application is currently running.
+        This method can be overridden to implement custom logic.
+        """
+        process_name = app.window_class.lower() if app.window_class else app.executable or app.name.lower()
+        res = subprocess.run(["pidof", "-s", process_name], capture_output=True)
+        return res.returncode == 0
 
     def _add_application(self, app: DesktopApp):
         icon = Image(
