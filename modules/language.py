@@ -9,6 +9,7 @@ from services.config import config
 
 
 class Language(Box):
+    """Widget that displays the current keyboard layout language in the bar."""
 
     def __init__(self, **kwargs):
         orientation = (

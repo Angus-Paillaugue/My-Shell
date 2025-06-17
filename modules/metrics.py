@@ -11,6 +11,7 @@ from services.metrics import shared_provider
 
 
 class Metrics(Box):
+    """Widget that displays system metrics such as CPU, RAM, and temperature."""
 
     def __init__(self, **kwargs):
         orientation = (
@@ -94,7 +95,7 @@ class Metrics(Box):
         self.metrics_fabricator.changed.connect(self.update_metrics)
         GLib.idle_add(self.update_metrics, None, shared_provider.get_metrics())
 
-    def update_metrics(self, sender, metrics):
+    def update_metrics(self, sender, metrics: tuple[float, float, float]) -> None:
         cpu, ram, temp = metrics
 
         self.cpu.set_value(cpu / 100)

@@ -17,6 +17,7 @@ from services.logger import logger
 
 
 class VolumeSlider(Scale):
+    """Slider widget to control audio volume."""
 
     def __init__(self, audio, **kwargs):
         super().__init__(
@@ -37,16 +38,19 @@ class VolumeSlider(Scale):
         self.on_speaker_changed()
         self.settings_notifier = SettingsBroker()
 
-    def on_new_speaker(self, *args):
+    def on_new_speaker(self, *args: object) -> None:
+        """Handle new speaker connection."""
         if self.audio.speaker:
             self.audio.speaker.connect("changed", self.on_speaker_changed)
             self.on_speaker_changed()
 
-    def on_value_changed(self, _):
+    def on_value_changed(self, *args: object) -> None:
+        """Update speaker volume when slider value changes."""
         if self.audio.speaker:
             self.audio.speaker.volume = self.value * 100
 
-    def on_speaker_changed(self, *_):
+    def on_speaker_changed(self, *args: object) -> None:
+        """Update slider value and style based on speaker state."""
         if not self.audio.speaker:
             return
 
@@ -62,6 +66,7 @@ class VolumeSlider(Scale):
 
 
 class VolumeIcon(Button):
+    """Button widget to toggle audio volume mute state and display icon."""
 
     def __init__(self, audio: Audio, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
@@ -84,7 +89,8 @@ class VolumeIcon(Button):
 
         self.set_icon()
 
-    def set_icon(self):
+    def set_icon(self) -> None:
+        """Set the icon based on the current speaker volume and mute state."""
         if not self.audio or not self.audio.speaker:
             return
         percentage = round(
@@ -98,12 +104,14 @@ class VolumeIcon(Button):
             icon = self.volume_icons[icon_index]
         self.label.set_markup(icon)
 
-    def on_clicked(self, _):
+    def on_clicked(self, *args: object) -> None:
+        """Toggle the speaker mute state and update the icon."""
         self.audio.speaker.muted = not self.audio.speaker.muted
         self.set_icon()
 
 
 class VolumeOutputsRevealer(Revealer):
+    """Revealer widget to show/hide audio output options."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -135,16 +143,19 @@ class VolumeOutputsRevealer(Revealer):
 
         self.shown = False
 
-    def toggle(self):
+    def toggle(self) -> None:
+        """Toggle the visibility of the outputs box."""
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
 
-    def collapse(self):
+    def collapse(self) -> None:
+        """Collapse the outputs box to hide it."""
         self.shown = False
         self.set_reveal_child(self.shown)
 
 
 class VolumeRow(Box):
+    """A horizontal row widget that contains the volume icon, slider, and output options."""
 
     def __init__(self, slot=None, **kwargs):
         super().__init__(
@@ -179,7 +190,8 @@ class VolumeRow(Box):
         self.add(self.output_box_button)
         self.slot.add(self.outputs_box)
 
-    def notify(self, *args):
+    def notify(self, *args: object) -> None:
+        """Update the list of available audio outputs."""
         self._clear_slot()
         for speaker in self.audio.get_speakers():
             self.add_output(speaker)
@@ -192,11 +204,12 @@ class VolumeRow(Box):
             # Make sure the dropdown shows the correct selection
             self._highlight_active_output()
 
-    def _clear_slot(self):
+    def _clear_slot(self) -> None:
+        """Clear the outputs container to remove old output buttons."""
         for child in self.outputs_box.output_container.get_children():
             self.outputs_box.output_container.remove(child)
 
-    def _highlight_active_output(self):
+    def _highlight_active_output(self) -> None:
         """Highlight the currently active output in the dropdown"""
         if not self.audio.speaker:
             return
@@ -208,7 +221,7 @@ class VolumeRow(Box):
             else:
                 child.remove_style_class("selected-output")
 
-    def switch_to_output(self, output):
+    def switch_to_output(self, output: object) -> None:
         """Change the audio output to the selected sink using shell commands"""
         if not output:
             return
@@ -237,7 +250,7 @@ class VolumeRow(Box):
         # Update UI after a delay to allow PulseAudio to update
         GLib.timeout_add(300, self.notify)
 
-    def _move_streams_to_sink(self, sink_id):
+    def _move_streams_to_sink(self, sink_id: str) -> None:
         """Move all audio streams to the specified sink"""
         # Create a lambda that handles just one output parameter
         callback = lambda output: self._on_sink_inputs_received(output, sink_id)
@@ -245,7 +258,7 @@ class VolumeRow(Box):
         # Call pactl to list all running audio streams
         exec_shell_command_async("pactl list short sink-inputs", callback)
 
-    def _on_sink_inputs_received(self, output, sink_id):
+    def _on_sink_inputs_received(self, output: str, sink_id: str) -> None:
         """Process sink inputs and move each to the new sink"""
         if not output:
             return
@@ -266,7 +279,7 @@ class VolumeRow(Box):
                 except IndexError:
                     pass  # Skip malformed lines
 
-    def _get_sink_id(self, output):
+    def _get_sink_id(self, output: object) -> str:
         """Extract the sink ID from the output object"""
         # Try different common properties that might contain the sink name/ID
         for attr in ["name", "id", "sink_name", "identifier", "index"]:
@@ -286,7 +299,8 @@ class VolumeRow(Box):
         # As a last resort, try __str__ in case it returns something useful
         return str(output)
 
-    def add_output(self, output):
+    def add_output(self, output: object) -> None:
+        """Add an audio output option to the outputs list"""
         # Get more descriptive name like HDMI/DisplayPort
         descriptive_name = self._get_descriptive_name(output)
 
@@ -331,7 +345,7 @@ class VolumeRow(Box):
 
         self.outputs_box.output_container.add(button)
 
-    def _get_descriptive_name(self, output):
+    def _get_descriptive_name(self, output: object) -> str:
         """Get a more descriptive name for the output similar to PulseAudio Volume Control"""
         # Try different properties to find the most descriptive name
 
@@ -365,6 +379,7 @@ class VolumeRow(Box):
 
 
 class MicSlider(Scale):
+    """Slider widget to control microphone volume."""
 
     def __init__(self, audio, **kwargs):
         super().__init__(
@@ -384,16 +399,19 @@ class MicSlider(Scale):
         self.add_style_class("mic")
         self.on_microphone_changed()
 
-    def on_new_microphone(self, *args):
+    def on_new_microphone(self, *args: object) -> None:
+        """Handle new microphone connection."""
         if self.audio.microphone:
             self.audio.microphone.connect("changed", self.on_microphone_changed)
             self.on_microphone_changed()
 
-    def on_value_changed(self, _):
+    def on_value_changed(self, *args: object) -> None:
+        """Update microphone volume when slider value changes."""
         if self.audio.microphone:
             self.audio.microphone.volume = self.value * 100
 
-    def on_microphone_changed(self, *_):
+    def on_microphone_changed(self, *args: object) -> None:
+        """Update slider value and style based on microphone state."""
         if not self.audio.microphone:
             return
 
@@ -410,6 +428,7 @@ class MicSlider(Scale):
 
 
 class MicIcon(Button):
+    """Button widget to toggle microphone mute state and display icon."""
 
     def __init__(self, audio: Audio, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
@@ -427,7 +446,8 @@ class MicIcon(Button):
 
         self.set_icon()
 
-    def set_icon(self):
+    def set_icon(self) -> None:
+        """Set the icon based on the current microphone state."""
         if not self.audio or not self.audio.microphone:
             return
         if self.audio.microphone.muted:
@@ -436,12 +456,14 @@ class MicIcon(Button):
             icon = icons.mic
         self.label.set_markup(icon)
 
-    def on_clicked(self, _):
+    def on_clicked(self, *args: object) -> None:
+        """Toggle the microphone mute state and update the icon."""
         self.audio.microphone.muted = not self.audio.microphone.muted
         self.set_icon()
 
 
 class MicInputsRevealer(Revealer):
+    """Revealer widget to show/hide microphone input options."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -474,16 +496,19 @@ class MicInputsRevealer(Revealer):
 
         self.shown = False
 
-    def collapse(self):
+    def collapse(self) -> None:
+        """Collapse the inputs box to hide it."""
         self.shown = False
         self.set_reveal_child(self.shown)
 
-    def toggle(self):
+    def toggle(self) -> None:
+        """Toggle the visibility of the inputs box."""
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
 
 
 class MicRow(Box):
+    """A horizontal row widget that contains the microphone icon, slider, and input options."""
 
     def __init__(self, slot=None, **kwargs):
         super().__init__(
@@ -525,7 +550,8 @@ class MicRow(Box):
         # Initialize microphone inputs
         GLib.timeout_add(500, self.notify_inputs)
 
-    def on_new_microphone(self, *args):
+    def on_new_microphone(self, *args: object) -> None:
+        """Handle new microphone connection."""
         if self.audio.microphone:
             self.audio.microphone.connect("changed", self.on_microphone_changed)
 
@@ -535,7 +561,8 @@ class MicRow(Box):
                 self.audio.microphone.stream.connect(
                     "notify::microphone_changed", self.on_microphone_changed)
 
-    def on_microphone_changed(self, *_):
+    def on_microphone_changed(self, *args: object) -> None:
+        """Update the UI when the microphone state changes."""
         if not self.audio.microphone:
             return
 
@@ -544,7 +571,7 @@ class MicRow(Box):
         self.mic_icon.set_icon()
         self._highlight_active_input()
 
-    def notify_inputs(self, *args):
+    def notify_inputs(self, *args: object) -> bool:
         """Update the list of available microphone inputs"""
         self._clear_inputs()
 
@@ -561,12 +588,12 @@ class MicRow(Box):
 
         return False  # Don't repeat if called from timeout
 
-    def _clear_inputs(self):
+    def _clear_inputs(self) -> None:
         """Clear the inputs container"""
         for child in self.inputs_box.input_container.get_children():
             self.inputs_box.input_container.remove(child)
 
-    def _highlight_active_input(self):
+    def _highlight_active_input(self) -> None:
         """Highlight the currently active microphone input"""
         if not self.audio.microphone:
             return
@@ -579,7 +606,7 @@ class MicRow(Box):
             else:
                 child.remove_style_class("selected-output")
 
-    def switch_to_input(self, input_src):
+    def switch_to_input(self, input_src: object) -> None:
         """Change the audio input to the selected source"""
         if not input_src:
             return
@@ -603,7 +630,7 @@ class MicRow(Box):
         # Update UI after a delay
         GLib.timeout_add(300, self.notify_inputs)
 
-    def _move_recording_streams_to_source(self, source_id):
+    def _move_recording_streams_to_source(self, source_id: str) -> None:
         """Move any recording streams to the new source"""
         # Create callback to handle the output
         callback = lambda output: self._on_source_outputs_received(
@@ -612,7 +639,7 @@ class MicRow(Box):
         # Call pactl to list all recording streams
         exec_shell_command_async("pactl list short source-outputs", callback)
 
-    def _on_source_outputs_received(self, output, source_id):
+    def _on_source_outputs_received(self, output: str, source_id: str) -> None:
         """Process source outputs and move each to the new source"""
         if not output:
             return
@@ -632,7 +659,7 @@ class MicRow(Box):
                 except IndexError:
                     pass  # Skip malformed lines
 
-    def _get_source_id(self, input_src):
+    def _get_source_id(self, input_src: object) -> str:
         """Extract the source ID from the input object"""
         # Try different common properties
         for attr in ["name", "id", "source_name", "identifier", "index"]:
@@ -652,7 +679,7 @@ class MicRow(Box):
         # Last resort: try string representation
         return str(input_src)
 
-    def add_input(self, input_src):
+    def add_input(self, input_src: object) -> None:
         """Add a microphone input to the inputs list"""
         # Get descriptive name for the input
         descriptive_name = self._get_descriptive_name(input_src)
@@ -695,7 +722,7 @@ class MicRow(Box):
 
         self.inputs_box.input_container.add(button)
 
-    def _get_descriptive_name(self, input_src):
+    def _get_descriptive_name(self, input_src: object) -> str:
         """Get a more descriptive name for the input source"""
         # Try different properties to find the most descriptive name
 

@@ -15,6 +15,7 @@ from services.logger import logger
 
 
 class Weather:
+    """Class to represent weather data with icon and temperature."""
 
     def __init__(self, icon=None, temperature=None):
         self.icon = icon
@@ -32,6 +33,7 @@ class Weather:
 
 
 class WeatherWorker(Service):
+    """Service to fetch and update weather data."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -42,7 +44,8 @@ class WeatherWorker(Service):
     def weather(self):
         return self._weather
 
-    def update_weather(self):
+    def update_weather(self) -> None:
+        """Fetch weather data from an external API and update the weather property."""
         if self.update_thread_active:
             return
 
@@ -73,6 +76,7 @@ class WeatherWorker(Service):
 
 
 class WeatherButton(Button):
+    """A button that displays the current weather icon and temperature, updating at a set interval."""
 
     def __init__(self, update_interval=10, **kwargs):
         super().__init__(
@@ -119,11 +123,13 @@ class WeatherButton(Button):
         )
         GLib.idle_add(self._build, None, self.weather_worker.update_weather())
 
-    def update_weather(self):
+    def update_weather(self) -> None:
+        """Trigger the weather update process."""
         self._set_loading(True)
         self.weather_worker.update_weather()
 
-    def _set_loading(self, is_loading):
+    def _set_loading(self, is_loading: bool) -> None:
+        """Set the loading state of the weather button."""
         self.is_loading = is_loading
         if is_loading:
             self.loading_icon.show()
@@ -134,7 +140,8 @@ class WeatherButton(Button):
             self.icon.show()
             self.temperature.show()
 
-    def _build(self, *_):
+    def _build(self, *args: object) -> bool:
+        """Build the weather button with the current weather data."""
         weather = self.weather_worker.weather
         self._set_loading(False)
         if weather.icon is None or weather.temperature is None:

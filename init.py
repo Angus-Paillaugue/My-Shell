@@ -21,7 +21,7 @@ def deep_update(target: dict, update: dict) -> dict:
     return target
 
 
-def ensure_matugen_config():
+def ensure_matugen_config() -> None:
     """
     Ensure that the matugen configuration file exists and is updated
     with the expected settings.
@@ -177,7 +177,7 @@ def ensure_matugen_config():
             )
 
 
-def generate_hypr_entrypoint():
+def generate_hypr_entrypoint() -> None:
     contents = f"""source = ~/.config/{config.APP_NAME}/config/hypr/overrides.conf"""
     location = os.path.expanduser(f"~/.config/hypr/hyprland.conf")
     if not os.path.exists(location):
@@ -194,7 +194,7 @@ def generate_hypr_entrypoint():
             print(f"Hyprland entrypoint updated at {location}")
 
 
-def generate_hyprlock_config():
+def generate_hyprlock_config() -> None:
     location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf")
     template_location = os.path.join(app_location, "config/hypr/hyprlock.conf")
     backup_location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf.bak")
@@ -205,7 +205,7 @@ def generate_hyprlock_config():
         print(f"Hyprlock configuration updated")
 
 
-def update_kitty_config():
+def update_kitty_config() -> None:
     contents = "include colors.conf"
     location = os.path.expanduser(f"~/.config/kitty/kitty.conf")
     if not os.path.exists(location):
@@ -223,7 +223,7 @@ def update_kitty_config():
         print(f"Kitty configuration updated at {location}")
 
 
-def wallpapers():
+def wallpapers() -> None:
     """
     Ensure the wallpapers directory exists and contains example wallpapers.
     """
@@ -239,7 +239,7 @@ def wallpapers():
             shutil.copy(src_path, dest_path)
 
 
-def others():
+def others() -> None:
     pinned_aps_location = os.path.join(app_location, "config/pinned_apps.json")
 
     if not os.path.exists(pinned_aps_location):

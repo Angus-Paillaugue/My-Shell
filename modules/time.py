@@ -14,6 +14,7 @@ from services.config import config
 
 
 class CalendarBox(Box):
+    """Widget that displays a calendar with month navigation and day buttons."""
 
     def __init__(self, **kwargs):
         super().__init__(name="calendar-container",
@@ -91,7 +92,8 @@ class CalendarBox(Box):
         self.add(self.calendar_grid)
         self.render_calendar()
 
-    def render_calendar(self):
+    def render_calendar(self) -> None:
+        """Render the calendar for the current month."""
         # Clear existing calendar grid
         for child in self.calendar_grid.get_children():
             self.calendar_grid.remove(child)
@@ -138,7 +140,8 @@ class CalendarBox(Box):
 
         self.calendar_grid.show_all()
 
-    def prev_month(self, *args):
+    def prev_month(self, *args: object) -> None:
+        """Navigate to the previous month."""
         # Go to previous month
         year = self.current_date.year
         month = self.current_date.month - 1
@@ -150,7 +153,7 @@ class CalendarBox(Box):
         self.current_date = self.current_date.replace(year=year, month=month)
         self.render_calendar()
 
-    def next_month(self, *args):
+    def next_month(self, *args: object) -> None:
         # Go to next month
         year = self.current_date.year
         month = self.current_date.month + 1
@@ -164,6 +167,7 @@ class CalendarBox(Box):
 
 
 class Time(Button):
+    """A button that displays the current time and date, updating at a set interval."""
 
     @Property(int, "read-write")
     def interval(self):
@@ -228,7 +232,8 @@ class Time(Button):
         self._repeater_id: int | None = None
         self.interval = interval
 
-    def set_button_label(self):
+    def set_button_label(self) -> None:
+        """Set the button label to the current time and date."""
         if config.BAR_POSITION in ["left", "right"]:
             current_time = time.strftime("%H\n%M", time.localtime())
         else:
@@ -238,6 +243,7 @@ class Time(Button):
 
         self.time_label.set_label(current_time)
 
-    def do_update_time(self):
+    def do_update_time(self) -> bool:
+        """Update the time label and date label."""
         self.set_button_label()
         return True

@@ -15,6 +15,7 @@ from services.network import NetworkClient
 
 
 class WiredConnectionSlot(Box):
+    """Widget that represents a single wired connection in the dropdown menu."""
 
     def __init__(self, connection_data, network_service: NetworkClient,
                  **kwargs):
@@ -51,14 +52,15 @@ class WiredConnectionSlot(Box):
         )
         self.add(self.connect_button)
 
-    def _on_connect_clicked(self, _):
+    def _on_connect_clicked(self, *args: object) -> None:
+        """Handle the connect button click event"""
         if not self.is_active and self.connection_data.get("uuid"):
             self.connect_button.set_label("Connecting...")
             self.connect_button.set_sensitive(False)
             self.network_service.activate_connection(
                 self.connection_data["uuid"])
 
-    def update_active_status(self, is_active):
+    def update_active_status(self, is_active: bool) -> None:
         """Update the slot to reflect its current active state"""
         self.is_active = is_active
         self.connect_button.set_sensitive(not is_active)
@@ -72,6 +74,7 @@ class WiredConnectionSlot(Box):
 
 
 class WiredNetworksDropdown(Revealer):
+    """Widget that represents the dropdown menu for wired connections."""
 
     def __init__(self, labels, **kwargs):
         super().__init__(
@@ -131,11 +134,12 @@ class WiredNetworksDropdown(Revealer):
 
         self.network_client.connect("device-ready", self._on_device_ready)
 
-    def collapse(self):
+    def collapse(self) -> None:
+        """Collapse the dropdown and hide its contents."""
         self.shown = False
         self.set_reveal_child(self.shown)
 
-    def toggle_visibility(self):
+    def toggle_visibility(self) -> None:
         """Toggle the visibility of the wired networks dropdown."""
         if (not self.network_client.ethernet_device or
                 self.network_client.ethernet_device._device.get_state()
@@ -147,7 +151,8 @@ class WiredNetworksDropdown(Revealer):
         if self.shown:
             self._load_connections()
 
-    def _on_device_ready(self, _client):
+    def _on_device_ready(self, *args: object) -> None:
+        """Initialize the dropdown when the device is ready."""
         if self.network_client.ethernet_device:
             self.network_client.ethernet_device.connect("changed",
                                                         self._load_connections)
@@ -159,7 +164,8 @@ class WiredNetworksDropdown(Revealer):
             self.wired_button.set_label("Not available")
             self.wired_button.add_style_class("disabled")
 
-    def _update_wired_status_ui(self, *args):
+    def _update_wired_status_ui(self, *args: object) -> None:
+        """Update the UI elements for the wired connection status."""
         if self.network_client.ethernet_device:
             state = self.network_client.ethernet_device.state
 
@@ -200,7 +206,7 @@ class WiredNetworksDropdown(Revealer):
             self.wired_button.add_style_class("disabled")
             self.wired_status_text.set_label("Unavailable")
 
-    def toggle_wired(self, *args):
+    def toggle_wired(self, *args: object) -> None:
         """Enable or disable the wired connection"""
         if self.network_client.ethernet_device:
             device = self.network_client.ethernet_device._device
@@ -226,11 +232,13 @@ class WiredNetworksDropdown(Revealer):
                     # No connection profiles available
                     self.wired_status_text.set_label("No profiles")
 
-    def _clear_connections_list(self):
+    def _clear_connections_list(self) -> None:
+        """Clear the connections list box."""
         for child in self.connections_list_box.get_children():
             child.destroy()
 
-    def _load_connections(self, *args):
+    def _load_connections(self, *args) -> None:
+        """Load the available wired connections and update the UI."""
         if not self.network_client.ethernet_device:
             self._clear_connections_list()
             self.status_label.set_label("Wired device not available.")
@@ -261,6 +269,7 @@ class WiredNetworksDropdown(Revealer):
 
 
 class Wired(Box):
+    """Widget that represents the wired network connections in the status bar."""
 
     def __init__(self, slot, **kwargs):
         super().__init__(
@@ -368,13 +377,13 @@ class Wired(Box):
                 lambda *_: GLib.idle_add(self._update_connection_name),
             )
 
-    def _check_initial_state(self):
+    def _check_initial_state(self) -> bool:
         """Fallback to ensure wired state is initialized properly"""
         if self.network_client.ethernet_device:
             self._update_connection_name()
         return False  # Run only once
 
-    def _on_device_ready(self, _client):
+    def _on_device_ready(self, *args: object) -> None:
         """Initialize the UI as soon as devices are ready"""
         # Update UI immediately without waiting for dropdown open
         if self.network_client.ethernet_device:
@@ -390,7 +399,7 @@ class Wired(Box):
                 lambda *_: GLib.idle_add(self._update_connection_name),
             )
 
-    def _update_connection_name(self):
+    def _update_connection_name(self) -> bool:
         """Update the connection name label directly"""
         if not self.network_client.ethernet_device:
             self.wired_icon.set_markup(icons.ethernet_off)
@@ -430,7 +439,7 @@ class Wired(Box):
             self.wired_status_text.set_label(state.capitalize())
         return False
 
-    def _refresh_connections(self):
+    def _refresh_connections(self) -> bool:
         """Refresh the connections list in the dropdown"""
         # Always update the connections list when connections change,
         # even if the dropdown isn't currently visible
@@ -438,7 +447,7 @@ class Wired(Box):
         # Return False to prevent this from being called again if used with timeout_add
         return False
 
-    def _on_ethernet_changed(self, *args):
+    def _on_ethernet_changed(self, *args: object) -> None:
         """Handle ethernet state changes"""
         # Make sure we update the UI
         GLib.idle_add(self._update_connection_name)

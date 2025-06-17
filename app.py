@@ -38,7 +38,7 @@ if __name__ == "__main__":
         osd,
     )
 
-    def apply_stylesheet(*_):
+    def apply_stylesheet(*_) -> None:
         return app.set_stylesheet_from_file(get_relative_path("main.css"))
 
     # Load main stylesheet

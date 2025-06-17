@@ -9,6 +9,7 @@ from services.logger import logger
 
 
 class OSD(WaylandWindow):
+    """On-Screen Display (OSD) for volume, brightness, and microphone changes."""
 
     def __init__(self):
         super().__init__(
@@ -30,10 +31,12 @@ class OSD(WaylandWindow):
         self.add(self._contents)
         self._hide_timeout = None
 
-    def _set_visible(self, visible):
+    def _set_visible(self, visible: bool) -> None:
+        """Set the visibility of the OSD."""
         self.set_visible(visible)
 
-    def on_event(self, event, *args, **kwargs):
+    def on_event(self, event: str, *args: object, **kwargs: object) -> None:
+        """Handle events to update the OSD contents."""
         ok = True
         if self._hide_timeout is not None:
             GLib.source_remove(self._hide_timeout)
