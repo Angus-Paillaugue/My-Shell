@@ -1,23 +1,22 @@
 import json
 import os
 import subprocess
-import cairo
 
+import cairo
 from fabric.utils import DesktopApp, get_desktop_applications, monitor_file
+from fabric.utils.helpers import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.eventbox import EventBox
 from fabric.widgets.image import Image
+from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.wayland import WaylandWindow as Window
-from fabric.widgets.label import Label
-from fabric.widgets.eventbox import EventBox
-from fabric.utils.helpers import exec_shell_command_async
-from gi.repository import GLib, Gtk, Gdk
+from gi.repository import Gdk, GLib, Gtk
 
+import modules.icons as icons
 from modules.corners import CornerContainer
 from services.config import config
-import modules.icons as icons
 from services.logger import logger
 
 pinned_aps_location = os.path.expanduser(

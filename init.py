@@ -257,15 +257,20 @@ def others() -> None:
     # Set wanted monospace font in the main.css file
     main_css_location = os.path.join(app_location, "main.css")
     main_css_template_location = os.path.join(app_location, "config/main.css")
+    with open(main_css_template_location, "r") as f:
+        contents = f.read()
+    contents = contents.replace(
+        "{{MONOSPACE_FONT_FAMILY}}",
+        f"\"{config.MONOSPACE_FONT_FAMILY}\", monospace")
+
     if os.path.exists(main_css_location):
-        with open(main_css_template_location, "r") as f:
-            contents = f.read()
-        contents = contents.replace(
-            "{{MONOSPACE_FONT_FAMILY}}", f"\"{config.MONOSPACE_FONT_FAMILY}\", monospace")
-        with open(main_css_location, "w") as f:
-            f.write(contents)
-    else:
-        print(f"Warning: {main_css_location} does not exist.")
+        with open(main_css_location, "r") as f:
+            existing_contents = f.read()
+        if contents.strip() == existing_contents.strip():
+            print(f"Main CSS already up to date.")
+            return
+    with open(main_css_location, "w") as f:
+        f.write(contents)
 
 
 if __name__ == "__main__":
