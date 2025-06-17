@@ -1,10 +1,11 @@
 import subprocess
+
 from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import Gdk
 from fabric.widgets.scrolledwindow import ScrolledWindow
+from gi.repository import Gdk
 
 
 class ClipboardManager(Box):

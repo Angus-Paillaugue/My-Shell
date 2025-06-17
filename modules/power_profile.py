@@ -1,10 +1,11 @@
+from fabric.core.fabricator import Fabricator
+from fabric.utils import exec_shell_command, exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from fabric.utils import exec_shell_command_async, exec_shell_command
 from gi.repository import GLib
+
 import modules.icons as icons
-from fabric.core.fabricator import Fabricator
 
 
 class PowerProfile(Box):

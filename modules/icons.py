@@ -67,13 +67,13 @@ trash: str = "&#xeb41;"
 dnd: str = "&#xece9;"
 notification: str = "&#xea35;"
 notifications_off: str = "&#xece9;"
-# Screen record
-screen_record: str = "&#xfca8;"
 # Time
 point: str = "&#xf698;"
 # Others
+screen_record: str = "&#xfca8;"
 screenshot: str = "&#xf201;"
 loading: str = "&#xea95;"
+color_picker: str = "&#xebe6;"
 
 exceptions: list[str] = ["font_family", "font_weight", "span"]
 

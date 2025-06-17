@@ -1,15 +1,17 @@
-from gi.repository import Gtk
-from fabric.widgets.wayland import WaylandWindow
-from fabric.widgets.centerbox import CenterBox
-from fabric.widgets.box import Box
 import os
-from modules.time import Time
+
+from fabric.widgets.box import Box
+from fabric.widgets.centerbox import CenterBox
+from fabric.widgets.wayland import WaylandWindow
+from gi.repository import Gtk
+
+from modules.language import Language
 from modules.metrics import Metrics
+from modules.power import PowerButton
+from modules.time import Time
 from modules.tray import SystemTray
 from modules.weather import WeatherButton
 from modules.workspaces import Workspaces
-from modules.language import Language
-from modules.power import PowerButton
 from services.config import config
 
 

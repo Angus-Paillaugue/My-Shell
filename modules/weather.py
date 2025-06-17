@@ -1,15 +1,18 @@
+import threading
+
 import requests
+from fabric import Property, Service
+from fabric.core.fabricator import Fabricator
+from fabric.core.service import Property
+from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from fabric.widgets.box import Box
-from fabric.core.service import Property
-import modules.icons as icons
-from fabric import Property, Service
-import threading
-from services.logger import logger
-from fabric.core.fabricator import Fabricator
 from gi.repository import GLib
+
+import modules.icons as icons
 from services.config import config
+from services.logger import logger
+
 
 class Weather:
 
@@ -50,7 +53,7 @@ class WeatherWorker(Service):
             if not res.ok:
                 logger.error(f"Failed to fetch weather data: {res.status_code}")
                 self._weather.set_weather(icon=None, temperature=None)
-                self.update_thread_active = True
+                self.update_thread_active = False
                 return
             elements_list = [el for el in res.text.split(" ") if el != ""]
             if (not all(isinstance(item, str) for item in elements_list) or
@@ -62,7 +65,7 @@ class WeatherWorker(Service):
                                           temperature=elements_list[1].replace(
                                               "+", ""))
                 logger.info(f"Weather updated: {self._weather}")
-            self.update_thread_active = True
+            self.update_thread_active = False
 
         thread = threading.Thread(target=worker)
         thread.daemon = True

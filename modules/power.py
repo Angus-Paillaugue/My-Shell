@@ -1,10 +1,12 @@
+from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from fabric.utils import exec_shell_command_async
-import modules.icons as icons
 from gi.repository import Gtk
+
+import modules.icons as icons
 from services.config import config
+
 
 class PowerButton(Button):
 
@@ -26,7 +28,8 @@ class PowerButton(Button):
 
     def on_clicked(self, button):
         exec_shell_command_async(
-            "fabric-cli exec my-shell 'notch.show_widget(\"power\", False)'")
+            f"fabric-cli exec {config.APP_NAME} 'notch.show_widget(\"power\", False)'"
+        )
 
 
 class PowerMenuActions(Gtk.Grid):

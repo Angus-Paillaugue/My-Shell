@@ -1,10 +1,9 @@
-from fabric.widgets.label import Label
-from fabric.widgets.box import Box
 from fabric.hyprland.service import HyprlandEvent
-from fabric.hyprland.widgets import (
-    Language as HyprlandLanguage,
-    get_hyprland_connection,
-)
+from fabric.hyprland.widgets import Language as HyprlandLanguage
+from fabric.hyprland.widgets import get_hyprland_connection
+from fabric.widgets.box import Box
+from fabric.widgets.label import Label
+
 import modules.icons as icons
 from services.config import config
 

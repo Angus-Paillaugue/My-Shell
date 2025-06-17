@@ -1,18 +1,19 @@
 import gi
 
 gi.require_version("Gtk", "3.0")
-from fabric.widgets.box import Box
-from fabric.widgets.label import Label
-from fabric.widgets.scale import Scale
-from fabric.widgets.button import Button
-from fabric.widgets.revealer import Revealer
-from fabric.widgets.scrolledwindow import ScrolledWindow
 from fabric.audio.service import Audio
-import modules.icons as icons
-from gi.repository import GLib
 from fabric.utils import exec_shell_command_async
-from services.logger import logger
+from fabric.widgets.box import Box
+from fabric.widgets.button import Button
+from fabric.widgets.label import Label
+from fabric.widgets.revealer import Revealer
+from fabric.widgets.scale import Scale
+from fabric.widgets.scrolledwindow import ScrolledWindow
+from gi.repository import GLib
+
+import modules.icons as icons
 from modules.settings import SettingsBroker
+from services.logger import logger
 
 
 class VolumeSlider(Scale):

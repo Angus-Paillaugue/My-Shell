@@ -1,10 +1,11 @@
-from fabric.widgets.wayland import WaylandWindow
-from modules.settings import SettingsBroker
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
-from services.logger import logger
-import modules.icons as icons
+from fabric.widgets.wayland import WaylandWindow
 from gi.repository import GLib
+
+import modules.icons as icons
+from modules.settings import SettingsBroker
+from services.logger import logger
 
 
 class OSD(WaylandWindow):

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-requiredCommands=("yapf" "prettier" "shfmt")
+requiredCommands=("yapf" "prettier" "shfmt" "isort")
 
 projectRoot="$HOME/.config/my-shell"
 cd "$projectRoot" || exit 1
@@ -17,6 +17,7 @@ checkCommands() {
 formatPython() {
   echo "Formatting Python files..."
   yapf -r --style google --verbose -i .
+  isort **/*.py
 }
 
 formatCSS() {

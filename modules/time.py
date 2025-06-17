@@ -1,14 +1,17 @@
+import calendar
+import time
+from datetime import datetime
+
+from fabric.core.service import Property
+from fabric.utils.helpers import invoke_repeater
+from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from fabric.widgets.box import Box
-from fabric.utils.helpers import invoke_repeater
-import time
-import calendar
-from datetime import datetime
 from gi.repository import Gdk, GLib, Gtk
-from fabric.core.service import Property
+
 import modules.icons as icons
 from services.config import config
+
 
 class CalendarBox(Box):
 

@@ -1,6 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
+
 import modules.icons as icons
 
 

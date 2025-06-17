@@ -1,13 +1,15 @@
 import os
 import threading
+
 from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.entry import Entry
-from fabric.widgets.label import Label
-from gi.repository import Gtk, GdkPixbuf, Gio, Gdk, GLib
 from fabric.widgets.image import Image
+from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
+from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk
+
 from services.logger import logger
 
 

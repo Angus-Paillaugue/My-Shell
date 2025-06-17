@@ -1,8 +1,11 @@
 from typing import Literal
+
 from fabric.widgets.box import Box
 from fabric.widgets.shapes import Corner
 from fabric.widgets.wayland import WaylandWindow as Window
+
 from services.config import config
+
 
 class MyCorner(Corner):
 

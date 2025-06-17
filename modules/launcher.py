@@ -3,10 +3,11 @@ import math
 import os
 import re
 import subprocess
-import numpy as np
-from services.config import config
 from collections.abc import Iterator
-from fabric.utils import DesktopApp, get_desktop_applications, idle_add, remove_handler
+
+import numpy as np
+from fabric.utils import (DesktopApp, get_desktop_applications, idle_add,
+                          remove_handler)
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.entry import Entry
@@ -14,9 +15,11 @@ from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import Gdk, GLib
-from services.logger import logger
+
 import modules.icons as icons
 from modules.dock import pinned_aps_location
+from services.config import config
+from services.logger import logger
 
 
 class AppLauncher(Box):
