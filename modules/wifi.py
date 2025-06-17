@@ -16,6 +16,7 @@ from services.network import NetworkClient
 
 
 class WifiAccessPointSlot(Box):
+    """Widget that represents a Wi-Fi access point in the dropdown menu."""
 
     def __init__(self, ap_data: dict, network_service: NetworkClient,
                  wifi_service, **kwargs):
@@ -90,7 +91,8 @@ class WifiAccessPointSlot(Box):
             self.connect_button,
         ]
 
-    def _on_connect_clicked(self, _):
+    def _on_connect_clicked(self, *args: object) -> None:
+        """Handle the connect button click event."""
         if not self.is_active and self.ap_data.get("bssid"):
             self.connect_button.set_label("Connecting...")
             self.connect_button.set_sensitive(False)
@@ -98,6 +100,7 @@ class WifiAccessPointSlot(Box):
 
 
 class WifiNetworksDropdown(Revealer):
+    """Widget that displays available Wi-Fi networks in a dropdown menu."""
 
     def __init__(self, labels, **kwargs):
         super().__init__(
@@ -168,11 +171,12 @@ class WifiNetworksDropdown(Revealer):
 
         self.network_client.connect("device-ready", self._on_device_ready)
 
-    def collapse(self):
+    def collapse(self) -> None:
+        """Collapse the Wi-Fi networks dropdown."""
         self.shown = False
         self.set_reveal_child(self.shown)
 
-    def toggle_visibility(self):
+    def toggle_visibility(self) -> None:
         """Toggle the visibility of the Wifi networks dropdown."""
         if not self.network_client._client.wireless_get_enabled():
             return
@@ -186,7 +190,8 @@ class WifiNetworksDropdown(Revealer):
                     self.network_client.wifi_device.enabled):
                 self._load_access_points()
 
-    def _on_device_ready(self, _client):
+    def _on_device_ready(self, *args: object) -> None:
+        """Initialize the Wi-Fi networks dropdown when the device is ready."""
         if self.network_client.wifi_device:
             self.network_client.wifi_device.connect("changed",
                                                     self._load_access_points)
@@ -206,7 +211,7 @@ class WifiNetworksDropdown(Revealer):
             self.wifi_button.add_style_class("disabled")
             self.refresh_button.set_sensitive(False)
 
-    def _update_wifi_status_ui(self, *args):
+    def _update_wifi_status_ui(self, *args: object) -> None:
         """Update the WiFi status display in the dropdown."""
         if not self.network_client._client:
             return
@@ -253,7 +258,7 @@ class WifiNetworksDropdown(Revealer):
             self.wifi_icon.set_markup(icons.wifi_off)
             self.refresh_button.set_sensitive(False)
 
-    def toggle_wifi(self, *args):
+    def toggle_wifi(self, *args: object) -> None:
         """Enable or disable the WiFi connection"""
         if not self.network_client._client:
             return
@@ -280,7 +285,8 @@ class WifiNetworksDropdown(Revealer):
             if self.shown:
                 GLib.timeout_add(1000, self._load_access_points)
 
-    def _refresh_access_points(self, _=None):
+    def _refresh_access_points(self, *args: object) -> bool:
+        """Refresh the list of available Wi-Fi access points."""
         if self.network_client.wifi_device and self.network_client.wifi_device.enabled:
             self.status_label.set_label("Scanning for Wi-Fi networks...")
             self._clear_ap_list()
@@ -288,11 +294,13 @@ class WifiNetworksDropdown(Revealer):
             self._load_access_points()
         return False
 
-    def _clear_ap_list(self):
+    def _clear_ap_list(self) -> None:
+        """Clear the list of access points in the dropdown."""
         for child in self.ap_list_box.get_children():
             child.destroy()
 
-    def _load_access_points(self, *args):
+    def _load_access_points(self, *args: object) -> None:
+        """Load and display available Wi-Fi access points."""
         if (not self.network_client.wifi_device or
                 not self.network_client.wifi_device.enabled):
             self._clear_ap_list()
@@ -322,6 +330,7 @@ class WifiNetworksDropdown(Revealer):
 
 
 class WifiModule(Box):
+    """Widget that represents the Wi-Fi connections module in the status bar."""
 
     def __init__(self, slot, **kwargs):
         super().__init__(
@@ -414,13 +423,13 @@ class WifiModule(Box):
                 lambda *_: GLib.idle_add(self._update_wifi_state),
             )
 
-    def _check_initial_state(self):
+    def _check_initial_state(self) -> bool:
         """Fallback to ensure WiFi state is initialized properly"""
         if self.network_client.wifi_device:
             self._update_wifi_state()
         return False  # Run only once
 
-    def _on_device_ready(self, _client):
+    def _on_device_ready(self, *args: object) -> None:
         """Initialize the UI state when WiFi device becomes ready"""
         if self.network_client.wifi_device:
             # Update UI with current WiFi info
@@ -436,7 +445,7 @@ class WifiModule(Box):
                 "notify::strength",
                 lambda *_: GLib.idle_add(self._update_wifi_state))
 
-    def _update_wifi_state(self):
+    def _update_wifi_state(self) -> bool:
         """Update the WiFi status display"""
         if not self.network_client.wifi_device:
             return

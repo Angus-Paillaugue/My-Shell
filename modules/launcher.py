@@ -23,6 +23,7 @@ from services.logger import logger
 
 
 class AppLauncher(Box):
+    """Application launcher widget that allows searching and launching applications."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -75,7 +76,8 @@ class AppLauncher(Box):
         self.add(self.search_entry)
         self.add(self.scrolled_window)
 
-    def open_launcher(self):
+    def open_launcher(self) -> None:
+        """Open the application launcher and initialize it with the list of applications."""
         self._all_apps = get_desktop_applications()
         self.arrange_viewport()
 
@@ -91,7 +93,7 @@ class AppLauncher(Box):
         GLib.idle_add(clear_selection)
         self.show()
 
-    def ensure_initialized(self):
+    def ensure_initialized(self) -> bool:
         """Make sure the launcher is initialized with apps list before opening"""
         if not hasattr(self, "_initialized"):
 
@@ -100,7 +102,7 @@ class AppLauncher(Box):
             return True
         return False
 
-    def arrange_viewport(self, query: str = ""):
+    def arrange_viewport(self, query: str = "") -> None:
         if query.startswith("="):
             self.update_calculator_viewport()
             return
@@ -126,12 +128,14 @@ class AppLauncher(Box):
             pin=True,
         )
 
-    def handle_arrange_complete(self, query):
+    def handle_arrange_complete(self, query: str) -> bool:
+        """Handle the completion of the viewport arrangement"""
         if query.strip() != "" and self.viewport.get_children():
             self.update_selection(0)
         return False
 
-    def add_next_application(self, apps_iter: Iterator[DesktopApp]):
+    def add_next_application(self, apps_iter: Iterator[DesktopApp]) -> bool:
+        """Add the next application to the viewport"""
         try:
             app = next(apps_iter)
             slot = self.bake_application_slot(app)
@@ -141,6 +145,7 @@ class AppLauncher(Box):
             return False
 
     def bake_application_slot(self, app: DesktopApp, **kwargs) -> Box:
+        """Create a button for the application with pin functionality"""
         # Check if app is pinned
         is_pinned = app.name in self.pinned_apps
 
@@ -200,7 +205,7 @@ class AppLauncher(Box):
 
         return container
 
-    def toggle_pin_status(self, button, app: DesktopApp):
+    def toggle_pin_status(self, button, app: DesktopApp) -> bool:
         """Toggle whether an app is pinned to the dock"""
 
         # Toggle the pin status
@@ -237,7 +242,8 @@ class AppLauncher(Box):
         # Stop event propagation
         return True
 
-    def update_selection(self, new_index: int):
+    def update_selection(self, new_index: int) -> None:
+        """Update the selected index and highlight the corresponding button"""
 
         if self.selected_index != -1 and self.selected_index < len(
                 self.viewport.get_children()):
@@ -252,7 +258,8 @@ class AppLauncher(Box):
         else:
             self.selected_index = -1
 
-    def scroll_to_selected(self, button):
+    def scroll_to_selected(self, button) -> None:
+        """Scroll the viewport to ensure the selected button is visible"""
 
         def scroll():
             adj = self.scrolled_window.get_vadjustment()
@@ -280,7 +287,8 @@ class AppLauncher(Box):
 
         GLib.idle_add(scroll)
 
-    def on_search_entry_activate(self, text):
+    def on_search_entry_activate(self, text: str) -> None:
+        """Handle the activation of the search entry"""
         if text.startswith("="):
 
             if self.selected_index == -1:
@@ -304,7 +312,8 @@ class AppLauncher(Box):
                     if 0 <= selected_index < len(children):
                         children[selected_index].get_children()[0].clicked()
 
-    def on_search_entry_key_press(self, widget, event):
+    def on_search_entry_key_press(self, widget: Entry, event: Gdk.EventKey) -> bool:
+        """Handle key press events in the search entry"""
         text = widget.get_text()
 
         if text.startswith("="):
@@ -355,7 +364,7 @@ class AppLauncher(Box):
                 return True
             return False
 
-    def notify_text(self, entry, *_):
+    def notify_text(self, entry: Entry, *_) -> None:
         """Handle text changes in the search entry"""
         text = entry.get_text()
         if text.startswith("="):
@@ -365,7 +374,8 @@ class AppLauncher(Box):
         else:
             self.arrange_viewport(text)
 
-    def move_selection(self, delta: int):
+    def move_selection(self, delta: int) -> None:
+        """Move the selection in the viewport by the specified delta"""
         children = self.viewport.get_children()
         if not children:
             return
@@ -377,12 +387,13 @@ class AppLauncher(Box):
         new_index = max(0, min(new_index, len(children) - 1))
         self.update_selection(new_index)
 
-    def save_calc_history(self):
+    def save_calc_history(self) -> None:
+        """Save the calculator history to a JSON file"""
         with open(self.calc_history_path, "w") as f:
             json.dump(self.calc_history, f)
 
     def evaluate_calculator_expression(self, text: str):
-
+        """Evaluate a calculator expression and update the history"""
         logger.debug(f"Evaluating calculator expression: {text}")
 
         expr = text.lstrip("=").strip()
@@ -446,7 +457,8 @@ class AppLauncher(Box):
         self.save_calc_history()
         self.update_calculator_viewport()
 
-    def update_calculator_viewport(self):
+    def update_calculator_viewport(self) -> None:
+        """Update the calculator viewport with the current history"""
         self.viewport.children = []
         for item in self.calc_history:
             btn = self.create_calc_history_button(item)
@@ -456,7 +468,7 @@ class AppLauncher(Box):
             self.selected_index = -1
 
     def create_calc_history_button(self, text: str) -> Button:
-
+        """Create a button for a calculator history item"""
         if "=>" in text:
             parts = text.split("=>")
             expression = parts[0].strip()
@@ -508,8 +520,8 @@ class AppLauncher(Box):
             )
         return btn
 
-    def copy_text_to_clipboard(self, text: str):
-
+    def copy_text_to_clipboard(self, text: str) -> None:
+        """Copy the given text to the clipboard using wl-copy"""
         parts = text.split("=>", 1)
         copy_text = parts[1].strip() if len(parts) > 1 else text
         try:
@@ -517,7 +529,8 @@ class AppLauncher(Box):
         except subprocess.CalledProcessError as e:
             logger.error(f"Clipboard copy failed: {e}")
 
-    def delete_selected_calc_history(self):
+    def delete_selected_calc_history(self) -> None:
+        """Delete the currently selected calculator history item"""
         if self.selected_index != -1 and self.selected_index < len(
                 self.calc_history):
 

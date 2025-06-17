@@ -9,6 +9,7 @@ import modules.icons as icons
 
 
 class PowerProfile(Box):
+    """Widget to manage and display power profiles on the system."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -84,13 +85,13 @@ class PowerProfile(Box):
         self.power_profile_fabricator.changed.connect(self.update_ui)
         GLib.idle_add(self.update_ui, None, self.get_profile())
 
-    def update_ui(self, *args):
+    def update_ui(self, *args: object) -> None:
         """Update the UI to reflect the current power profile."""
         self.profile_icon.set_markup(self.active_profile["icon"])
         self.profile_name.set_label(self.active_profile["label"])
         self.add_style_class(self.active_profile["name"])
 
-    def get_profile(self):
+    def get_profile(self) -> str | None:
         res = exec_shell_command("tuned-adm active")
         if res:
             profile_name = res.split(":")[1].strip()
@@ -100,7 +101,7 @@ class PowerProfile(Box):
                     return profile_name
         return None  # Return None if no profile matches or command fails
 
-    def rotate_profile(self):
+    def rotate_profile(self) -> None:
         """Rotate through the available power profiles."""
         current_index = self.profiles.index(self.active_profile)
         next_index = (current_index + 1) % len(self.profiles)

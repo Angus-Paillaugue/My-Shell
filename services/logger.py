@@ -3,11 +3,13 @@ import inspect
 import re
 from os import listdir, makedirs, remove, rename
 from os.path import dirname, exists, join, realpath
+from typing import Literal
 
 from .config import config
 
 
 class Logger:
+    """A simple logger class that writes logs to a file and rotates them based on a retention policy."""
 
     def __init__(
         self,
@@ -32,7 +34,7 @@ class Logger:
             self.log_file_location)
         self.max_log_files_retention = max_log_files_retention
 
-    def _make_logs_dir(self):
+    def _make_logs_dir(self) -> None:
         """
         Creates the directory where the logs are stored if it does not already exists.
         """
@@ -42,7 +44,7 @@ class Logger:
         if not exists(self.old_logs_location):
             makedirs(self.old_logs_location)
 
-    def _append_to_file(self, line, path):
+    def _append_to_file(self, line: str, path: str) -> None:
         """
         Appends a line of text to a file
         Parameters:
@@ -89,7 +91,7 @@ class Logger:
             print(f"Looks like your log file does not exists : {old_path}")
             print(e)
 
-    def _get_nb_lines_in_file(self, path):
+    def _get_nb_lines_in_file(self, path: str) -> int:
         """Returns the number of lines in a file"""
         try:
             with open(path, "r") as fp:
@@ -98,7 +100,7 @@ class Logger:
         except:
             return 0
 
-    def _create_line(self, text, level):
+    def _create_line(self, text: str, level: Literal["debug", "info", "warning", "error", "fatal", "success"]) -> str:
         """
         Creates a standardized log line
         Parameters:
@@ -113,7 +115,7 @@ class Logger:
         """Returns the current log file name"""
         return f"{self.process}.{self.log_file_ext}"
 
-    def debug(self, args):
+    def debug(self, args: any) -> None:
         """
         Writes a DEBUG log to the log file
         """
@@ -122,7 +124,7 @@ class Logger:
         self._append_to_file(line, file)
         print(line)
 
-    def error(self, args):
+    def error(self, args: any) -> None:
         """
         Writes a ERROR log to the log file
         """
@@ -131,7 +133,7 @@ class Logger:
         self._append_to_file(line, file)
         print(line)
 
-    def warning(self, args):
+    def warning(self, args: any) -> None:
         """
         Writes a WARNING log to the log file
         """
@@ -140,7 +142,7 @@ class Logger:
         self._append_to_file(line, file)
         print(line)
 
-    def info(self, args):
+    def info(self, args: any) -> None:
         """
         Writes an INFO log to the log file
         """
@@ -149,7 +151,7 @@ class Logger:
         self._append_to_file(line, file)
         print(line)
 
-    def fatal(self, args):
+    def fatal(self, args: any) -> None:
         """
         Writes a FATAL log to the log file
         """
@@ -158,7 +160,7 @@ class Logger:
         self._append_to_file(line, file)
         print(line)
 
-    def success(self, args):
+    def success(self, args: any) -> None:
         """
         Writes a SUCCESS log to the log file
         """

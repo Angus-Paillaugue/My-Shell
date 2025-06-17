@@ -8,6 +8,7 @@ from services.config import config
 
 
 class MyCorner(Corner):
+    """Custom corner widget that extends the Corner class with additional properties."""
 
     def __init__(self, corner, size=20, name="corner", **kwargs):
         super().__init__(
@@ -103,7 +104,8 @@ class CornerContainer(Box):
                 )
             )
 
-    def _add_children(self):
+    def _add_children(self) -> None:
+        """Add children to the inner box."""
         kwargs = self.kwargs.copy()
         kwargs["h_align"] = kwargs.get("h_align", "fill")
         kwargs["v_align"] = kwargs.get("v_align", "fill")
@@ -132,6 +134,7 @@ class CornerContainer(Box):
 
 
 class Corners(Window):
+    """Window that contains all four corners of the screen."""
 
     def __init__(self):
         margin = f"{"-54px" if config.BAR_POSITION == "top" else "0"} {"-54px" if config.BAR_POSITION == "right" else "0"} {"-54px" if config.BAR_POSITION == "bottom" else "0"} {"-54px" if config.BAR_POSITION == "left" else "0"}"

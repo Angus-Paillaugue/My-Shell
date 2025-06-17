@@ -14,6 +14,7 @@ from services.logger import logger
 
 
 class WallpaperManager(Box):
+    """Widget to manage and display wallpapers in a grid layout."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -69,12 +70,12 @@ class WallpaperManager(Box):
         self.setup_file_monitor()
         self.connect("key-press-event", self.on_key_press)
 
-    def notify_text(self, entry, *_):
+    def notify_text(self, entry: Entry, *args: object) -> None:
         """Handle text changes in the search entry"""
         text = entry.get_text()
         self._refresh_wallpapers(text)
 
-    def on_key_press(self, widget, event):
+    def on_key_press(self, widget: Entry, event: Gdk.EventKey) -> bool:
         """Handle keyboard navigation"""
         keyval = event.get_keyval()[1]
 
@@ -86,14 +87,15 @@ class WallpaperManager(Box):
         # Let Tab navigation work normally
         return False
 
-    def setup_file_monitor(self):
+    def setup_file_monitor(self) -> None:
+        """ Set up a file monitor to watch for changes in the wallpaper directory. """
         gfile = Gio.File.new_for_path(self.wallpaper_location)
         self.file_monitor = gfile.monitor_directory(Gio.FileMonitorFlags.NONE,
                                                     None)
         self.file_monitor.connect("changed",
                                   lambda *_: self._refresh_wallpapers())
 
-    def _refresh_wallpapers(self, search=""):
+    def _refresh_wallpapers(self, search: str="") -> None:
         """
         Refresh the list of wallpapers and update the buttons.
         """
@@ -151,7 +153,7 @@ class WallpaperManager(Box):
         self.show_all()
 
     def _add_wallpaper_button_placeholder(self, path: str, filename: str,
-                                          col: int, row: int):
+                                          col: int, row: int) -> None:
         """Add a wallpaper button with a placeholder image."""
         image_width = 330
         image_height = image_width * 3 // 4  # 16:9 aspect ratio
@@ -196,7 +198,7 @@ class WallpaperManager(Box):
         # Use the provided row and column positions
         self.buttons_grid.attach(button, col, row, 1, 1)
 
-    def _load_images_in_background(self, wallpapers):
+    def _load_images_in_background(self, wallpapers: list) -> None:
         """Load images in a background thread to avoid UI freezes."""
         if self.load_thread_active:
             return
@@ -228,7 +230,7 @@ class WallpaperManager(Box):
         thread.daemon = True
         thread.start()
 
-    def _update_image(self, path, pixbuf):
+    def _update_image(self, path: str, pixbuf: GdkPixbuf.Pixbuf) -> None:
         """Update the image widget with the loaded pixbuf."""
         # Mark this image as loaded
         self.loaded_images.add(path)
@@ -254,7 +256,7 @@ class WallpaperManager(Box):
                     # Exit the loop after finding the matching image
                     return
 
-    def _list_wallpapers(self):
+    def _list_wallpapers(self) -> list:
         """
         List all wallpapers in the wallpapers directory.
         """
@@ -280,10 +282,6 @@ class WallpaperManager(Box):
                 f"The specified path does not exist: {path}")
 
         try:
-            # exec_shell_command_async(
-            #     f'swww img "{path}" -t outer --transition-duration 1.5 --transition-step 255 --transition-fps 60 -f Nearest',
-            #     lambda *_: None,
-            # )
             # Link the wallpaper to the current directory
             current_wall = os.path.expanduser("~/.current.wall")
             if os.path.isfile(current_wall) or os.path.islink(

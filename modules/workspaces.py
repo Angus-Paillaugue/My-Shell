@@ -5,6 +5,7 @@ from services.config import config
 
 
 class Workspaces(BaseWorkspaces):
+    """Widget that displays workspace buttons in the bar."""
 
     def __init__(self):
         orientation = (

@@ -16,6 +16,7 @@ from services.config import config
 
 
 class Bar(WaylandWindow):
+    """The main bar widget that contains various components like workspaces, system tray, time, etc."""
 
     def __init__(self, **kwargs):
         anchors = {

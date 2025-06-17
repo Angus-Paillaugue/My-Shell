@@ -8,6 +8,7 @@ import modules.icons as icons
 
 
 class ScreenshotButton(Button):
+    """Button to trigger screenshot functionality."""
 
     def __init__(self):
         super().__init__(
@@ -23,6 +24,7 @@ class ScreenshotButton(Button):
         )
         self.output_path = os.path.expanduser("~/Pictures/screenshots")
 
-    def _on_click(self, *_):
+    def _on_click(self, *args: object) -> None:
+        """Handle the button click to take a screenshot."""
         exec_shell_command_async(f"hyprshot -m region -o {self.output_path}",
                                  lambda *_: None)

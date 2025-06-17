@@ -53,7 +53,7 @@ class Wifi(Service):
             )
             self._activate_ap()
 
-    def ap_update(self):
+    def ap_update(self) -> None:
         self.emit("changed")
         for sn in [
                 "enabled",
@@ -67,7 +67,7 @@ class Wifi(Service):
         ]:
             self.notify(sn)
 
-    def _activate_ap(self):
+    def _activate_ap(self) -> None:
         if self._ap:
             self._ap.disconnect(self._ap_signal)
         self._ap = self._device.get_active_access_point()
@@ -77,11 +77,13 @@ class Wifi(Service):
         self._ap_signal = self._ap.connect(
             "notify::strength", lambda *args: self.ap_update())  # type: ignore
 
-    def toggle_wifi(self):
+    def toggle_wifi(self) -> None:
+        """Toggle the wifi connection."""
         self._client.wireless_set_enabled(
             not self._client.wireless_get_enabled())
 
-    def scan(self):
+    def scan(self) -> None:
+        """Request a scan for available WiFi access points."""
         self._device.request_scan_async(
             None,
             lambda device, result: [
@@ -90,7 +92,8 @@ class Wifi(Service):
             ],
         )
 
-    def notifier(self, name: str, *args):
+    def notifier(self, name: str, *args: object) -> None:
+        """Notify listeners about a change in the wifi state."""
         self.notify(name)
         self.emit("changed")
         return
@@ -241,7 +244,8 @@ class Ethernet(Service):
         ):
             self._device.connect(f"notify::{pn}", lambda *_: self.notifier(pn))
 
-    def notifier(self, pn):
+    def notifier(self, pn: str) -> None:
+        """Notify listeners about a change in the ethernet state."""
         self.notify(pn)
         self.emit("changed")
 
@@ -290,7 +294,8 @@ class Ethernet(Service):
             if d.get_type_description() == "ethernet"
         ]
 
-    def connect_to_interface(self, interface):
+    def connect_to_interface(self, interface: str) -> str:
+        """Connect to a specific ethernet interface."""
         if interface not in self.interfaces:
             raise ValueError(
                 f"The interface {interface} does not seem to exist!")
@@ -327,7 +332,7 @@ class NetworkClient(Service):
         except Exception as e:
             logger.error(f"Failed to initialize NetworkManager client: {e}")
 
-    def _init_devices(self):
+    def _init_devices(self) -> None:
         """Initialize network devices."""
         if not self._client:
             return
@@ -449,7 +454,7 @@ class NetworkClient(Service):
 
         return connections
 
-    def activate_connection(self, uuid):
+    def activate_connection(self, uuid: str) -> bool:
         """Activate a connection by UUID."""
         if not self._client:
             return False

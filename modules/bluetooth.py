@@ -12,6 +12,7 @@ from modules.settings import SettingsButton
 
 
 class BluetoothDeviceSlot(CenterBox):
+    """Widget that represents a Bluetooth device in the dropdown menu."""
 
     def __init__(self, device: BluetoothDevice, **kwargs):
         super().__init__(name="bluetooth-device", **kwargs)
@@ -51,7 +52,7 @@ class BluetoothDeviceSlot(CenterBox):
 
         self.device.emit("changed")
 
-    def on_changed(self, *_):
+    def on_changed(self, *_) -> None:
         self.connection_label.set_markup(
             icons.bluetooth if self.device.connected else icons.bluetooth_off)
         if self.device.connecting:
@@ -64,10 +65,10 @@ class BluetoothDeviceSlot(CenterBox):
             self.connect_button.add_style_class("connected")
         else:
             self.connect_button.remove_style_class("connected")
-        return
 
 
 class BluetoothDevicesDropdown(Revealer):
+    """Dropdown widget that displays available Bluetooth devices."""
 
     def __init__(self, labels=dict(), **kwargs):
         super().__init__(
@@ -134,26 +135,26 @@ class BluetoothDevicesDropdown(Revealer):
         self.client.notify("scanning")
         self.client.notify("enabled")
 
-    def get_label(self, label_name):
+    def get_label(self, label_name: str) -> Label:
         """Get the label for the Bluetooth devices dropdown."""
         return self.labels.get(label_name, Label())
 
-    def set_labels(self, labels):
+    def set_labels(self, labels: dict) -> None:
         """Set the labels for the Bluetooth devices dropdown."""
         self.labels = labels
         self.status_label()
 
-    def collapse(self):
+    def collapse(self) -> None:
         """Toggle the visibility of the Bluetooth devices dropdown."""
         self.shown = False
         self.set_reveal_child(self.shown)
 
-    def toggle_visibility(self):
+    def toggle_visibility(self) -> None:
         """Toggle the visibility of the Bluetooth devices dropdown."""
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
 
-    def status_label(self):
+    def status_label(self) -> None:
         self.enabled = self.client.enabled
         if self.client.enabled:
             self.get_label("status_text").set_label("Enabled")
@@ -174,7 +175,7 @@ class BluetoothDevicesDropdown(Revealer):
                 i.add_style_class("disabled")
             self.get_label("icon").set_markup(icons.bluetooth_off)
 
-    def on_device_added(self, client: BluetoothClient, address: str):
+    def on_device_added(self, client: BluetoothClient, address: str) -> None:
         if not (device := client.get_device(address)):
             return
 
@@ -198,7 +199,7 @@ class BluetoothDevicesDropdown(Revealer):
             self.available_box.add(slot)
             self.available_box.show_all()
 
-    def update_scan_label(self):
+    def update_scan_label(self) -> None:
         if self.client.scanning:
             self.scan_label.add_style_class("scanning")
             self.scan_button.add_style_class("scanning")
@@ -211,6 +212,7 @@ class BluetoothDevicesDropdown(Revealer):
 
 
 class BluetoothButton(SettingsButton):
+    """Button to toggle Bluetooth and show available devices."""
 
     def __init__(self, slot=None, **kwargs):
         self.labels = dict()

@@ -9,6 +9,7 @@ from services.config import config
 
 
 class PowerButton(Button):
+    """Button to trigger the power menu in the bar."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -26,13 +27,15 @@ class PowerButton(Button):
             **kwargs,
         )
 
-    def on_clicked(self, button):
+    def on_clicked(self, *args: object) -> None:
+        """Handle the button click to show or hide the power menu."""
         exec_shell_command_async(
             f"fabric-cli exec {config.APP_NAME} 'notch.show_widget(\"power\", False)'"
         )
 
 
 class PowerMenuActions(Gtk.Grid):
+    """Grid to display power options like logout, reboot, and shutdown."""
 
     def __init__(self, **kwargs):
         super().__init__(

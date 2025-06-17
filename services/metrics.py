@@ -36,11 +36,11 @@ class MetricsProvider:
 
         return True
 
-    def get_metrics(self):
+    def get_metrics(self) -> tuple[float, float, float]:
         return (self.cpu, self.mem, self.temp)
 
-    def get_battery(self):
-        return (self.bat_percent, self.bat_charging)
+    def get_battery(self) -> tuple[float, bool]:
+        return (self.bat_percent, self.bat_charging or False)
 
 
 shared_provider = MetricsProvider()
