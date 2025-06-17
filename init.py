@@ -198,11 +198,19 @@ def generate_hyprlock_config() -> None:
     location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf")
     template_location = os.path.join(app_location, "config/hypr/hyprlock.conf")
     backup_location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf.bak")
-    if (os.path.exists(location) and not os.path.exists(backup_location) and
-            os.path.exists(template_location)):
+
+    # Create a backup of the existing hyprlock configuration if it exists
+    if os.path.exists(location) and not os.path.exists(backup_location):
         shutil.copyfile(location, backup_location)
-        shutil.copyfile(template_location, location)
-        print(f"Hyprlock configuration updated")
+        print(f"Backup created at {backup_location}")
+
+    with open(template_location, "r") as f:
+        contents = f.read()
+        contents = contents.replace("{{APP_NAME}}", config.APP_NAME).replace(
+            "{{MONOSPACE_FONT_FAMILY}}", config.MONOSPACE_FONT_FAMILY)
+    with open(location, "w") as f:
+        f.write(contents)
+    print(f"Hyprlock configuration updated")
 
 
 def update_kitty_config() -> None:
@@ -245,6 +253,19 @@ def others() -> None:
     if not os.path.exists(pinned_aps_location):
         with open(pinned_aps_location, "w") as f:
             f.write("[]")
+
+    # Set wanted monospace font in the main.css file
+    main_css_location = os.path.join(app_location, "main.css")
+    main_css_template_location = os.path.join(app_location, "config/main.css")
+    if os.path.exists(main_css_location):
+        with open(main_css_template_location, "r") as f:
+            contents = f.read()
+        contents = contents.replace(
+            "{{MONOSPACE_FONT_FAMILY}}", f"\"{config.MONOSPACE_FONT_FAMILY}\", monospace")
+        with open(main_css_location, "w") as f:
+            f.write(contents)
+    else:
+        print(f"Warning: {main_css_location} does not exist.")
 
 
 if __name__ == "__main__":

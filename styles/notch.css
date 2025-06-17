@@ -40,3 +40,6 @@
 #notch-widget-picker-grid {
   margin-bottom: 20px;
 }
+#notch-active-window-box {
+  min-width: 220px;
+}

@@ -86,4 +86,3 @@
 .bar-action-button.danger:active label {
   color: var(--foreground);
 }
-/* TODO: Add labels on the wifi, wired, bluetooth and power-profile buttons */

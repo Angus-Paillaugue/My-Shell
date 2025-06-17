@@ -5,3 +5,4 @@ config/hypr/colors.conf
 styles/colors.css
 config/pinned_apps.json
 poetry.lock
+main.css

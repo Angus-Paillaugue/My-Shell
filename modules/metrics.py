@@ -68,8 +68,7 @@ class Metrics(Box):
             style_classes=['metrics-progress-bar'],
             child=Label(
                 name="ram-label",
-                markup=
-                "<span font-family='JetBrainsMono Nerd Font' font-weight='normal'> </span>",
+                markup=icons.memory
             ),
         )
         self.temp = CircularProgressBar(
