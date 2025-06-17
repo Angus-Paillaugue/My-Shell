@@ -1,8 +1,8 @@
-from fabric.hyprland.widgets import (
-    WorkspaceButton,
-    Workspaces as BaseWorkspaces,
-)
+from fabric.hyprland.widgets import WorkspaceButton
+from fabric.hyprland.widgets import Workspaces as BaseWorkspaces
+
 from services.config import config
+
 
 class Workspaces(BaseWorkspaces):
 

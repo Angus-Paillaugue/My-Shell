@@ -1,7 +1,9 @@
 import os
+
+from fabric.utils import exec_shell_command_async
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from fabric.utils import exec_shell_command_async
+
 import modules.icons as icons
 
 

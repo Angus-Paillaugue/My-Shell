@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from typing import Literal, Protocol, Literal
+from typing import Literal, Protocol
 
 
 class ConfigInterface(Protocol):
@@ -16,7 +15,6 @@ class ConfigInterface(Protocol):
     ] = "top-right"
 
 
-@dataclass
 class BaseConfig(ConfigInterface):
     APP_NAME: str = "my-shell"
     BAR_POSITION: Literal["top", "left", "right", "bottom"] = "top"

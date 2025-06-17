@@ -2,13 +2,14 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("NM", "1.0")
-from gi.repository import GLib, NM
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
-from fabric.widgets.label import Label
 from fabric.widgets.centerbox import CenterBox
+from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
+from gi.repository import NM, GLib
+
 import modules.icons as icons
 from services.network import NetworkClient
 

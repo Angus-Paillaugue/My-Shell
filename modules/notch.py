@@ -1,41 +1,41 @@
 import json
 import subprocess
-from gi.repository import Gtk, Gdk, GLib
 
-from fabric.hyprland.widgets import get_hyprland_connection
 from fabric.hyprland.service import HyprlandEvent
+from fabric.hyprland.widgets import get_hyprland_connection
 from fabric.utils.helpers import get_desktop_applications
+from fabric.widgets.box import Box
+from fabric.widgets.button import Button
+from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.eventbox import EventBox
+from fabric.widgets.image import Image
+from fabric.widgets.label import Label
+from fabric.widgets.revealer import Revealer
 from fabric.widgets.stack import Stack
 from fabric.widgets.wayland import WaylandWindow
-from fabric.widgets.box import Box
-from fabric.widgets.button import Button
-from fabric.widgets.revealer import Revealer
-from fabric.widgets.box import Box
-from fabric.widgets.image import Image
-from fabric.widgets.button import Button
-from fabric.widgets.label import Label
-from fabric.widgets.centerbox import CenterBox
+from gi.repository import Gdk, GLib, Gtk
 
-from services.logger import logger
-
-from modules.corners import CornerContainer
-from modules.notification import NotificationHistory, NotificationHistoryIndicator
-from modules.time import CalendarBox as Calendar
-from modules.bluetooth import BluetoothButton
 from modules.battery import Battery
+from modules.bluetooth import BluetoothButton
 from modules.brightness import BrightnessRow
+from modules.clipboard import ClipboardManager
+from modules.color_picker import ColorPickerButton
+from modules.corners import CornerContainer
+from modules.launcher import AppLauncher
+from modules.notification import (NotificationHistory,
+                                  NotificationHistoryIndicator)
 from modules.power import PowerMenuActions
 from modules.power_profile import PowerProfile
-from modules.volume import VolumeRow, MicRow
+from modules.screen_record import ScreenRecordButton
+from modules.screenshot import ScreenshotButton
+from modules.time import CalendarBox as Calendar
+from modules.volume import MicRow, VolumeRow
+from modules.wallpaper import WallpaperManager
 from modules.wifi import WifiModule
 from modules.wired import Wired
-from modules.screenshot import ScreenshotButton
-from modules.screen_record import ScreenRecordButton
-from modules.wallpaper import WallpaperManager
-from modules.launcher import AppLauncher
-from modules.clipboard import ClipboardManager
 from services.config import config
+from services.logger import logger
+
 
 class NotchWidgetPicker(Revealer):
     """Buttons at the top of the notch used to switch tab (launcher, networking, wallpaper, etc.)"""
@@ -122,7 +122,7 @@ class NotchWidgetPicker(Revealer):
 class NotchWidgetDefaultExpanded(Box):
     """Default widget when hovering the notch, showing various modules like wifi, bluetooth, volume, etc."""
 
-    def __init__(self, notification_history: NotificationHistory):
+    def __init__(self, notification_history: NotificationHistory, show_widget=None):
         super().__init__(
             orientation="v",
             spacing=8,
@@ -145,6 +145,7 @@ class NotchWidgetDefaultExpanded(Box):
         self.network_module = Wired(slot=self.wired_networks_dropdown_slot)
         self.screenshot_button = ScreenshotButton()
         self.screen_record_button = ScreenRecordButton()
+        self.color_picker_button = ColorPickerButton(hide_notch=lambda: show_widget("default"))
 
         self.buttons_grid = Gtk.Grid(
             column_homogeneous=True,
@@ -174,6 +175,7 @@ class NotchWidgetDefaultExpanded(Box):
 
         self.end_children = Box(
             children=[
+                self.color_picker_button,
                 self.screen_record_button,
                 self.screenshot_button,
             ],
@@ -425,6 +427,7 @@ class NotchInner(CornerContainer):
         self,
         notification_history: NotificationHistory,
         notch_widget_picker: NotchWidgetPicker,
+        show_widget,
     ):
         self.widgets_labels = [
             'default', 'default-expanded', 'launcher', 'wallpaper', 'power',
@@ -433,7 +436,8 @@ class NotchInner(CornerContainer):
         self.notch_widget_picker = notch_widget_picker
         self.notch_widget_default = NotchWidgetDefault()
         self.notch_widget_default_expanded = NotchWidgetDefaultExpanded(
-            notification_history=notification_history)
+            notification_history=notification_history, show_widget=show_widget
+        )
         self.launcher = AppLauncher()
         self.notch_widget_wallpaper = WallpaperManager()
         self.power = PowerMenuActions()
@@ -486,11 +490,12 @@ class NotchInner(CornerContainer):
 class Notch(EventBox):
     """Main notch widget that contains the notch inner and the widget picker"""
 
-    def __init__(self, notification_history: NotificationHistory):
+    def __init__(self, notification_history: NotificationHistory, show_widget):
         self.notch_widget_picker = NotchWidgetPicker(self)
         self.inner = NotchInner(
             notification_history=notification_history,
             notch_widget_picker=self.notch_widget_picker,
+            show_widget=show_widget,
         )
         self.notification_history_indicator = NotificationHistoryIndicator(
             notification_history=notification_history)
@@ -555,7 +560,7 @@ class NotchWindow(WaylandWindow):
             margin=margin,
             keyboard_mode="on_demand",
         )
-        self.notch = Notch(notification_history=notification_history)
+        self.notch = Notch(notification_history=notification_history, show_widget=self.show_widget)
         self._container = Box(
             name="notch-container",
             orientation="h",

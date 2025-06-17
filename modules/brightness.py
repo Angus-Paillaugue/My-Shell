@@ -1,10 +1,12 @@
 import os
+
 from fabric import Property, Service, Signal
+from fabric.utils import exec_shell_command_async, monitor_file
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.scale import Scale
-from fabric.utils import exec_shell_command_async, monitor_file
 from gi.repository import GLib
+
 import modules.icons as icons
 from modules.settings import SettingsBroker
 from services.logger import logger

@@ -1,13 +1,13 @@
+from fabric.bluetooth.service import BluetoothClient, BluetoothDevice
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
-from fabric.widgets.label import Label
-from fabric.bluetooth.service import BluetoothClient, BluetoothDevice
 from fabric.widgets.centerbox import CenterBox
-import modules.icons as icons
-from fabric.widgets.revealer import Revealer
-from fabric.widgets.revealer import Revealer
 from fabric.widgets.image import Image
+from fabric.widgets.label import Label
+from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
+
+import modules.icons as icons
 from modules.settings import SettingsButton
 
 

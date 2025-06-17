@@ -3,6 +3,7 @@ package-mode = false
 
 [tool.poetry.group.dev.dependencies]
 yapf = "^0.43.0"
+isort = "^6.0.1"
 
 [project]
 name = "my-shell"

@@ -4,7 +4,8 @@ import os
 import uuid
 from datetime import datetime, timedelta
 
-from fabric.notifications.service import Notification, NotificationAction, Notifications
+from fabric.notifications.service import (Notification, NotificationAction,
+                                          Notifications)
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.centerbox import CenterBox
@@ -12,12 +13,12 @@ from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import GdkPixbuf, GLib, Gtk
 from fabric.widgets.wayland import WaylandWindow
-from services.logger import logger
+from gi.repository import GdkPixbuf, GLib, Gtk
 
 import modules.icons as icons
 from services.config import config
+from services.logger import logger
 
 PERSISTENT_DIR = f"/tmp/{config.APP_NAME}/notifications"
 PERSISTENT_HISTORY_FILE = os.path.join(PERSISTENT_DIR,

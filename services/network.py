@@ -2,8 +2,10 @@ from typing import Any, List, Literal
 
 import gi
 from fabric.core.service import Property, Service, Signal
-from fabric.utils import bulk_connect, exec_shell_command_async, exec_shell_command
+from fabric.utils import (bulk_connect, exec_shell_command,
+                          exec_shell_command_async)
 from gi.repository import Gio
+
 from services.logger import logger
 
 try:

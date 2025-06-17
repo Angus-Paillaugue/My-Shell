@@ -1,16 +1,18 @@
+import json
+import os
 import subprocess
-from fabric.widgets.wayland import WaylandWindow as Window
+
+from fabric.utils import DesktopApp, get_desktop_applications, monitor_file
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
+from fabric.widgets.eventbox import EventBox
 from fabric.widgets.image import Image
 from fabric.widgets.revealer import Revealer
-import os
+from fabric.widgets.wayland import WaylandWindow as Window
 from gi.repository import GLib
-import json
-from services.config import config
+
 from modules.corners import CornerContainer
-from fabric.widgets.eventbox import EventBox
-from fabric.utils import DesktopApp, get_desktop_applications, monitor_file
+from services.config import config
 
 pinned_aps_location = os.path.expanduser(
     f"~/.config/{config.APP_NAME}/config/pinned_apps.json"
@@ -29,7 +31,7 @@ class Dock(Window):
             "left": "left center",
             "right": "right center",
         }[config.DOCK_POSITION]
-        margin = f"{"-54px" if config.DOCK_POSITION == "top" else 0} 0 0 0"
+        margin = f"0 0 {"-54px" if config.BAR_POSITION == "bottom" else 0} 0"
         super().__init__(
             name="dock-overlay",
             layer="overlay",

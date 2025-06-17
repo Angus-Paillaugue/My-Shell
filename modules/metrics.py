@@ -1,12 +1,13 @@
+from fabric.core.fabricator import Fabricator
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
-from fabric.widgets.label import Label
 from fabric.widgets.circularprogressbar import CircularProgressBar
-import modules.icons as icons
-from services.metrics import shared_provider
-from fabric.core.fabricator import Fabricator
+from fabric.widgets.label import Label
 from gi.repository import GLib
+
+import modules.icons as icons
 from services.config import config
+from services.metrics import shared_provider
 
 
 class Metrics(Box):
