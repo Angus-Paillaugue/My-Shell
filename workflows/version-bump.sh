@@ -53,9 +53,12 @@ main() {
   fi
   update_versions_in_files "$new_version"
 
+  # Commit and push the changes
   git add "$project_dir/VERSION" "$project_dir/pyproject.toml"
   git commit -m "Bump version to $new_version"
   git push origin "$bump_branch"
+
+  # Create a pull request and merge it
   gh pr create --base "$release_branch" --head "$bump_branch" --title "Version Bump to $new_version" --body "This PR bumps the version to $new_version."
   if [[ $? -ne 0 ]]; then
     echo "Error: Failed to create a pull request."
@@ -66,10 +69,19 @@ main() {
     echo "Error: Failed to merge the pull request."
     exit 1
   fi
+
+  # Push the changes to the release branch
   git checkout "$release_branch"
   git pull origin "$release_branch"
   git branch -D "$bump_branch"
   git push origin --delete "$bump_branch"
+
+  # Create a github release
+  notes=$(git log --pretty=format:"%h - %s (%an)" "$current_local_version"..HEAD)
+  gh release create "$new_version" --generate-notes || {
+    echo "Error: Failed to create a GitHub release."
+    exit 1
+  }
   echo "Version bumped to $new_version and changes pushed to the release branch '$bump_branch'."
 }
 
