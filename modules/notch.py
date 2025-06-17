@@ -3,6 +3,7 @@ import subprocess
 
 from fabric.hyprland.service import HyprlandEvent
 from fabric.hyprland.widgets import get_hyprland_connection
+from fabric.utils import DesktopApp
 from fabric.utils.helpers import get_desktop_applications
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
@@ -95,11 +96,13 @@ class NotchWidgetPicker(Revealer):
         self.set_active_index(0)
         self.add(self.revealer_2)
 
-    def show(self):
+    def show(self) -> None:
+        """Show the widget picker and reveal the buttons"""
         self.revealer_2.set_reveal_child(True)
         self.set_reveal_child(True)
 
-    def hide(self):
+    def hide(self) -> None:
+        """Hide the widget picker and collapse the buttons"""
         self.revealer_2.set_reveal_child(False)
         self.set_reveal_child(False)
         if hasattr(self.notch.inner._contents.get_visible_child(), "cleanup"):
@@ -107,7 +110,8 @@ class NotchWidgetPicker(Revealer):
             self.notch.inner._contents.get_visible_child().cleanup()
         self.notch.inner.show_widget("default")
 
-    def set_active_index(self, index: int):
+    def set_active_index(self, index: int) -> None:
+        """Set the active button based on the index and highlight it"""
         if 0 <= index < len(self.buttons):
             for i, button in enumerate(self.buttons):
                 if i == index:
@@ -215,7 +219,7 @@ class NotchWidgetDefaultExpanded(Box):
         self.set_valign(Gtk.Align.START)
         self.set_halign(Gtk.Align.CENTER)
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Collapse all of the Revealer used by modules"""
         self.network_module.wired_networks_dropdown.collapse()
         self.wifi_module.wifi_networks_dropdown.collapse()
@@ -266,7 +270,7 @@ class NotchWidgetDefault(Box):
         self._current_window_class = self._get_current_window_class()
         self.conn.connect("event::activewindow", self.on_active_window_changed)
 
-    def set_desktop_string(self, update_ui=False):
+    def set_desktop_string(self, update_ui: bool=False) -> None:
         """Set the desktop string to be displayed in the notch"""
         username_result = subprocess.run(["whoami"],
                                          capture_output=True,
@@ -281,7 +285,7 @@ class NotchWidgetDefault(Box):
             self.active_window.set_label(
                 self._center_string(self.desktop_string, max_length=20))
 
-    def update_window_icon(self, *args):
+    def update_window_icon(self, *args) -> None:
         """Update the window icon based on the current active window title"""
 
         label_widget = self.active_window
@@ -335,11 +339,11 @@ class NotchWidgetDefault(Box):
             self.active_window.set_label(self._center_string(window_name))
             self.update_window_icon()
 
-    def _set_icon_visibility(self, visible: bool):
+    def _set_icon_visibility(self, visible: bool) -> None:
         """Set the visibility of the window icon"""
         self.icon_revealer.set_reveal_child(visible)
 
-    def show_default(self):
+    def show_default(self) -> None:
         """Show the default widget"""
         self.active_window.set_label(self._center_string(self.desktop_string))
         self._set_icon_visibility(False)
@@ -361,7 +365,8 @@ class NotchWidgetDefault(Box):
             logger.error(f"Error getting window class: {e}")
         return ""
 
-    def find_app(self, app_identifier):
+    def find_app(self, app_identifier: str | dict | None) -> DesktopApp | None:
+        """Find an application by its identifier, which can be a string or a dictionary."""
         if not app_identifier:
             return None
         if isinstance(app_identifier, dict):
@@ -379,9 +384,8 @@ class NotchWidgetDefault(Box):
             return None
         return self.find_app_by_key(app_identifier)
 
-    def find_app_by_key(self, key_value):
-        if not key_value:
-            return None
+    def find_app_by_key(self, key_value: str) -> DesktopApp | None:
+        """Find an application by a specific key value (like name, class, etc.)."""
         normalized_id = str(key_value).lower()
         if normalized_id in self.app_identifiers:
             return self.app_identifiers[normalized_id]
@@ -398,12 +402,14 @@ class NotchWidgetDefault(Box):
                 return app
         return None
 
-    def update_app_map(self):
+    def update_app_map(self) -> None:
+        """Update the application map and identifiers from the desktop applications."""
         self._all_apps = get_desktop_applications()
         self.app_map = {app.name: app for app in self._all_apps if app.name}
         self.app_identifiers = self._build_app_identifiers_map()
 
-    def _build_app_identifiers_map(self) -> dict:
+    def _build_app_identifiers_map(self) -> dict[str, DesktopApp]:
+        """Build a map of application identifiers to their corresponding DesktopApp objects."""
         identifiers = {}
         for app in self._all_apps:
             if app.name:
@@ -472,7 +478,8 @@ class NotchInner(CornerContainer):
             children=[self.notch_widget_picker, self._contents],
         )
 
-    def show_widget(self, widget_name: str, *_):
+    def show_widget(self, widget_name: str, *_) -> bool:
+        """Show a specific widget based on its name, updating the visible child of the contents stack."""
         widgets = self._contents.get_children()
         if widget_name not in self.widgets_labels:
             logger.error(f"Unknown widget name: {widget_name}")
@@ -511,7 +518,8 @@ class Notch(EventBox):
         self.connect("enter-notify-event", self._on_mouse_enter)
         self.connect("leave-notify-event", self._on_mouse_leave)
 
-    def _on_mouse_enter(self, widget, event):
+    def _on_mouse_enter(self, *args) -> bool:
+        """Handle mouse enter event to show the notch widget picker and change styles."""
         if not self.hovered:
             self.hovered = True
             self.inner.add_style_class("hovered")
@@ -524,7 +532,8 @@ class Notch(EventBox):
                 self.inner.show_widget("default-expanded")
         return False  # Allow event propagation
 
-    def _on_mouse_leave(self, widget, event):
+    def _on_mouse_leave(self, widget, event: Gdk.Event) -> bool:
+        """Handle mouse leave event to hide the notch widget picker and change styles."""
         if event.detail == Gdk.NotifyType.INFERIOR:
             # Mouse is moving to a child widget - ignore this event
             return False
@@ -544,7 +553,8 @@ class Notch(EventBox):
                 )
         return False  # Allow event propagation
 
-    def show_widget(self, widget_name: str, show_picker: bool = True):
+    def show_widget(self, widget_name: str, show_picker: bool = True) -> bool:
+        """Show a specific widget in the notch inner and update the widget picker state."""
         self.show_picker = show_picker
         return self.inner.show_widget(widget_name)
 
@@ -568,7 +578,8 @@ class NotchWindow(WaylandWindow):
         self._container.add(self.notch)
         self.add(self._container)
 
-    def show_widget(self, widget_name: str, show_picker: bool = True):
+    def show_widget(self, widget_name: str, show_picker: bool = True) -> bool:
+        """Show a specific widget in the notch and update the notch inner state."""
         is_default = self.notch.show_widget(widget_name, show_picker)
         if is_default:
             self.notch.inner.remove_style_class("hovered")

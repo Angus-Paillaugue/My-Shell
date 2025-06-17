@@ -7,10 +7,12 @@ This project is my implementation of a all-in-one wayland shell. It is pretty an
 
 # Preview
 
-![Desktop](./assets/git/desktop.png)
-![All menus open in blue](./assets/git/all_menus_blue.png)
-![All menus open in purple](./assets/git/all_menus_purple.png)
-![All menus open in yellow](./assets/git/all_menus_yellow.png)
+![Notch](./assets/git/notch.png)
+![Desktop with sidebar green](./assets/git/desktop_sidebar_green.png)
+![Desktop in blue](./assets/git/desktop_blue.png)
+![Desktop in purple](./assets/git/desktop_purple.png)
+![Desktop in yellow](./assets/git/desktop_yellow.png)
+![Desktop flower](./assets/git/desktop_flower.png)
 
 
 # Installation

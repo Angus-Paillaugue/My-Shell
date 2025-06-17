@@ -11,6 +11,7 @@ from services.metrics import shared_provider
 
 
 class Battery(Button):
+    """Widget that displays the battery status with an icon and percentage."""
 
     def __init__(self, **kwargs):
         super().__init__(name="battery-container", **kwargs)
@@ -73,7 +74,7 @@ class Battery(Button):
     def _format_percentage(self, value: int) -> str:
         return f"{value}%"
 
-    def on_mouse_enter(self, widget, event):
+    def on_mouse_enter(self, *args) -> bool:
         self.hover_counter += 1
         if self.hide_timer is not None:
             GLib.source_remove(self.hide_timer)
@@ -82,7 +83,7 @@ class Battery(Button):
         self.bat_revealer.set_reveal_child(True)
         return False
 
-    def on_mouse_leave(self, widget, event):
+    def on_mouse_leave(self, *args) -> bool:
         if self.hover_counter > 0:
             self.hover_counter -= 1
         if self.hover_counter == 0:
@@ -91,12 +92,12 @@ class Battery(Button):
             self.hide_timer = GLib.timeout_add(100, self.hide_revealer)
         return False
 
-    def hide_revealer(self):
+    def hide_revealer(self) -> bool:
         self.bat_revealer.set_reveal_child(False)
         self.hide_timer = None
         return False
 
-    def update_battery(self, sender, battery_data):
+    def update_battery(self, sender, battery_data: tuple[float, bool]) -> None:
         value, charging = battery_data
         if value == 0:
             self.set_visible(False)

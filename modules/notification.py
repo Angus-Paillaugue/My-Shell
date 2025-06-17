@@ -442,6 +442,7 @@ class HistoricalNotification(object):
 
 
 class NotificationHistory(Box):
+    """Widget that displays the notification history with options to clear and manage notifications."""
 
     def __init__(self,
                  notification_server: Notifications,
@@ -516,19 +517,23 @@ class NotificationHistory(Box):
         self.LIMITED_APPS_HISTORY = ["Spotify"]
         self._server = notification_server
 
-    def on_event(self, func):
+    def on_event(self, func: callable) -> None:
+        """ Set the event handler for notification events."""
         self.on_event = func
 
-    def emit(self, signal_name, *args):
+    def emit(self, signal_name: str, *args: object) -> None:
+        """ Emit a signal to the event handler."""
         self.on_event(signal_name, *args)
 
-    def get_ordinal(self, n):
+    def get_ordinal(self, n: int) -> str:
+        """Return the ordinal suffix for a given integer."""
         if 11 <= (n % 100) <= 13:
             return "th"
         else:
             return {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
 
-    def get_date_header(self, dt):
+    def get_date_header(self, dt: datetime) -> str:
+        """Return a formatted date header for the given datetime."""
         now = datetime.now()
         today = now.date()
         date = dt.date()
@@ -554,19 +559,22 @@ class NotificationHistory(Box):
                 locale.setlocale(locale.LC_TIME, original_locale)
             return result
 
-    def schedule_midnight_update(self):
+    def schedule_midnight_update(self) -> None:
+        """Schedule an update to rebuild notifications at midnight."""
         now = datetime.now()
         next_midnight = datetime.combine(now.date() + timedelta(days=1),
                                          datetime.min.time())
         delta_seconds = (next_midnight - now).total_seconds()
         GLib.timeout_add_seconds(int(delta_seconds), self.on_midnight)
 
-    def on_midnight(self):
+    def on_midnight(self) -> bool:
+        """Rebuild notifications with date separators at midnight."""
         self.rebuild_with_separators()
         self.schedule_midnight_update()
         return GLib.SOURCE_REMOVE
 
-    def create_date_separator(self, date_header):
+    def create_date_separator(self, date_header: str) -> Box:
+        """Create a date separator box with the given date header."""
         return Box(
             name="notif-date-sep",
             children=[
@@ -579,10 +587,12 @@ class NotificationHistory(Box):
             ],
         )
 
-    def rebuild_with_separators(self):
+    def rebuild_with_separators(self) -> None:
+        """Rebuild the notification list with date separators."""
         GLib.idle_add(self._do_rebuild_with_separators)
 
-    def _do_rebuild_with_separators(self):
+    def _do_rebuild_with_separators(self) -> None:
+        """Perform the actual rebuilding of the notification list."""
         children = list(self.notifications_list.get_children())
         for child in children:
             self.notifications_list.remove(child)
@@ -608,7 +618,8 @@ class NotificationHistory(Box):
 
         self.notifications_list.show_all()
 
-    def on_do_not_disturb_changed(self):
+    def on_do_not_disturb_changed(self) -> None:
+        """Toggle Do Not Disturb mode and update the UI accordingly."""
         self.do_not_disturb_enabled = not self.do_not_disturb_enabled
         logger.info(
             f"Do Not Disturb mode {'enabled' if self.do_not_disturb_enabled else 'disabled'}"
@@ -620,7 +631,8 @@ class NotificationHistory(Box):
             do_not_disturb_enabled else "Enable Do Not Disturb")
         self.emit("do-not-disturb-changed")
 
-    def clear_history(self, *args):
+    def clear_history(self, *args: object) -> None:
+        """Clear the notification history and remove all notifications."""
         for child in self.notifications_list.get_children()[:]:
             container = child
             notif_box = (container.notification_box if hasattr(
@@ -642,7 +654,8 @@ class NotificationHistory(Box):
         self.rebuild_with_separators()
         self.emit("notification-deleted")
 
-    def _load_persistent_history(self):
+    def _load_persistent_history(self) -> None:
+        """Load persistent notification history from file."""
         if not os.path.exists(PERSISTENT_DIR):
             os.makedirs(PERSISTENT_DIR, exist_ok=True)
         if os.path.exists(PERSISTENT_HISTORY_FILE):
@@ -654,7 +667,7 @@ class NotificationHistory(Box):
             except Exception as e:
                 logger.error(f"Error loading persistent history: {e}")
 
-    def delete_historical_notification(self, note_id, container):
+    def delete_historical_notification(self, note_id: int, container: Box) -> None:
         """Delete a historical notification and remove it from persistent storage."""
         # Convert note_id to string for consistent comparison
         target_note_id_str = str(note_id)
@@ -709,19 +722,14 @@ class NotificationHistory(Box):
         # Notify about deletion for counter update
         self.emit("notification-deleted")
 
-    def _save_persistent_history(self):
-        """Improved persistent history saving with atomic writes."""
+    def _save_persistent_history(self) -> None:
         try:
             # Ensure directory exists
             os.makedirs(PERSISTENT_DIR, exist_ok=True)
 
-            # Write to a temporary file first
-            temp_file = f"{PERSISTENT_HISTORY_FILE}.tmp"
-            with open(temp_file, "w") as f:
+            with open(PERSISTENT_HISTORY_FILE, "w") as f:
                 json.dump(self.persistent_notifications, f)
 
-            # Then atomically move it to the target file
-            os.replace(temp_file, PERSISTENT_HISTORY_FILE)
             logger.debug("Persistent notification history saved successfully")
         except Exception as e:
             logger.error(f"Error saving persistent history: {e}")
@@ -1107,6 +1115,7 @@ class NotificationHistory(Box):
 
 
 class NotificationHistoryIndicator(Button):
+    """Indicator button for notification history."""
 
     def __init__(self, notification_history: NotificationHistory, **kwargs):
         super().__init__(
@@ -1141,7 +1150,7 @@ class NotificationHistoryIndicator(Button):
             self.notification_history.persistent_notifications)
         self.update_counter()
 
-    def on_notification_history_event(self, signal_name, *args):
+    def on_notification_history_event(self, signal_name: str, *args) -> None:
         """Handle notification history events with proper count management."""
         self.notification_count = len(
             self.notification_history.persistent_notifications)
@@ -1170,7 +1179,7 @@ class NotificationHistoryIndicator(Button):
                 logger.warning(
                     f"Unhandled notification history event: {signal_name}")
 
-    def update_counter(self):
+    def update_counter(self) -> None:
         """Update notification counter display with proper state management."""
 
         # Update UI based on count
@@ -1185,6 +1194,7 @@ class NotificationHistoryIndicator(Button):
 
 
 class NotificationContainer(Box):
+    """Main container for displaying notifications."""
     LIMITED_APPS = ["Spotify"]
 
     def __init__(
@@ -1231,7 +1241,8 @@ class NotificationContainer(Box):
         self._destroyed_notifications = set()
         self.visible_notifications = []
 
-    def on_new_notification(self, fabric_notif, id):
+    def on_new_notification(self, fabric_notif, id: str, *args) -> None:
+        """Handle new notification from the server."""
         notification_history_instance = self.notification_history
         if notification_history_instance.do_not_disturb_enabled:
             logger.info(
@@ -1289,7 +1300,8 @@ class NotificationContainer(Box):
         self.main_revealer.show_all()
         self.main_revealer.set_reveal_child(True)
 
-    def _animate_notification_removal(self, notification_box):
+    def _animate_notification_removal(self, notification_box: NotificationBox) -> None:
+        """Animate the removal of a notification box."""
         # Add exit animation class
         notification_box.remove_style_class("notification-visible")
         notification_box.add_style_class("notification-exiting")
@@ -1298,7 +1310,8 @@ class NotificationContainer(Box):
         GLib.timeout_add(
             250, lambda: self._complete_notification_removal(notification_box))
 
-    def _complete_notification_removal(self, notification_box):
+    def _complete_notification_removal(self, notification_box: NotificationBox) -> bool:
+        """Complete the removal of a notification box."""
         if notification_box.get_parent() == self.notifications_box:
             self.notifications_box.remove(notification_box)
         notification_box.destroy()
@@ -1307,7 +1320,8 @@ class NotificationContainer(Box):
         self._show_next_notification()
         return False
 
-    def _show_next_notification(self):
+    def _show_next_notification(self) -> bool:
+        """Show the next hidden notification if available."""
         # If we have more notifications waiting to be shown, show the next one
         hidden_notifications = [
             n for n in self.notifications if n not in self.visible_notifications
@@ -1321,7 +1335,8 @@ class NotificationContainer(Box):
             return True
         return False
 
-    def on_notification_closed(self, notification: Notification, reason):
+    def on_notification_closed(self, notification: Notification, reason: str) -> None:
+        """Handle notification close event."""
         if self._is_destroying:
             return
         if notification.id in self._destroyed_notifications:
@@ -1428,7 +1443,8 @@ class NotificationContainer(Box):
         except Exception as e:
             logger.error(f"Error closing notification: {e}")
 
-    def _destroy_container(self):
+    def _destroy_container(self) -> bool:
+        """Clean up the notification container."""
         try:
             self.notifications.clear()
             self._destroyed_notifications.clear()
@@ -1442,7 +1458,8 @@ class NotificationContainer(Box):
             self._is_destroying = False
             return False
 
-    def pause_and_reset_all_timeouts(self):
+    def pause_and_reset_all_timeouts(self) -> None:
+        """Pause and reset all notification timeouts."""
         if self._is_destroying:
             return
         for notification in self.notifications[:]:
@@ -1452,7 +1469,8 @@ class NotificationContainer(Box):
             except Exception as e:
                 logger.error(f"Error pausing timeout: {e}")
 
-    def resume_all_timeouts(self):
+    def resume_all_timeouts(self) -> None:
+        """Resume all notification timeouts."""
         if self._is_destroying:
             return
         for notification in self.notifications[:]:
@@ -1462,13 +1480,15 @@ class NotificationContainer(Box):
             except Exception as e:
                 logger.error(f"Error resuming timeout: {e}")
 
-    def close_all_notifications(self, *args):
+    def close_all_notifications(self, *args) -> None:
+        """Close all notifications in the container."""
         notifications_to_close = self.notifications.copy()
         for notification_box in notifications_to_close:
             notification_box.notification.close("dismissed-by-user")
 
 
 class NotificationPopup(WaylandWindow):
+    """Notification popup window that displays notifications."""
 
     def __init__(self, notification_server: Notifications,
                  notification_history: NotificationHistory, **kwargs):

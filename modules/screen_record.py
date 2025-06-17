@@ -6,6 +6,7 @@ import modules.icons as icons
 
 
 class ScreenRecordButton(Button):
+    """Button to trigger screen recording functionality."""
 
     def __init__(self):
         super().__init__(
@@ -20,7 +21,8 @@ class ScreenRecordButton(Button):
             on_clicked=self.screen_record,
         )
 
-    def screen_record(self, *args):
+    def screen_record(self, *args: object) -> None:
+        """Start the screen recording service."""
         script_location = get_relative_path("../services/screen-record.sh")
         exec_shell_command_async(
             f"bash -c 'nohup bash {script_location} > /dev/null 2>&1 & disown'")

@@ -10,6 +10,7 @@ from services.logger import logger
 
 
 class SystemTray(Box):
+    """Widget that displays system tray icons for running applications."""
 
     def __init__(self, **kwargs) -> None:
         super().__init__(
@@ -38,15 +39,18 @@ class SystemTray(Box):
 
         GLib.timeout_add_seconds(1, self._refresh_all_items)
 
-    def set_visible(self, visible: bool):
+    def set_visible(self, visible: bool) -> None:
+        """Set the visibility of the system tray."""
         self.enabled = visible
         self._update_visibility()
 
-    def _update_visibility(self):
+    def _update_visibility(self) -> None:
+        """Update the visibility of the system tray based on its state."""
         has = len(self.get_children()) > 0
         super().set_visible(self.enabled and has)
 
     def _get_item_pixbuf(self, item: Gray.Item) -> GdkPixbuf.Pixbuf:
+        """Get the icon pixbuf for a Gray.Item."""
         try:
             pm = Gray.get_pixmap_for_pixmaps(item.get_icon_pixmaps(),
                                              self.pixel_size)
@@ -67,7 +71,8 @@ class SystemTray(Box):
                 Gtk.IconLookupFlags.FORCE_SIZE)
 
     def _refresh_item_ui(self, identifier: str, item: Gray.Item,
-                         button: Gtk.Button):
+                         button: Gtk.Button) -> None:
+        """Refresh the UI of a specific item button."""
         pixbuf = self._get_item_pixbuf(item)
         img = button.get_image()
         if isinstance(img, Gtk.Image):
@@ -87,14 +92,15 @@ class SystemTray(Box):
             button.set_has_tooltip(False)
 
     def _refresh_all_items(self) -> bool:
-
+        """Refresh the UI for all items in the system tray."""
         for ident, item in self.items_by_id.items():
             btn = self.buttons_by_id.get(ident)
             if btn:
                 self._refresh_item_ui(ident, item, btn)
         return True
 
-    def on_watcher_item_added(self, _, identifier: str):
+    def on_watcher_item_added(self, _, identifier: str) -> None:
+        """Handle the addition of a new item in the system tray."""
         item = self.watcher.get_item_for_identifier(identifier)
         if not item:
             return
@@ -132,6 +138,7 @@ class SystemTray(Box):
         self._update_visibility()
 
     def do_bake_item_button(self, item: Gray.Item) -> Gtk.Button:
+        """Create a button for a Gray.Item."""
         btn = Gtk.Button()
         btn.connect("button-press-event",
                     lambda b, e: self.on_button_click(b, item, e))
@@ -144,7 +151,8 @@ class SystemTray(Box):
         return btn
 
     def on_item_instance_removed(self, identifier: str,
-                                 removed_item: Gray.Item):
+                                 removed_item: Gray.Item) -> None:
+        """Handle the removal of an item from the system tray."""
         if self.items_by_id.get(identifier) is removed_item:
             btn = self.buttons_by_id.pop(identifier, None)
             self.items_by_id.pop(identifier, None)
@@ -153,7 +161,8 @@ class SystemTray(Box):
             self._update_visibility()
 
     def on_button_click(self, button: Gtk.Button, item: Gray.Item,
-                        event: Gdk.EventButton):
+                        event: Gdk.EventButton) -> None:
+        """Handle button click events for system tray items."""
         if event.button == Gdk.BUTTON_PRIMARY:
             try:
                 item.activate(int(event.x_root), int(event.y_root))

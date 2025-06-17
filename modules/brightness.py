@@ -96,6 +96,7 @@ class Brightness(Service):
 
 
 class BrightnessSlider(Scale):
+    """Widget to control screen brightness with a slider."""
 
     def __init__(self, client, **kwargs):
         super().__init__(
@@ -120,21 +121,21 @@ class BrightnessSlider(Scale):
         self.connect("change-value", self.on_scale_move)
         self.client.connect("screen", self.on_brightness_changed)
 
-    def on_brightness_changed(self, client, _):
+    def on_brightness_changed(self, *args) -> None:
         self.settings_notifier.notify_listeners(
             "brightness-changed",
             round(
                 (self.client.screen_brightness / self.client.max_screen) * 100))
         self.set_value(self.client.screen_brightness)
 
-    def on_scale_move(self, widget, scroll, moved_pos):
+    def on_scale_move(self, widget, scroll, moved_pos) -> bool:
         self._pending_value = moved_pos
         if self._update_source_id is None:
             self._update_source_id = GLib.idle_add(
                 self._update_brightness_callback)
         return False
 
-    def _update_brightness_callback(self):
+    def _update_brightness_callback(self) -> bool:
         if self._pending_value is not None:
             value_to_set = self._pending_value
             self._pending_value = None
@@ -147,6 +148,7 @@ class BrightnessSlider(Scale):
 
 
 class BrightnessRow(Box):
+    """A horizontal row widget that contains the brightness icon and slider."""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -177,7 +179,7 @@ class BrightnessRow(Box):
 
         self.set_icon()
 
-    def set_icon(self, *args):
+    def set_icon(self, *args) -> None:
         current = int(
             (self.client.screen_brightness / self.client.max_screen) * 100)
         num_icons = len(self.brightness_icons)
@@ -188,7 +190,7 @@ class BrightnessRow(Box):
 
         self.brightness_icon.set_markup(icon)
 
-    def destroy(self):
+    def destroy(self) -> None:
         if self._update_source_id is not None:
             GLib.source_remove(self._update_source_id)
         super().destroy()

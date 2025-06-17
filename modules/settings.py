@@ -5,7 +5,8 @@ from fabric.widgets.label import Label
 import modules.icons as icons
 
 
-def singleton(class_):
+def singleton(class_: object) -> object:
+    """Decorator to make a class a singleton"""
     instances = {}
 
     def getinstance(*args, **kwargs):
@@ -18,22 +19,27 @@ def singleton(class_):
 
 @singleton
 class SettingsBroker():
+    """Broker for managing settings-related events and listeners."""
 
-    def register_listener(self, listener):
+    def register_listener(self, listener: callable) -> None:
+        """Register a listener for settings events."""
         if not hasattr(self, '_listeners'):
             self._listeners = []
         self._listeners.append(listener)
 
-    def notify_listeners(self, event, *args, **kwargs):
+    def notify_listeners(self, event: str, *args: object, **kwargs: object) -> None:
+        """Notify all registered listeners of an event."""
         for listener in getattr(self, '_listeners', []):
             listener(event, *args, **kwargs)
 
-    def unregister_listener(self, listener):
+    def unregister_listener(self, listener: callable) -> None:
+        """Unregister a listener from settings events."""
         if hasattr(self, '_listeners'):
             self._listeners.remove(listener)
 
 
 class SettingsButton(Box):
+    """Base class for settings buttons with a label, icon, and dropdown menu."""
 
     def __init__(self,
                  label,

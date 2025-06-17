@@ -12,6 +12,7 @@ from services.logger import logger
 
 
 class ColorPickerButton(Button):
+    """Button that triggers a color picker script when clicked."""
 
     def __init__(self, hide_notch=None):
         super().__init__(
@@ -30,7 +31,7 @@ class ColorPickerButton(Button):
         self.path = os.path.expanduser(
             f"~/.config/{config.APP_NAME}/services/color-picker.sh")
 
-    def _on_click(self, *_):
+    def _on_click(self, *_) -> None:
         if self.script_thread_active:
             logger.warning("Color picker update already in progress.")
             return

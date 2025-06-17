@@ -100,7 +100,7 @@ class Dock(Window):
         self.mouse_area.connect("leave-notify-event", self._on_mouse_leave)
         GLib.timeout_add(1000, self.check_running_apps)
 
-    def _on_mouse_enter(self, widget, event):
+    def _on_mouse_enter(self, widget, event) -> bool:
         # Cancel any pending hide operations
         if self.hide_timer is not None:
             GLib.source_remove(self.hide_timer)
@@ -110,19 +110,22 @@ class Dock(Window):
             self._show_dock()
         return True  # Important: consume the event
 
-    def _show_dock(self):
+    def _show_dock(self) -> None:
+        """Show the dock with an animation."""
         if not self.is_animating and not self.revealer.get_reveal_child():
             self.is_animating = True
             self.revealer.set_reveal_child(True)
             self.animation_timeout = GLib.timeout_add(250, self._animation_done)
 
-    def _animation_done(self):
+    def _animation_done(self) -> bool:
+        """Callback for when the animation is done."""
         # Animation is complete, reset flag
         self.is_animating = False
         self.animation_timeout = None
         return False  # Remove the source
 
-    def _hide_dock(self):
+    def _hide_dock(self) -> bool:
+        """Hide the dock with an animation."""
         if not self.is_animating and self.revealer.get_reveal_child():
             self.is_animating = True
             self.revealer.set_reveal_child(False)
@@ -130,7 +133,8 @@ class Dock(Window):
         self.hide_timer = None
         return False  # Remove the source
 
-    def _on_mouse_leave(self, widget, event):
+    def _on_mouse_leave(self, widget, event) -> bool:
+        """Handle mouse leave event to start hiding the dock."""
         # Don't start hide timer if still animating
         if self.is_animating:
             return False
@@ -143,7 +147,7 @@ class Dock(Window):
         self.hide_timer = GLib.timeout_add(500, self._hide_dock)
         return True
 
-    def check_running_apps(self):
+    def check_running_apps(self) -> bool:
         """
         Check if pinned applications are running and update their state.
         This method can be overridden to implement custom logic.
@@ -171,6 +175,7 @@ class Dock(Window):
         return res.returncode == 0
 
     def _add_application(self, app: DesktopApp):
+        """ Add a single application to the dock."""
         icon = Image(
             pixbuf=app.get_icon_pixbuf(size=30),
             h_align="center",
@@ -186,7 +191,7 @@ class Dock(Window):
         )
         self.items_container.add(button)
 
-    def _load_apps(self):
+    def _load_apps(self) -> list[str]:
         """
         Load applications from the pinned apps file.
         This method can be overridden to load custom applications.
@@ -198,11 +203,12 @@ class Dock(Window):
             pinned_apps = json.load(f)  # TODO: handle malformed JSON data
         return pinned_apps
 
-    def _on_pinned_apps_file_changed(self, *_):
+    def _on_pinned_apps_file_changed(self, *_) -> None:
+        """Handle changes to the pinned apps file."""
         self.pinned_apps = self._load_apps()
         self._add_applications()
 
-    def _add_applications(self, *_):
+    def _add_applications(self, *_) -> None:
         """
         Add items to the dock container.
         This method can be overridden to add custom items to the dock.

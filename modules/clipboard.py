@@ -9,6 +9,7 @@ from gi.repository import Gdk
 
 
 class ClipboardManager(Box):
+    """Widget that manages clipboard history and allows copying items back to the clipboard."""
 
     def __init__(self, notch_inner, **kwargs):
         super().__init__(
@@ -52,7 +53,7 @@ class ClipboardManager(Box):
         self._build_list()
         self.connect("key-press-event", self.on_key_press)
 
-    def on_key_press(self, widget, event):
+    def on_key_press(self, widget, event: Gdk.EventKey) -> bool:
         """Handle keyboard navigation"""
         keyval = event.get_keyval()[1]
 
@@ -64,11 +65,11 @@ class ClipboardManager(Box):
         # Let Tab navigation work normally
         return False
 
-    def _clear_items(self):
+    def _clear_items(self) -> None:
         for child in self.clipboard_items.get_children():
             self.clipboard_items.remove(child)
 
-    def _build_list(self, filter_text=""):
+    def _build_list(self, filter_text: str = "") -> None:
         result = subprocess.run(["cliphist", "list"],
                                 capture_output=True,
                                 check=True)
@@ -106,7 +107,7 @@ class ClipboardManager(Box):
             )
             self.clipboard_items.add(button)
 
-    def _copy_entry(self, id):
+    def _copy_entry(self, id: str) -> None:
         result = subprocess.run(["cliphist", "decode", id],
                                 capture_output=True,
                                 check=True)
