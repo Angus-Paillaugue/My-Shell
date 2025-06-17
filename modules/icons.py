@@ -51,7 +51,7 @@ battery_eco: str = "&#xef3c;"
 battery_charging: str = "&#xea33;"
 # Metrics
 cpu: str = "&#xef8e;"
-memory: str = "&#xf0a0;"
+memory: str = "&#xf384;" # TODO: find a better icon
 temperature: str = "&#xeb38;"
 disk: str = "&#xea88;"
 # Launcher
@@ -69,6 +69,11 @@ notification: str = "&#xea35;"
 notifications_off: str = "&#xece9;"
 # Time
 point: str = "&#xf698;"
+# Dock
+grid_dots: str = "&#xeaba;"
+arrow_up: str = "&#xfaf3;"
+arrow_down: str = "&#xfaf0;"
+drag_handle: str = "&#xec01;"
 # Others
 screen_record: str = "&#xfca8;"
 screenshot: str = "&#xf201;"

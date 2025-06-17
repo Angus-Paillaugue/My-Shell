@@ -1,6 +1,7 @@
 requirements:
 	poetry export -f requirements.txt --without-hashes -o requirements.txt
-dev:
+dev: init dev-launch
+dev-launch:
 	GTK_DEBUG=interactive DEV_MODE=true python app.py
 init:
 	python init.py

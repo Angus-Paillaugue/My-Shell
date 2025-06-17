@@ -57,3 +57,11 @@
 .dock-item.running {
   background-color: var(--surface);
 }
+.dock-app-item.dragging {
+  opacity: 0.7;
+}
+
+.dock-app-item.drag-hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}

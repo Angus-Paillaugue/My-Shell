@@ -22,6 +22,7 @@ from modules.brightness import BrightnessRow
 from modules.clipboard import ClipboardManager
 from modules.color_picker import ColorPickerButton
 from modules.corners import CornerContainer
+from modules.dock import DockSettings
 from modules.launcher import AppLauncher
 from modules.notification import (NotificationHistory,
                                   NotificationHistoryIndicator)
@@ -244,10 +245,20 @@ class NotchWidgetDefault(Box):
         self.set_desktop_string()
 
         self.active_window = Label(
-            h_expand=False,
-            label=self._center_string(self.desktop_string),
-            h_align="start",
+            label=self.desktop_string,
             v_align="center",
+            h_align="center",
+            h_expand=True,
+            v_expand=True,
+        )
+        self.active_window_box = Box(
+            orientation="h",
+            v_align="center",
+            h_align="center",
+            h_expand=True,
+            v_expand=True,
+            children=[self.active_window],
+            name="notch-active-window-box",
         )
         self.window_icon = Image(
             name="notch-window-icon",
@@ -265,7 +276,7 @@ class NotchWidgetDefault(Box):
             child=self.window_icon,
         )
         self.add(self.icon_revealer)
-        self.add(self.active_window)
+        self.add(self.active_window_box)
         self.conn = get_hyprland_connection()
         self._current_window_class = self._get_current_window_class()
         self.conn.connect("event::activewindow", self.on_active_window_changed)
@@ -282,8 +293,7 @@ class NotchWidgetDefault(Box):
         hostname = hostname_result.stdout.decode().strip()
         self.desktop_string = f"{username}@{hostname}"
         if update_ui:
-            self.active_window.set_label(
-                self._center_string(self.desktop_string, max_length=20))
+            self.active_window.set_label(self.desktop_string)
 
     def update_window_icon(self, *args) -> None:
         """Update the window icon based on the current active window title"""
@@ -318,13 +328,6 @@ class NotchWidgetDefault(Box):
         else:
             self._set_icon_visibility(False)
 
-    def _center_string(self, s: str, max_length: int = 20) -> str:
-        """Center a string within a given length."""
-        if len(s) >= max_length:
-            return s[:max_length]
-        padding = (max_length - len(s)) // 2
-        return ' ' * padding + s + ' ' * (max_length - len(s) - padding)
-
     def on_active_window_changed(self, _, event: HyprlandEvent) -> None:
         if len(event.data) < 2:
             return
@@ -335,8 +338,8 @@ class NotchWidgetDefault(Box):
             self.show_default()
         elif class_name != self._current_window_class:
             self._current_window_class = class_name
-            window_name = f"{class_name[0].upper() + class_name[1:]}"
-            self.active_window.set_label(self._center_string(window_name))
+            window_name = f"{class_name[0].upper() + class_name[1:]}"[:20]
+            self.active_window.set_label(window_name)
             self.update_window_icon()
 
     def _set_icon_visibility(self, visible: bool) -> None:
@@ -345,7 +348,7 @@ class NotchWidgetDefault(Box):
 
     def show_default(self) -> None:
         """Show the default widget"""
-        self.active_window.set_label(self._center_string(self.desktop_string))
+        self.active_window.set_label(self.desktop_string)
         self._set_icon_visibility(False)
 
     def _get_current_window_class(self) -> str:
@@ -434,10 +437,12 @@ class NotchInner(CornerContainer):
         notification_history: NotificationHistory,
         notch_widget_picker: NotchWidgetPicker,
         show_widget,
+        notch,
     ):
+        self.notch = notch
         self.widgets_labels = [
             'default', 'default-expanded', 'launcher', 'wallpaper', 'power',
-            'clipboard'
+            'clipboard', 'dock-settings'
         ]
         self.notch_widget_picker = notch_widget_picker
         self.notch_widget_default = NotchWidgetDefault()
@@ -448,6 +453,7 @@ class NotchInner(CornerContainer):
         self.notch_widget_wallpaper = WallpaperManager()
         self.power = PowerMenuActions()
         self.clipboard = ClipboardManager(notch_inner=self)
+        self.dock_settings = DockSettings(notch=self.notch)
 
         self._contents = Stack(
             transition_type="slide-up-down",
@@ -459,6 +465,7 @@ class NotchInner(CornerContainer):
                 self.notch_widget_wallpaper,
                 self.power,
                 self.clipboard,
+                self.dock_settings,
             ],
             interpolate_size=True,
             h_expand=False,
@@ -503,24 +510,30 @@ class Notch(EventBox):
             notification_history=notification_history,
             notch_widget_picker=self.notch_widget_picker,
             show_widget=show_widget,
+            notch=self,
         )
         self.notification_history_indicator = NotificationHistoryIndicator(
             notification_history=notification_history)
         self.hovered = False
         self.show_picker = True
+        self.drag_active = False
 
         super().__init__(
             child=Box(
-                orientation='h',
-                children=[self.notification_history_indicator, self.inner]),
-            events=["leave-notify", "enter-notify"],
+                orientation="h",
+                children=[self.notification_history_indicator, self.inner],
+            ),
+            events=[
+                "leave-notify",
+                "enter-notify",
+            ],
         )
         self.connect("enter-notify-event", self._on_mouse_enter)
         self.connect("leave-notify-event", self._on_mouse_leave)
 
-    def _on_mouse_enter(self, *args) -> bool:
+    def _on_mouse_enter(self, widget, event: Gdk.EventCrossing) -> bool:
         """Handle mouse enter event to show the notch widget picker and change styles."""
-        if not self.hovered:
+        if not self.hovered or not self.drag_active:
             self.hovered = True
             self.inner.add_style_class("hovered")
             if self.show_picker:
@@ -528,14 +541,17 @@ class Notch(EventBox):
             self.notification_history_indicator.add_style_class("hidden")
             self.notification_history_indicator.add_style_class("hovered")
             if self.inner._contents.get_visible_child(
-            ) is self.inner.notch_widget_default:  # if we are still showing the default widget, move to the expanded one
+            ) is self.inner.notch_widget_default:
                 self.inner.show_widget("default-expanded")
         return False  # Allow event propagation
 
     def _on_mouse_leave(self, widget, event: Gdk.Event) -> bool:
         """Handle mouse leave event to hide the notch widget picker and change styles."""
-        if event.detail == Gdk.NotifyType.INFERIOR:
-            # Mouse is moving to a child widget - ignore this event
+        if (
+            event.detail == Gdk.NotifyType.INFERIOR
+            or self.drag_active  # Don't hide when dragging
+        ):
+            # Mouse is moving to a child widget or we're dragging - ignore this event
             return False
 
         if self.hovered:
@@ -553,11 +569,21 @@ class Notch(EventBox):
                 )
         return False  # Allow event propagation
 
+    def start_drag(self):
+        """Called when a drag operation starts to prevent notch from hiding"""
+        self.drag_active = True
+
+    def end_drag(self):
+        """Called when a drag operation ends to restore normal notch behavior"""
+        # TODO: fix this sketchy race condition
+        def reset_drag_active():
+            self.drag_active = False
+        GLib.timeout_add(500, lambda: reset_drag_active())
+
     def show_widget(self, widget_name: str, show_picker: bool = True) -> bool:
         """Show a specific widget in the notch inner and update the widget picker state."""
         self.show_picker = show_picker
         return self.inner.show_widget(widget_name)
-
 
 class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
