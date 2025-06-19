@@ -2,7 +2,7 @@ from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import Gtk
+from gi.repository import Gtk # type: ignore
 
 import modules.icons as icons
 from services.config import config
@@ -80,6 +80,6 @@ class PowerMenuActions(Gtk.Grid):
                     ],
                 ),
                 on_clicked=lambda b, a=action: exec_shell_command_async(a[
-                    'command'])(a),
+                    'command']),
             )
             self.attach(button, i, 0, 1, 1)

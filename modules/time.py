@@ -7,7 +7,7 @@ from fabric.utils.helpers import invoke_repeater
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk # type: ignore
 
 import modules.icons as icons
 from services.config import config
@@ -170,7 +170,7 @@ class Time(Button):
     """A button that displays the current time and date, updating at a set interval."""
 
     @Property(int, "read-write")
-    def interval(self):
+    def interval(self): # type: ignore
         return self._interval
 
     @interval.setter

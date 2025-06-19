@@ -9,7 +9,7 @@ from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scale import Scale
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from modules.settings import SettingsBroker
@@ -36,7 +36,7 @@ class VolumeSlider(Scale):
         self.connect("value-changed", self.on_value_changed)
         self.add_style_class("vol")
         self.on_speaker_changed()
-        self.settings_notifier = SettingsBroker()
+        self.settings_notifier = SettingsBroker() # type: ignore
 
     def on_new_speaker(self, *args: object) -> None:
         """Handle new speaker connection."""
@@ -157,7 +157,7 @@ class VolumeOutputsRevealer(Revealer):
 class VolumeRow(Box):
     """A horizontal row widget that contains the volume icon, slider, and output options."""
 
-    def __init__(self, slot=None, **kwargs):
+    def __init__(self, slot: Box=Box(), **kwargs):
         super().__init__(
             name="volume-row",
             orientation="h",
@@ -291,8 +291,8 @@ class VolumeRow(Box):
         # Try props dictionary if available
         if hasattr(output, "props"):
             for prop in ["name", "device.name", "alsa.name", "pulse.name"]:
-                if hasattr(output.props, prop):
-                    value = getattr(output.props, prop)
+                if hasattr(output.props, prop): # type: ignore
+                    value = getattr(output.props, prop) # type: ignore
                     if value:
                         return str(value)
 
@@ -350,27 +350,27 @@ class VolumeRow(Box):
         # Try different properties to find the most descriptive name
 
         # First check if there's a description directly on the output
-        if hasattr(output, "description") and output.description:
-            return output.description
+        if hasattr(output, "description") and output.description: # type: ignore
+            return output.description # type: ignore
 
         # Check if there's a display name property
-        if hasattr(output, "display_name") and output.display_name:
-            return output.display_name
+        if hasattr(output, "display_name") and output.display_name: # type: ignore
+            return output.display_name # type: ignore
 
         # Check if there's a name property
-        if hasattr(output, "name") and output.name:
-            return output.name
+        if hasattr(output, "name") and output.name: # type: ignore
+            return output.name # type: ignore
 
         # Check if there are properties available
         if hasattr(output, "props"):
             # Common property in PulseAudio for friendly names
-            if hasattr(output.props, "device_description"):
-                return output.props.device_description
+            if hasattr(output.props, "device_description"): # type: ignore
+                return output.props.device_description # type: ignore
 
             # Try alternate properties
             for prop_name in ["description", "alsa.name", "device.description"]:
-                if hasattr(output.props, prop_name):
-                    prop_value = getattr(output.props, prop_name)
+                if hasattr(output.props, prop_name): # type: ignore
+                    prop_value = getattr(output.props, prop_name) # type: ignore
                     if prop_value:
                         return prop_value
 
@@ -391,7 +391,7 @@ class MicSlider(Scale):
             **kwargs,
         )
         self.audio = audio
-        self.settings_notifier = SettingsBroker()
+        self.settings_notifier = SettingsBroker() # type: ignore
         self.audio.connect("notify::microphone", self.on_new_microphone)
         if self.audio.microphone:
             self.audio.microphone.connect("changed", self.on_microphone_changed)
@@ -510,7 +510,7 @@ class MicInputsRevealer(Revealer):
 class MicRow(Box):
     """A horizontal row widget that contains the microphone icon, slider, and input options."""
 
-    def __init__(self, slot=None, **kwargs):
+    def __init__(self, slot: Box=Box(), **kwargs):
         super().__init__(
             name="mic-row",
             orientation="h",
@@ -671,8 +671,8 @@ class MicRow(Box):
         # Try props dictionary if available
         if hasattr(input_src, "props"):
             for prop in ["name", "device.name", "alsa.name", "pulse.name"]:
-                if hasattr(input_src.props, prop):
-                    value = getattr(input_src.props, prop)
+                if hasattr(input_src.props, prop): # type: ignore
+                    value = getattr(input_src.props, prop) # type: ignore
                     if value:
                         return str(value)
 
@@ -727,26 +727,26 @@ class MicRow(Box):
         # Try different properties to find the most descriptive name
 
         # First check if there's a description directly on the input
-        if hasattr(input_src, "description") and input_src.description:
-            return input_src.description
+        if hasattr(input_src, "description") and input_src.description: # type: ignore
+            return input_src.description # type: ignore
 
         # Check for display_name
-        if hasattr(input_src, "display_name") and input_src.display_name:
-            return input_src.display_name
+        if hasattr(input_src, "display_name") and input_src.display_name: # type: ignore
+            return input_src.display_name # type: ignore
 
         # Check for name
-        if hasattr(input_src, "name") and input_src.name:
-            return input_src.name
+        if hasattr(input_src, "name") and input_src.name: # type: ignore
+            return input_src.name # type: ignore
 
         # Check property dictionary
         if hasattr(input_src, "props"):
-            if hasattr(input_src.props, "device_description"):
-                return input_src.props.device_description
+            if hasattr(input_src.props, "device_description"): # type: ignore
+                return input_src.props.device_description # type: ignore
 
             # Try other common properties
             for prop_name in ["description", "alsa.name", "device.description"]:
-                if hasattr(input_src.props, prop_name):
-                    prop_value = getattr(input_src.props, prop_name)
+                if hasattr(input_src.props, prop_name): # type: ignore
+                    prop_value = getattr(input_src.props, prop_name) # type: ignore
                     if prop_value:
                         return prop_value
 

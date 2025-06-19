@@ -1,7 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from modules.settings import SettingsBroker
@@ -13,7 +13,7 @@ class OSD(WaylandWindow):
 
     def __init__(self):
         super().__init__(
-            layer="overlay",
+            layer="top",
             anchor="bottom center",
             margin="0 0 100px 0",
             pass_through=True,
@@ -21,7 +21,7 @@ class OSD(WaylandWindow):
             keyboard_mode="none",
             visible=True,
         )
-        self._broker = SettingsBroker()
+        self._broker = SettingsBroker() # type: ignore
         self._broker.register_listener(self.on_event)
         self._contents = Box(name="osd-contents",
                              orientation='h',

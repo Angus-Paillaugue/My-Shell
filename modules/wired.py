@@ -8,7 +8,7 @@ from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import NM, GLib
+from gi.repository import NM, GLib # type: ignore
 
 import modules.icons as icons
 from services.network import NetworkClient
@@ -405,7 +405,7 @@ class Wired(Box):
             self.wired_icon.set_markup(icons.ethernet_off)
             self.left_button.add_style_class("disabled")
             self.wired_status_text.set_label("Unavailable")
-            return
+            return False
 
         state = self.network_client.ethernet_device.state
         connection_name = "Ethernet"

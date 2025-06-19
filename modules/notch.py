@@ -1,5 +1,6 @@
 import json
 import subprocess
+from typing import Callable
 
 from fabric.hyprland.service import HyprlandEvent
 from fabric.hyprland.widgets import get_hyprland_connection
@@ -14,7 +15,7 @@ from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.stack import Stack
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk # type: ignore
 
 from modules.battery import Battery
 from modules.bluetooth import BluetoothButton
@@ -127,7 +128,7 @@ class NotchWidgetPicker(Revealer):
 class NotchWidgetDefaultExpanded(Box):
     """Default widget when hovering the notch, showing various modules like wifi, bluetooth, volume, etc."""
 
-    def __init__(self, notification_history: NotificationHistory, show_widget=None):
+    def __init__(self, notification_history: NotificationHistory, show_widget: Callable):
         super().__init__(
             orientation="v",
             spacing=8,
@@ -490,7 +491,7 @@ class NotchInner(CornerContainer):
         widgets = self._contents.get_children()
         if widget_name not in self.widgets_labels:
             logger.error(f"Unknown widget name: {widget_name}")
-            return
+            return False
 
         index = self.widgets_labels.index(widget_name)
         if self._contents.get_visible_child() is widgets[index]:
@@ -592,7 +593,7 @@ class NotchWindow(WaylandWindow):
         margin = f"{"-54px" if config.BAR_POSITION == "top" else 0} 0 0 0"
         super().__init__(
             anchor="top center",
-            layer="overlay",
+            layer="top",
             margin=margin,
             keyboard_mode="on_demand",
         )
@@ -604,7 +605,7 @@ class NotchWindow(WaylandWindow):
         self._container.add(self.notch)
         self.add(self._container)
 
-    def show_widget(self, widget_name: str, show_picker: bool = True) -> bool:
+    def show_widget(self, widget_name: str, show_picker: bool = True) -> None:
         """Show a specific widget in the notch and update the notch inner state."""
         is_default = self.notch.show_widget(widget_name, show_picker)
         if is_default:

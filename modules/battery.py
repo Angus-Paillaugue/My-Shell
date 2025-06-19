@@ -4,7 +4,7 @@ from fabric.widgets.button import Button
 from fabric.widgets.circularprogressbar import CircularProgressBar
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from services.metrics import shared_provider
@@ -65,7 +65,7 @@ class Battery(Button):
             stream=False,
             default_value=0,
         )
-        self.batt_fabricator.changed.connect(self.update_battery)
+        self.batt_fabricator.connect("changed", self.update_battery)
         GLib.idle_add(self.update_battery, None, shared_provider.get_battery())
 
         self.hide_timer = None

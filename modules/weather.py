@@ -7,7 +7,7 @@ from fabric.core.service import Property
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from services.config import config
@@ -152,3 +152,4 @@ class WeatherButton(Button):
         self.temperature.set_label(weather.temperature)
         self.main_container.add(self.icon)
         self.main_container.add(self.temperature)
+        return True

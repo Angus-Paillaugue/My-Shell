@@ -4,7 +4,7 @@ from services.config import config
 
 gi.require_version("Gray", "0.1")
 from fabric.widgets.box import Box
-from gi.repository import Gdk, GdkPixbuf, GLib, Gray, Gtk
+from gi.repository import Gdk, GdkPixbuf, GLib, Gray, Gtk # type: ignore
 
 from services.logger import logger
 
@@ -170,7 +170,7 @@ class SystemTray(Box):
                 logger.error(f"Activate error: {e}")
         elif event.button == Gdk.BUTTON_SECONDARY:
             menu = getattr(item, "get_menu", lambda: None)()
-            if isinstance(menu, Gtk.Menu):
+            if isinstance(menu, Gtk.Menu) and menu:
                 menu.popup_at_widget(button, Gdk.Gravity.SOUTH_WEST,
                                      Gdk.Gravity.NORTH_WEST, event)
             else:

@@ -5,7 +5,7 @@ from fabric.utils import exec_shell_command_async, monitor_file
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.scale import Scale
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from modules.settings import SettingsBroker
@@ -70,7 +70,7 @@ class Brightness(Service):
         return -1  # Return -1 if file doesn't exist, indicating an error.
 
     @Property(int, "read-write")
-    def screen_brightness(self) -> int:
+    def screen_brightness(self) -> int: # type: ignore
         # Property to get or set the screen brightness.
         brightness_path = os.path.join(self.screen_backlight_path, "brightness")
         if os.path.exists(brightness_path):
@@ -116,7 +116,7 @@ class BrightnessSlider(Scale):
 
         self._pending_value = None
         self._update_source_id = None
-        self.settings_notifier = SettingsBroker()
+        self.settings_notifier = SettingsBroker() # type: ignore
 
         self.connect("change-value", self.on_scale_move)
         self.client.connect("screen", self.on_brightness_changed)

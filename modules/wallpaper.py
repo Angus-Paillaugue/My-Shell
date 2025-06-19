@@ -8,7 +8,7 @@ from fabric.widgets.entry import Entry
 from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk
+from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk # type: ignore
 
 from services.logger import logger
 
@@ -62,7 +62,7 @@ class WallpaperManager(Box):
             notify_text=self.notify_text,
             name="search-entry",
         )
-        self.entry.props.xalign = 0.5
+        self.entry.props.xalign = 0.5 # type: ignore
         self.add(self.entry)
         self.add(self.scrollable_area)
 
@@ -291,8 +291,6 @@ class WallpaperManager(Box):
             os.symlink(path, current_wall)
 
             exec_shell_command_async(
-                f'matugen image "{current_wall}"',
-                lambda process, stdout: logger.debug(stdout),
-            )
+                f'matugen image "{current_wall}"')
         except Exception as e:
             logger.error(f"Failed to set wallpaper: {e}")

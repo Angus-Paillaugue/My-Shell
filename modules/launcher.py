@@ -14,7 +14,7 @@ from fabric.widgets.entry import Entry
 from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import Gdk, GLib
+from gi.repository import Gdk, GLib # type: ignore
 
 import modules.icons as icons
 from modules.dock import pinned_aps_location
@@ -60,7 +60,7 @@ class AppLauncher(Box):
                 entry.get_text()),
             on_key_press_event=self.on_search_entry_key_press,
         )
-        self.search_entry.props.xalign = 0.5
+        self.search_entry.props.xalign = 0.5 # type: ignore
         self.scrolled_window = ScrolledWindow(
             name="notch-scrolled-window",
             spacing=10,
@@ -141,6 +141,7 @@ class AppLauncher(Box):
             slot = self.bake_application_slot(app)
             self.viewport.add(slot)
             idle_add(self.add_next_application, apps_iter)
+            return True
         except StopIteration:
             return False
 
@@ -443,7 +444,9 @@ class AppLauncher(Box):
                     result_str = str(result)
             elif isinstance(result, (int, float, np.number)):
 
-                if isinstance(result, (int, np.integer)) or result.is_integer():
+                if isinstance(result, (int, np.integer)):
+                    result_str = str(int(result))
+                elif isinstance(result, float) and result.is_integer():
                     result_str = str(int(result))
                 else:
                     result_str = f"{float(result):.10g}"

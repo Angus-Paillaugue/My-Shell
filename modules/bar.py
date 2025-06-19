@@ -29,7 +29,7 @@ class Bar(WaylandWindow):
                        else "vertical")
         super().__init__(
             name="bar",
-            layer="overlay",
+            layer="top",
             anchor=anchors[config.BAR_POSITION],
             exclusivity="auto",
             visible=True,

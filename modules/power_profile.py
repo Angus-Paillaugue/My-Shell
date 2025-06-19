@@ -3,7 +3,7 @@ from fabric.utils import exec_shell_command, exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 
@@ -82,7 +82,7 @@ class PowerProfile(Box):
             stream=False,
             default_value=0,
         )
-        self.power_profile_fabricator.changed.connect(self.update_ui)
+        self.power_profile_fabricator.connect("changed", self.update_ui)
         GLib.idle_add(self.update_ui, None, self.get_profile())
 
     def update_ui(self, *args: object) -> None:

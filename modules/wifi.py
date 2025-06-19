@@ -9,7 +9,7 @@ from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from services.network import NetworkClient
@@ -178,7 +178,7 @@ class WifiNetworksDropdown(Revealer):
 
     def toggle_visibility(self) -> None:
         """Toggle the visibility of the Wifi networks dropdown."""
-        if not self.network_client._client.wireless_get_enabled():
+        if not self.network_client._client.wireless_get_enabled(): # type: ignore
             return
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
@@ -317,9 +317,9 @@ class WifiNetworksDropdown(Revealer):
         if not access_points:
             self.status_label.set_label("No Wi-Fi networks found.")
         else:
-            sorted_aps = sorted(access_points,
-                                key=lambda x: x.get("strength", 0),
-                                reverse=True)
+            sorted_aps = sorted(access_points, # type: ignore
+                                key=lambda x: x.get("strength", 0), # type: ignore
+                                reverse=True) # type: ignore
             self.status_label.set_label(
                 f"{len(sorted_aps)} Wi-Fi networks found:")
             for ap_data in sorted_aps:
@@ -448,7 +448,7 @@ class WifiModule(Box):
     def _update_wifi_state(self) -> bool:
         """Update the WiFi status display"""
         if not self.network_client.wifi_device:
-            return
+            return False
 
         # Update based on current WiFi state
         enabled = self.network_client.wifi_device.enabled

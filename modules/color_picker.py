@@ -9,12 +9,12 @@ from fabric.widgets.label import Label
 import modules.icons as icons
 from services.config import config
 from services.logger import logger
-
+from typing import Callable
 
 class ColorPickerButton(Button):
     """Button that triggers a color picker script when clicked."""
 
-    def __init__(self, hide_notch=None):
+    def __init__(self, hide_notch: Callable, **kwargs):
         super().__init__(
             orientation="h",
             spacing=4,

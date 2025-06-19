@@ -35,7 +35,7 @@ class Language(Box):
         self.on_language_switch()
         self.connection.connect("event::activelayout", self.on_language_switch)
 
-    def on_language_switch(self, _=None, event: HyprlandEvent = None):
+    def on_language_switch(self, _=None, event: HyprlandEvent|None = None) -> None:
         """Update the language widget based on the active layout."""
         lang_data = (event.data[1] if event and event.data and
                      len(event.data) > 1 else HyprlandLanguage().get_label())

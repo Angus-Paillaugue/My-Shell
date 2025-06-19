@@ -56,7 +56,7 @@ def save_pinned_apps(pinned_apps: list[str]) -> None:
         logger.error("Malformed pinned apps data, not saving.")
         return
     with open(pinned_aps_location, "w") as f:
-        json.dump(pinned_apps, f) 
+        json.dump(pinned_apps, f)
 
 
 def load_apps() -> list[str]:
@@ -281,7 +281,7 @@ class Dock(Window):
         margin = f"0 0 {"-54px" if config.BAR_POSITION == "bottom" else 0} 0"
         super().__init__(
             name="dock-overlay",
-            layer="overlay",
+            layer="top",
             anchor=anchor,
             exclusivity="none",
             h_align="end",

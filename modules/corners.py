@@ -140,7 +140,7 @@ class Corners(Window):
         margin = f"{"-54px" if config.BAR_POSITION == "top" else "0"} {"-54px" if config.BAR_POSITION == "right" else "0"} {"-54px" if config.BAR_POSITION == "bottom" else "0"} {"-54px" if config.BAR_POSITION == "left" else "0"}"
         super().__init__(
             name="corners",
-            layer="overlay",
+            layer="top",
             anchor="top bottom left right",
             margin=margin,
             exclusivity="normal",

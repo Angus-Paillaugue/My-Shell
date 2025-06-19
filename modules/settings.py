@@ -1,7 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-
+from typing import Callable
 import modules.icons as icons
 
 
@@ -11,7 +11,7 @@ def singleton(class_: object) -> object:
 
     def getinstance(*args, **kwargs):
         if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
+            instances[class_] = class_(*args, **kwargs) # type: ignore
         return instances[class_]
 
     return getinstance
@@ -21,7 +21,7 @@ def singleton(class_: object) -> object:
 class SettingsBroker():
     """Broker for managing settings-related events and listeners."""
 
-    def register_listener(self, listener: callable) -> None:
+    def register_listener(self, listener: Callable) -> None:
         """Register a listener for settings events."""
         if not hasattr(self, '_listeners'):
             self._listeners = []
@@ -32,7 +32,7 @@ class SettingsBroker():
         for listener in getattr(self, '_listeners', []):
             listener(event, *args, **kwargs)
 
-    def unregister_listener(self, listener: callable) -> None:
+    def unregister_listener(self, listener: Callable) -> None:
         """Unregister a listener from settings events."""
         if hasattr(self, '_listeners'):
             self._listeners.remove(listener)

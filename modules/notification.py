@@ -1,6 +1,7 @@
 import json
 import locale
 import os
+from typing import Callable
 import uuid
 from datetime import datetime, timedelta
 
@@ -14,7 +15,7 @@ from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import GdkPixbuf, GLib, Gtk
+from gi.repository import GdkPixbuf, GLib, Gtk # type: ignore
 
 import modules.icons as icons
 from services.config import config
@@ -446,7 +447,7 @@ class NotificationHistory(Box):
 
     def __init__(self,
                  notification_server: Notifications,
-                 on_event=None,
+                 on_event:Callable | None = None,
                  **kwargs):
         super().__init__(name="notification-history",
                          orientation="v",
@@ -477,7 +478,7 @@ class NotificationHistory(Box):
             child=Label(name="nhh-button-label", markup=icons.trash),
             on_clicked=self.clear_history,
         )
-        self.on_event = on_event
+        self.on_event = on_event # type: ignore
         self.do_not_disturb_enabled = False
 
         self.history_header = CenterBox(
@@ -517,13 +518,13 @@ class NotificationHistory(Box):
         self.LIMITED_APPS_HISTORY = ["Spotify"]
         self._server = notification_server
 
-    def on_event(self, func: callable) -> None:
+    def on_event(self, func: Callable) -> None:
         """ Set the event handler for notification events."""
         self.on_event = func
 
     def emit(self, signal_name: str, *args: object) -> None:
         """ Emit a signal to the event handler."""
-        self.on_event(signal_name, *args)
+        self.on_event(signal_name, *args) # type: ignore
 
     def get_ordinal(self, n: int) -> str:
         """Return the ordinal suffix for a given integer."""
@@ -745,7 +746,7 @@ class NotificationHistory(Box):
             cached_image_path=note.get("cached_image_path"),
         )
 
-        hist_box = NotificationBox(hist_notif, timeout_ms=0)
+        hist_box = NotificationBox(hist_notif, timeout_ms=0) # type: ignore
         hist_box.uuid = hist_notif.id
         hist_box.cached_image_path = hist_notif.cached_image_path
         hist_box.set_is_history(True)
@@ -1129,7 +1130,7 @@ class NotificationHistoryIndicator(Button):
 
         # Create notification history component
         self.notification_history = notification_history
-        self.notification_history.on_event = self.on_notification_history_event
+        self.notification_history.on_event = self.on_notification_history_event # type: ignore
         self.dnd = self.notification_history.do_not_disturb_enabled
 
         # Create container for icon and counter

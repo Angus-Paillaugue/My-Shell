@@ -1,9 +1,8 @@
 from fabric.core.fabricator import Fabricator
 from fabric.widgets.box import Box
-from fabric.widgets.button import Button
 from fabric.widgets.circularprogressbar import CircularProgressBar
 from fabric.widgets.label import Label
-from gi.repository import GLib
+from gi.repository import GLib # type: ignore
 
 import modules.icons as icons
 from services.config import config
@@ -91,7 +90,7 @@ class Metrics(Box):
             stream=False,
             default_value=0,
         )
-        self.metrics_fabricator.changed.connect(self.update_metrics)
+        self.metrics_fabricator.connect("changed", self.update_metrics)
         GLib.idle_add(self.update_metrics, None, shared_provider.get_metrics())
 
     def update_metrics(self, sender, metrics: tuple[float, float, float]) -> None:
