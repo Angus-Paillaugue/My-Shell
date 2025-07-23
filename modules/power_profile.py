@@ -3,7 +3,7 @@ from fabric.utils import exec_shell_command, exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import GLib # type: ignore
+from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
 

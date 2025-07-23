@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+from typing import Callable
 
 from fabric.utils.helpers import exec_shell_command_async
 from fabric.widgets.button import Button
@@ -9,7 +10,7 @@ from fabric.widgets.label import Label
 import modules.icons as icons
 from services.config import config
 from services.logger import logger
-from typing import Callable
+
 
 class ColorPickerButton(Button):
     """Button that triggers a color picker script when clicked."""

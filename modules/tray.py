@@ -4,7 +4,7 @@ from services.config import config
 
 gi.require_version("Gray", "0.1")
 from fabric.widgets.box import Box
-from gi.repository import Gdk, GdkPixbuf, GLib, Gray, Gtk # type: ignore
+from gi.repository import Gdk, GdkPixbuf, GLib, Gray, Gtk  # type: ignore
 
 from services.logger import logger
 

@@ -3,7 +3,7 @@ import os
 from fabric.widgets.box import Box
 from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import Gtk
+from gi.repository import Gtk  # type: ignore
 
 from modules.language import Language
 from modules.metrics import Metrics

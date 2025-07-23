@@ -5,10 +5,12 @@ from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import Gdk
+from gi.repository import Gdk  # type: ignore
+
+from services.interfaces import NotchWidgetInterface
 
 
-class ClipboardManager(Box):
+class ClipboardManager(Box, NotchWidgetInterface):
     """Widget that manages clipboard history and allows copying items back to the clipboard."""
 
     def __init__(self, notch_inner, **kwargs):
@@ -52,6 +54,10 @@ class ClipboardManager(Box):
         self.add(self.scrollable_area)
         self._build_list()
         self.connect("key-press-event", self.on_key_press)
+
+    def on_show(self) -> None:
+        """On widget show, rebuild the list of clipboard items."""
+        self._build_list()
 
     def on_key_press(self, widget, event: Gdk.EventKey) -> bool:
         """Handle keyboard navigation"""

@@ -9,7 +9,7 @@ from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import GLib # type: ignore
+from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
 from services.network import NetworkClient

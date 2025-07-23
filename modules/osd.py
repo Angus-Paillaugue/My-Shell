@@ -1,7 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import GLib # type: ignore
+from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
 from modules.settings import SettingsBroker
