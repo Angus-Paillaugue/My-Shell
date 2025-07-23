@@ -2,7 +2,7 @@ from fabric.core.fabricator import Fabricator
 from fabric.widgets.box import Box
 from fabric.widgets.circularprogressbar import CircularProgressBar
 from fabric.widgets.label import Label
-from gi.repository import GLib # type: ignore
+from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
 from services.config import config

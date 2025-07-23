@@ -1,9 +1,9 @@
 import json
 import locale
 import os
-from typing import Callable
 import uuid
 from datetime import datetime, timedelta
+from typing import Callable
 
 from fabric.notifications.service import (Notification, NotificationAction,
                                           Notifications)
@@ -15,7 +15,7 @@ from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scrolledwindow import ScrolledWindow
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import GdkPixbuf, GLib, Gtk # type: ignore
+from gi.repository import GdkPixbuf, GLib, Gtk  # type: ignore
 
 import modules.icons as icons
 from services.config import config

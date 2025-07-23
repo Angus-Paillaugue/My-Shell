@@ -8,12 +8,13 @@ from fabric.widgets.entry import Entry
 from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk # type: ignore
+from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk  # type: ignore
 
+from services.interfaces import NotchWidgetInterface
 from services.logger import logger
 
 
-class WallpaperManager(Box):
+class WallpaperManager(Box, NotchWidgetInterface):
     """Widget to manage and display wallpapers in a grid layout."""
 
     def __init__(self, **kwargs):
@@ -69,6 +70,13 @@ class WallpaperManager(Box):
         self._refresh_wallpapers()
         self.setup_file_monitor()
         self.connect("key-press-event", self.on_key_press)
+
+    def on_show(self) -> None:
+        def focus_search_entry():
+            self.entry.grab_focus()
+            self.entry.select_region(0, -1)
+
+        GLib.timeout_add(250, focus_search_entry)
 
     def notify_text(self, entry: Entry, *args: object) -> None:
         """Handle text changes in the search entry"""

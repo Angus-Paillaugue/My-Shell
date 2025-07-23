@@ -4,7 +4,7 @@ from fabric.widgets.button import Button
 from fabric.widgets.circularprogressbar import CircularProgressBar
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
-from gi.repository import GLib # type: ignore
+from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
 from services.metrics import shared_provider

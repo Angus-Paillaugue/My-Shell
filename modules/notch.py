@@ -15,7 +15,7 @@ from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.stack import Stack
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import Gdk, GLib, Gtk # type: ignore
+from gi.repository import Gdk, GLib, Gtk  # type: ignore
 
 from modules.battery import Battery
 from modules.bluetooth import BluetoothButton
@@ -37,6 +37,7 @@ from modules.wallpaper import WallpaperManager
 from modules.wifi import WifiModule
 from modules.wired import Wired
 from services.config import config
+from services.interfaces import NotchWidgetInterface
 from services.logger import logger
 
 
@@ -499,6 +500,8 @@ class NotchInner(CornerContainer):
 
         self.notch_widget_picker.set_active_index(index - 1 if index > 0 else 0)
         self._contents.set_visible_child(widgets[index])
+        if isinstance(widgets[index], NotchWidgetInterface):
+            widgets[index].on_show()
         return index == 0
 
 

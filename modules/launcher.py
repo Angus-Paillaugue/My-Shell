@@ -14,15 +14,16 @@ from fabric.widgets.entry import Entry
 from fabric.widgets.image import Image
 from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
-from gi.repository import Gdk, GLib # type: ignore
+from gi.repository import Gdk, GLib  # type: ignore
 
 import modules.icons as icons
 from modules.dock import pinned_aps_location
 from services.config import config
+from services.interfaces import NotchWidgetInterface
 from services.logger import logger
 
 
-class AppLauncher(Box):
+class AppLauncher(Box, NotchWidgetInterface):
     """Application launcher widget that allows searching and launching applications."""
 
     def __init__(self, **kwargs):
@@ -76,13 +77,16 @@ class AppLauncher(Box):
         self.add(self.search_entry)
         self.add(self.scrolled_window)
 
+    def on_show(self) -> None:
+        """On widget show, rebuild the list of entries."""
+        self.open_launcher()
+
     def open_launcher(self) -> None:
         """Open the application launcher and initialize it with the list of applications."""
         self._all_apps = get_desktop_applications()
         self.arrange_viewport()
 
         def clear_selection():
-
             entry = self.search_entry
             if entry.get_text():
                 pos = len(entry.get_text())
@@ -90,8 +94,13 @@ class AppLauncher(Box):
                 entry.select_region(pos, pos)
             return False
 
+        def focus_search_entry():
+            self.search_entry.grab_focus()
+            self.search_entry.select_region(0, -1)
+
         GLib.idle_add(clear_selection)
-        self.show()
+        GLib.timeout_add(250, focus_search_entry)
+        # self.show()
 
     def ensure_initialized(self) -> bool:
         """Make sure the launcher is initialized with apps list before opening"""
