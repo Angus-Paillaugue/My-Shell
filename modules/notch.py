@@ -476,9 +476,9 @@ class NotchInner(CornerContainer):
         self._contents.set_visible_child(
             self._contents.get_children()
             [0])  # Show the default widget initially
-
         super().__init__(
             name="bar-center-container",
+            style_classes=[config.BAR_POSITION],
             corners=(True, True),
             height=30,
             v_align="center",
@@ -601,12 +601,7 @@ class NotchWindow(WaylandWindow):
             keyboard_mode="on_demand",
         )
         self.notch = Notch(notification_history=notification_history, show_widget=self.show_widget)
-        self._container = Box(
-            name="notch-container",
-            orientation="h",
-        )
-        self._container.add(self.notch)
-        self.add(self._container)
+        self.add(self.notch)
 
     def show_widget(self, widget_name: str, show_picker: bool = True) -> None:
         """Show a specific widget in the notch and update the notch inner state."""

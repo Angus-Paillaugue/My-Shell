@@ -29,6 +29,7 @@ class CornerContainer(Box):
         corners=(True, True),
         children=[],
         height=25,
+        style_classes=["corner-container"],
         **kwargs,
     ):
         is_vertical = position in ["left", "right"]
@@ -41,7 +42,7 @@ class CornerContainer(Box):
             v_align=("start" if position != "bottom" else "end"),
             h_expand=False,
             v_expand=False,
-            style_classes=["corner-container"],
+            style_classes=style_classes,
             orientation=orientation,
         )
         self._name = name
