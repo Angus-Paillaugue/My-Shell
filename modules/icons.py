@@ -74,6 +74,8 @@ grid_dots: str = "&#xeaba;"
 arrow_up: str = "&#xfaf3;"
 arrow_down: str = "&#xfaf0;"
 drag_handle: str = "&#xec01;"
+# VPN
+tailscale: str = "&#xf39a;"
 # Others
 screen_record: str = "&#xfca8;"
 screenshot: str = "&#xf201;"

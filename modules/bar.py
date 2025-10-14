@@ -8,6 +8,7 @@ from gi.repository import Gtk  # type: ignore
 from modules.language import Language
 from modules.metrics import Metrics
 from modules.power import PowerButton
+from modules.tailscale import Tailscale
 from modules.time import Time
 from modules.tray import SystemTray
 from modules.weather import WeatherButton
@@ -42,6 +43,7 @@ class Bar(WaylandWindow):
         self.metrics = Metrics()
         self.time = Time()
         self.system_tray = SystemTray()
+        self.tailscale = Tailscale()
         self.weather_button = (WeatherButton() if not os.environ.get("DEV_MODE")
                                else Box(visible=False))
         self.power_button = PowerButton()
@@ -63,7 +65,7 @@ class Bar(WaylandWindow):
             spacing=8,
             orientation=orientation,
             children=[
-                self.system_tray, self.language, self.time, self.power_button
+                self.system_tray, self.tailscale, self.language, self.time, self.power_button
             ],
         )
 

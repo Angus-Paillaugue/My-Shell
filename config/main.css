@@ -23,6 +23,7 @@
 @import url("./styles/workspace.css");
 @import url("./styles/weather.css");
 @import url("./styles/bluetooth.css");
+@import url("./styles/tailscale.css");
 
 * {
   all: unset;

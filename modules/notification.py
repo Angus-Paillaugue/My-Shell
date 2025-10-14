@@ -1133,12 +1133,6 @@ class NotificationHistoryIndicator(Button):
         self.notification_history.on_event = self.on_notification_history_event # type: ignore
         self.dnd = self.notification_history.do_not_disturb_enabled
 
-        # Create container for icon and counter
-        self._container = Box(
-            name="notification-history-container",
-            spacing=0,
-        )
-
         # Bell icon
         self.icon = Label(name="notification-history-icon",
                           markup=icons.notification)
@@ -1182,6 +1176,10 @@ class NotificationHistoryIndicator(Button):
 
     def update_counter(self) -> None:
         """Update notification counter display with proper state management."""
+        if config.BAR_POSITION != "top":
+            self.remove_style_class("active")
+            self.add_style_class("hidden")
+            return
 
         # Update UI based on count
         if self.notification_count > 0:

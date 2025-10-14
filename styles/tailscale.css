@@ -1,0 +1,6 @@
+#tailscale-icon {
+  font-size: 20px;
+}
+#tailscale-icon.down {
+  color: var(--red);
+}

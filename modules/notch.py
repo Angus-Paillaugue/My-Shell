@@ -542,8 +542,9 @@ class Notch(EventBox):
             self.inner.add_style_class("hovered")
             if self.show_picker:
                 self.notch_widget_picker.show()
-            self.notification_history_indicator.add_style_class("hidden")
-            self.notification_history_indicator.add_style_class("hovered")
+            if config.BAR_POSITION == "top":
+                self.notification_history_indicator.add_style_class("hidden")
+                self.notification_history_indicator.add_style_class("hovered")
             if self.inner._contents.get_visible_child(
             ) is self.inner.notch_widget_default:
                 self.inner.show_widget("default-expanded")
@@ -563,9 +564,10 @@ class Notch(EventBox):
             self.show_picker = True
             self.inner.remove_style_class("hovered")
             self.notch_widget_picker.hide()
-            self.notification_history_indicator.remove_style_class("hovered")
+            if config.BAR_POSITION != "top":
+                self.notification_history_indicator.remove_style_class("hovered")
             # Show notification bell if has pending notifications to read
-            if self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd:
+            if config.BAR_POSITION == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
                 GLib.timeout_add(
                     500,
                     lambda *_: self.notification_history_indicator.
