@@ -115,9 +115,9 @@ class NotchWidgetPicker(Revealer):
 
     def set_active_index(self, index: int) -> None:
         """Set the active button based on the index and highlight it"""
-        if 0 <= index < len(self.buttons):
+        if 0 <= index+1 < len(self.buttons):
             for i, button in enumerate(self.buttons):
-                if i == index:
+                if i == index + 1:
                     button.add_style_class("active")
                 else:
                     button.remove_style_class("active")
@@ -498,7 +498,7 @@ class NotchInner(CornerContainer):
         if self._contents.get_visible_child() is widgets[index]:
             index = 0
 
-        self.notch_widget_picker.set_active_index(index - 1 if index > 0 else 0)
+        self.notch_widget_picker.set_active_index(index - 2 if index > 0 else 0)
         self._contents.set_visible_child(widgets[index])
         if isinstance(widgets[index], NotchWidgetInterface):
             widgets[index].on_show()

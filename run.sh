@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 here="$HOME/.config/my-shell"
-. ./.venv/bin/activate
+source $here/.venv/bin/activate
 . "$here/workflows/shared.sh"
 
 pkill $app_name_lower

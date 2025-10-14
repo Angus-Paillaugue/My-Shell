@@ -39,10 +39,6 @@ class Metrics(Box):
                 'warning': 70,
                 'danger': 90,
             },
-            'disk': {    # Disk usage thresholds in percentage
-                'warning': 70,
-                'danger': 90,
-            },
             'temp': {    # Temperature thresholds in Celsius
                 'warning': 70,
                 'danger': 85,

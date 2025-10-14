@@ -1,6 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.wayland import WaylandWindow
+from fabric.widgets.revealer import Revealer
 from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
@@ -28,12 +29,20 @@ class OSD(WaylandWindow):
                              spacing=8,
                              h_align="center",
                              v_align="center")
-        self.add(self._contents)
+        self.revealer = Revealer(
+            transition_type="crossfade",
+            all_visible=True,
+            transition_duration=200,
+            child=self._contents,
+            child_revealed=False,
+            name="osd-revealer",
+        )
+        self.add(self.revealer)
         self._hide_timeout = None
 
     def _set_visible(self, visible: bool) -> None:
         """Set the visibility of the OSD."""
-        self.set_visible(visible)
+        self.revealer.child_revealed = visible
 
     def on_event(self, event: str, *args: object, **kwargs: object) -> None:
         """Handle events to update the OSD contents."""
@@ -44,8 +53,9 @@ class OSD(WaylandWindow):
         match event:
             case "volume-changed":
                 percentage = f"{args[0]}%"
+                enabled = args[1] if len(args) > 1 else True
                 self._contents.children = [
-                    Label(markup=icons.volume_high),
+                    Label(markup=icons.volume_high if enabled else icons.volume_muted),
                     Label(label=percentage),
                 ]
             case "brightness-changed":
@@ -56,8 +66,9 @@ class OSD(WaylandWindow):
                 ]
             case "mic-changed":
                 percentage = f"{args[0]}%"
+                enabled = args[1] if len(args) > 1 else True
                 self._contents.children = [
-                    Label(markup=icons.mic),
+                    Label(markup=icons.mic if enabled else icons.mic_muted),
                     Label(label=percentage),
                 ]
             case _:
@@ -67,4 +78,4 @@ class OSD(WaylandWindow):
         if ok:
             self._set_visible(True)
             self._hide_timeout = GLib.timeout_add(
-                500, lambda *_: self._set_visible(False))
+                750, lambda *_: self._set_visible(False))

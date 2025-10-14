@@ -19,7 +19,7 @@ from services.logger import logger
 class VolumeSlider(Scale):
     """Slider widget to control audio volume."""
 
-    def __init__(self, audio, **kwargs):
+    def __init__(self, audio, settings_notifier, **kwargs):
         super().__init__(
             name="control-slider",
             orientation="h",
@@ -36,7 +36,7 @@ class VolumeSlider(Scale):
         self.connect("value-changed", self.on_value_changed)
         self.add_style_class("vol")
         self.on_speaker_changed()
-        self.settings_notifier = SettingsBroker() # type: ignore
+        self.settings_notifier = settings_notifier
 
     def on_new_speaker(self, *args: object) -> None:
         """Handle new speaker connection."""
@@ -62,15 +62,16 @@ class VolumeSlider(Scale):
             return
         self.value = round(self.audio.speaker.volume / 100, 2)
         self.settings_notifier.notify_listeners("volume-changed",
-                                                round(self.value * 100))
+                                                round(self.value * 100), not self.audio.speaker.muted)
 
 
 class VolumeIcon(Button):
     """Button widget to toggle audio volume mute state and display icon."""
 
-    def __init__(self, audio: Audio, **kwargs):
+    def __init__(self, audio: Audio, settings_notifier, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
         self.audio = audio
+        self.settings_notifier = settings_notifier
         self.value = 0
         self.hide_timer = None
         self.hover_counter = 0
@@ -108,6 +109,8 @@ class VolumeIcon(Button):
         """Toggle the speaker mute state and update the icon."""
         self.audio.speaker.muted = not self.audio.speaker.muted
         self.set_icon()
+        self.settings_notifier.notify_listeners("volume-changed",
+                                                round(self.audio.speaker.volume), not self.audio.speaker.muted)
 
 
 class VolumeOutputsRevealer(Revealer):
@@ -169,6 +172,7 @@ class VolumeRow(Box):
         self.slot = slot
         self.audio = Audio()
         self.outputs_box = VolumeOutputsRevealer()
+        self.settings_notifier = SettingsBroker() # type: ignore
         self.output_box_button = Button(
             style_classes=["volume-outputs-open-button"],
             child=Label(markup=icons.chevron_right),
@@ -182,8 +186,8 @@ class VolumeRow(Box):
         if self.audio.speaker:
             self.audio.speaker.connect("changed", self.notify)
 
-        self.volume_slider = VolumeSlider(self.audio)
-        self.volume_icon = VolumeIcon(self.audio)
+        self.volume_slider = VolumeSlider(self.audio, self.settings_notifier)
+        self.volume_icon = VolumeIcon(self.audio, self.settings_notifier)
 
         self.add(self.volume_icon)
         self.add(self.volume_slider)
@@ -381,7 +385,7 @@ class VolumeRow(Box):
 class MicSlider(Scale):
     """Slider widget to control microphone volume."""
 
-    def __init__(self, audio, **kwargs):
+    def __init__(self, audio, settings_notifier, **kwargs):
         super().__init__(
             name="control-slider",
             orientation="h",
@@ -391,7 +395,7 @@ class MicSlider(Scale):
             **kwargs,
         )
         self.audio = audio
-        self.settings_notifier = SettingsBroker() # type: ignore
+        self.settings_notifier = settings_notifier
         self.audio.connect("notify::microphone", self.on_new_microphone)
         if self.audio.microphone:
             self.audio.microphone.connect("changed", self.on_microphone_changed)
@@ -424,15 +428,16 @@ class MicSlider(Scale):
             return
         self.value = round(self.audio.microphone.volume / 100, 2)
         self.settings_notifier.notify_listeners("mic-changed",
-                                                round(self.value * 100))
+                                                round(self.value * 100), not self.audio.microphone.muted)
 
 
 class MicIcon(Button):
     """Button widget to toggle microphone mute state and display icon."""
 
-    def __init__(self, audio: Audio, **kwargs):
+    def __init__(self, audio: Audio, settings_notifier, **kwargs):
         super().__init__(name="volume-icon", **kwargs)
         self.audio = audio
+        self.settings_notifier = settings_notifier
         self.value = 0
         self.hide_timer = None
         self.hover_counter = 0
@@ -442,9 +447,8 @@ class MicIcon(Button):
             markup=icons.mic,
         )
         self.connect("clicked", self.on_clicked)
-        self.add(self.label)
-
         self.set_icon()
+        self.add(self.label)
 
     def set_icon(self) -> None:
         """Set the icon based on the current microphone state."""
@@ -460,6 +464,8 @@ class MicIcon(Button):
         """Toggle the microphone mute state and update the icon."""
         self.audio.microphone.muted = not self.audio.microphone.muted
         self.set_icon()
+        self.settings_notifier.notify_listeners("mic-changed",
+                                                round(self.audio.microphone.volume), not self.audio.microphone.muted)
 
 
 class MicInputsRevealer(Revealer):
@@ -506,7 +512,6 @@ class MicInputsRevealer(Revealer):
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
 
-
 class MicRow(Box):
     """A horizontal row widget that contains the microphone icon, slider, and input options."""
 
@@ -532,9 +537,9 @@ class MicRow(Box):
             on_clicked=lambda _:
             (self.inputs_box.toggle(), self.notify_inputs()),
         )
-
-        self.mic_slider = MicSlider(self.audio)
-        self.mic_icon = MicIcon(self.audio)
+        self.settings_notifier = SettingsBroker() # type: ignore
+        self.mic_slider = MicSlider(self.audio, self.settings_notifier)
+        self.mic_icon = MicIcon(self.audio, self.settings_notifier)
 
         # Connect to microphone change events
         self.audio.connect("notify::microphone", self.on_new_microphone)
