@@ -1,0 +1,73 @@
+#search-entry {
+  font-weight: bold;
+  background-color: var(--surface);
+  color: var(--foreground);
+  border-radius: {{BORDER_RADIUS}};
+  padding: {{PADDING * 1.2}};
+}
+
+#search-entry selection {
+  color: var(--background);
+  background-color: var(--primary);
+}
+
+#notch-scrolled-window {
+  min-height: 400px;
+  min-width: 700px;
+}
+
+#notch-scrolled-window scrollbar,
+#bluetooth-devices scrollbar,
+#network-ap-scrolled-window scrollbar {
+  border-radius: {{BORDER_RADIUS}};
+  background-color: var(--surface);
+  padding: {{PADDING/2}};
+  margin-left: {{PADDING * 0.8}};
+}
+
+#notch-scrolled-window slider,
+#bluetooth-devices slider,
+#network-ap-scrolled-window slider {
+  border-radius: {{BORDER_RADIUS/2}};
+  min-width: 16px;
+  min-height: 48px;
+  background-color: var(--primary);
+}
+
+@keyframes loadSlot {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+#app-icon {
+  margin: -{{PADDING}};
+  margin-right: {{PADDING/2}};
+}
+
+#app-label {
+  color: var(--foreground);
+  font-weight: bold;
+}
+
+#app-desc {
+  color: var(--outline);
+  font-size: {{FONT_SIZE * 0.8}};
+  font-style: italic;
+}
+#app-button {
+  padding: {{PADDING * 2}};
+  border-radius: {{BORDER_RADIUS}};
+  transition: all 0.2s ease;
+}
+
+#app-button:hover,
+#app-button:focus,
+#app-button.selected {
+  background-color: var(--surface);
+  padding-left: {{PADDING * 3}};
+}

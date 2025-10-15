@@ -17,7 +17,6 @@ from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import Gdk, GLib  # type: ignore
 
 import modules.icons as icons
-from modules.dock import pinned_aps_location
 from services.config import config
 from services.interfaces import NotchWidgetInterface
 from services.logger import logger
@@ -37,7 +36,7 @@ class AppLauncher(Box, NotchWidgetInterface):
         self._arranger_handler: int = 0
         self._all_apps = get_desktop_applications()
 
-        CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config.APP_NAME}"
+        CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config['APP_NAME']}"
         self.calc_history_path = f"{CACHE_DIR}/calc.json"
         if not os.path.exists(CACHE_DIR):
             os.makedirs(CACHE_DIR)
@@ -47,8 +46,6 @@ class AppLauncher(Box, NotchWidgetInterface):
         else:
             self.calc_history = []
 
-        with open(pinned_aps_location, "r") as f:
-            self.pinned_apps = json.load(f)
 
         self.viewport = Box(name="viewport", spacing=4, orientation="v")
         self.search_entry = Entry(
@@ -156,18 +153,6 @@ class AppLauncher(Box, NotchWidgetInterface):
 
     def bake_application_slot(self, app: DesktopApp, **kwargs) -> Box:
         """Create a button for the application with pin functionality"""
-        # Check if app is pinned
-        is_pinned = app.name in self.pinned_apps
-
-        # Create pin button
-        pin_icon = icons.pin_on if is_pinned else icons.pin_off
-        pin_button = Button(
-            child=Label(markup=pin_icon, name="pin-icon"),
-            style_classes=["pin-button", "pinned" if is_pinned else "unpinned"],
-            tooltip_text="Unpin from dock" if is_pinned else "Pin to dock",
-            on_clicked=lambda button, *_: self.toggle_pin_status(button, app),
-            v_align="center",
-        )
 
         # Create app button (without the pin button as a child)
         app_button = Button(
@@ -204,53 +189,7 @@ class AppLauncher(Box, NotchWidgetInterface):
             on_clicked=lambda *_: app.launch(),
         )
 
-        # Create a container that holds both buttons side by side
-        container = Box(
-            name="slot-button",
-            orientation="h",
-            spacing=4,
-            children=[app_button, pin_button],
-            **kwargs,
-        )
-
-        return container
-
-    def toggle_pin_status(self, button, app: DesktopApp) -> bool:
-        """Toggle whether an app is pinned to the dock"""
-
-        # Toggle the pin status
-        if app.name in self.pinned_apps:
-            self.pinned_apps.remove(app.name)
-            is_pinned = False
-            tooltip = "Pin to dock"
-            icon = icons.pin_off
-        else:
-            self.pinned_apps.append(app.name)
-            is_pinned = True
-            tooltip = "Unpin from dock"
-            icon = icons.pin_on
-
-        # Update the button
-        icon_label = button.get_child(
-        )  # Direct access, no need for get_children()
-        icon_label.set_markup(icon)
-        button.set_tooltip_text(tooltip)
-
-        # Update CSS classes
-        style_context = button.get_style_context()
-        if is_pinned:
-            style_context.remove_class("unpinned")
-            style_context.add_class("pinned")
-        else:
-            style_context.remove_class("pinned")
-            style_context.add_class("unpinned")
-
-        # Save the updated list
-        with open(pinned_aps_location, "w") as f:
-            json.dump(self.pinned_apps, f)
-
-        # Stop event propagation
-        return True
+        return app_button
 
     def update_selection(self, new_index: int) -> None:
         """Update the selected index and highlight the corresponding button"""

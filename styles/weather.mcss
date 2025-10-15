@@ -2,17 +2,13 @@
   font-weight: bold;
 }
 .loading-icon {
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.2}};
   animation: loading-animation 1.5s infinite;
 }
 
 @keyframes loading-animation {
   0% {
     opacity: 1;
-  }
-
-  50% {
-    opacity: 0.4;
   }
 
   100% {

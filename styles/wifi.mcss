@@ -1,5 +1,8 @@
 #wifi-left-button {
-  border-radius: 12px 2px 2px 12px;
+  border-radius: {{BORDER_RADIUS}}
+    {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS}};
 }
 
 #wifi-left-button.disabled {
@@ -11,26 +14,26 @@
 }
 
 #wifi-connections-box {
-  margin-top: 12px;
+  margin-top: {{PADDING * 1.5}};
   background-color: var(--surface);
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: {{BORDER_RADIUS * 0.8}};
+  padding: {{PADDING}};
 }
 
 #wifi-networks-header {
-  font-size: 16px;
+  font-size: {{FONT_SIZE}};
   color: var(--foreground);
 }
 
 #wifi-scan {
-  padding: 8px;
-  border-radius: 8px;
+  padding: {{PADDING}};
+  border-radius: {{BORDER_RADIUS * 0.8}};
   background-color: var(--surface-bright);
   transition: all 0.1s ease;
 }
 
 #wifi-scan:hover {
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 2}};
   background-color: var(--primary);
 }
 
@@ -40,7 +43,7 @@
 
 #wifi-scan label {
   color: var(--foreground);
-  font-size: 18px;
+  font-size: {{FONT_SIZE * 1.1}};
   transition: all 0.1s ease;
 }
 
@@ -62,5 +65,5 @@
 #wifi-connect-button label,
 .wifi-ap-icon,
 .wifi-connection-label {
-  font-size: 14px;
+  font-size: {{FONT_SIZE * 0.8}};
 }

@@ -10,4 +10,5 @@ uwsm app -- python "$here/app.py" >/dev/null 2>&1 &
 disown
 
 # Run update script
+sleep 2
 bash "$here/workflows/update.sh"

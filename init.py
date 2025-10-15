@@ -4,7 +4,7 @@ from fabric.utils.helpers import exec_shell_command_async
 import toml
 import shutil
 
-app_location = os.path.expanduser(f"~/.config/{config.APP_NAME}")
+app_location = os.path.expanduser(f"~/.config/{config['APP_NAME']}")
 
 
 def deep_update(target: dict, update: dict) -> dict:
@@ -33,12 +33,12 @@ def ensure_matugen_config() -> None:
                 "command": "swww",
                 "arguments": [
                     "img",
-                    "-t",
-                    "outer",
-                    "--transition-duration",
-                    "1.5",
+                    "--transition-type",
+                    "grow",
+                    "--transition-pos",
+                    "0.854,0.033",
                     "--transition-step",
-                    "255",
+                    "90",
                     "--transition-fps",
                     "60",
                     "-f",
@@ -86,15 +86,15 @@ def ensure_matugen_config() -> None:
                 "output_path":
                     os.path.join(app_location, "config/hypr/colors.conf"),
             },
-            f"{config.APP_NAME}": {
+            f"{config['APP_NAME']}": {
                 "input_path":
                     os.path.join(
                         app_location,
-                        f"config/matugen/templates/{config.APP_NAME}.css"),
+                        f"config/matugen/templates/{config['APP_NAME']}.css"),
                 "output_path":
-                    os.path.join(app_location, "styles/colors.css"),
+                    os.path.join(app_location, "styles/colors.mcss"),
                 "post_hook":
-                    f"fabric-cli exec {config.APP_NAME} 'app.apply_stylesheet()' &",
+                    f"fabric-cli exec {config['APP_NAME']} 'app.apply_stylesheet()' &",
             },
             "kitty": {
                 "input_path":
@@ -133,7 +133,7 @@ def ensure_matugen_config() -> None:
 
     current_wall = os.path.expanduser("~/.current.wall")
     hypr_colors = os.path.join(app_location, "config/hypr/colors.conf")
-    css_colors = os.path.join(app_location, "styles/colors.css")
+    css_colors = os.path.join(app_location, "styles/colors.mcss")
 
     if (not os.path.exists(current_wall) or not os.path.exists(hypr_colors) or
             not os.path.exists(css_colors)):
@@ -178,7 +178,7 @@ def ensure_matugen_config() -> None:
 
 
 def generate_hypr_entrypoint() -> None:
-    contents = f"""source = ~/.config/{config.APP_NAME}/config/hypr/overrides.conf"""
+    contents = f"""source = ~/.config/{config['APP_NAME']}/config/hypr/overrides.conf"""
     location = os.path.expanduser(f"~/.config/hypr/hyprland.conf")
     if not os.path.exists(location):
         raise FileNotFoundError(
@@ -206,8 +206,9 @@ def generate_hyprlock_config() -> None:
 
     with open(template_location, "r") as f:
         contents = f.read()
-        contents = contents.replace("{{APP_NAME}}", config.APP_NAME).replace(
-            "{{MONOSPACE_FONT_FAMILY}}", config.MONOSPACE_FONT_FAMILY)
+        contents = contents.replace("{{APP_NAME}}", config['APP_NAME']).replace(
+            "{{MONOSPACE_FONT_FAMILY}}",
+            config['STYLES']['MONOSPACE_FONT_FAMILY'])
     with open(location, "w") as f:
         f.write(contents)
     print(f"Hyprlock configuration updated")
@@ -247,36 +248,21 @@ def wallpapers() -> None:
             shutil.copy(src_path, dest_path)
 
 
-def others() -> None:
-    pinned_aps_location = os.path.join(app_location, "config/pinned_apps.json")
-
-    if not os.path.exists(pinned_aps_location):
-        with open(pinned_aps_location, "w") as f:
-            f.write("[]")
-
-    # Set wanted monospace font in the main.css file
-    main_css_location = os.path.join(app_location, "main.css")
-    main_css_template_location = os.path.join(app_location, "config/main.css")
-    with open(main_css_template_location, "r") as f:
-        contents = f.read()
-    contents = contents.replace(
-        "{{MONOSPACE_FONT_FAMILY}}",
-        f"\"{config.MONOSPACE_FONT_FAMILY}\", monospace")
-
-    if os.path.exists(main_css_location):
-        with open(main_css_location, "r") as f:
-            existing_contents = f.read()
-        if contents.strip() == existing_contents.strip():
-            print(f"Main CSS already up to date.")
-            return
-    with open(main_css_location, "w") as f:
-        f.write(contents)
+def ensure_app_config() -> None:
+    """
+    Ensure that the application configuration file exists.
+    """
+    config_path = os.path.join(app_location, "config.yaml")
+    if not os.path.exists(config_path):
+        default_config_path = os.path.join(app_location, "config.default.yaml")
+        shutil.copyfile(default_config_path, config_path)
+        print(f"Default configuration copied to {config_path}")
 
 
 if __name__ == "__main__":
+    ensure_app_config()
     ensure_matugen_config()
     generate_hypr_entrypoint()
     generate_hyprlock_config()
     update_kitty_config()
     wallpapers()
-    others()

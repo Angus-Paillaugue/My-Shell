@@ -20,7 +20,7 @@ class SystemTray(Box):
                 "bar-item",
                 (
                     "horizontal"
-                    if config.BAR_POSITION in ["top", "bottom"]
+                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
                     else "vertical"
                 ),
             ],

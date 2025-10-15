@@ -5,7 +5,7 @@ from os import listdir, makedirs, remove, rename
 from os.path import dirname, exists, join, realpath
 from typing import Literal
 
-from .config import config
+from services.config import config
 
 
 class Logger:
@@ -14,7 +14,7 @@ class Logger:
     def __init__(
         self,
         log_file_location="logs",
-        process=config.APP_NAME,
+        process=config['APP_NAME'],
         log_rotate_retention=10000,
         log_file_ext="log",
         max_log_files_retention=20,

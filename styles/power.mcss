@@ -1,0 +1,35 @@
+#power-options-container {
+  margin-top: {{PADDING * 2}};
+}
+#power-option-button {
+  border-radius: {{BORDER_RADIUS * 0.8}};
+  padding: {{PADDING * 2}};
+  background-color: var(--surface);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#option-label {
+  font-size: {{FONT_SIZE}};
+}
+#option-icon {
+  font-size: {{FONT_SIZE * 2}};
+}
+
+#power-option-button:hover {
+  background-color: var(--surface-bright);
+}
+
+#power-option-button:active {
+  background-color: var(--primary);
+}
+
+#power-option-button:hover label {
+  color: var(--primary);
+}
+
+#power-option-button:active label {
+  color: var(--shadow);
+}
+
+#setting-buttons-grid {
+  margin-top: {{PADDING * 1.5}};
+}

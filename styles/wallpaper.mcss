@@ -1,8 +1,8 @@
 #no-wallpapers-label {
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.2}};
   color: var(--foreground);
 }
 .wallpaper-placeholder {
   background-color: rgba(100, 100, 100, 0.3);
-  border-radius: 4px;
+  border-radius: {{BORDER_RADIUS/4}};
 }

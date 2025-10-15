@@ -1,10 +1,11 @@
 from fabric import Fabricator
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
+from gi.repository import GLib  # type: ignore
+
 import modules.icons as icons
 from services.config import config
 from services.tailscale import TailscaleProvider
-from gi.repository import GLib  # type: ignore
 
 
 class Tailscale(Button):
@@ -15,14 +16,14 @@ class Tailscale(Button):
             name="tailscale",
             style_classes=["bar-item", (
                     "horizontal"
-                    if config.BAR_POSITION in ["top", "bottom"]
+                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
                     else "vertical"
                 )],
             h_align="center",
             v_align="center",
             spacing=4,
-            v_expand=False,
-            h_expand=False,
+            v_expand=True,
+            h_expand=True,
             on_clicked=lambda *_: self.on_click(),
             **kwargs,
         )

@@ -138,7 +138,8 @@ class Corners(Window):
     """Window that contains all four corners of the screen."""
 
     def __init__(self):
-        margin = f"{"-54px" if config.BAR_POSITION == "top" else "0"} {"-54px" if config.BAR_POSITION == "right" else "0"} {"-54px" if config.BAR_POSITION == "bottom" else "0"} {"-54px" if config.BAR_POSITION == "left" else "0"}"
+        offset = '-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING'])
+        margin = f"{offset if config['POSITIONS']['BAR'] == "top" else "0"} {offset if config['POSITIONS']['BAR'] == "right" else "0"} {offset if config['POSITIONS']['BAR'] == "bottom" else "0"} {offset if config['POSITIONS']['BAR'] == "left" else "0"}"
         super().__init__(
             name="corners",
             layer="top",

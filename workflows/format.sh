@@ -21,7 +21,23 @@ formatPython() {
 }
 
 formatCSS() {
-  prettier --write "**/*.css"
+  echo "Formatting CSS files (preserving {{VARIABLES}})..."
+
+  for file in $(find "$projectRoot/styles" -type f -name "*.mcss"); do
+    tmp="${file}.tmp"
+
+    # Step 1: replace {{...}} with placeholders
+    perl -0777 -pe 's/\{\{(.*?)\}\}/__PLACEHOLDER__(\1)__PLACEHOLDER__/sg' "$file" >"$tmp"
+
+    # Step 2: run prettier on the temporary file
+    prettier --parser css --write "$tmp" >/dev/null 2>&1
+
+    # Step 3: restore placeholders back to {{...}}, even if Prettier added spaces or line breaks
+    perl -0777 -pe 's/__PLACEHOLDER__\s*\(\s*(.*?)\s*\)\s*__PLACEHOLDER__/{{\1}}/sg' "$tmp" >"$file"
+
+    rm -f "$tmp"
+    echo "→ $file formatted"
+  done
 }
 
 formatShell() {

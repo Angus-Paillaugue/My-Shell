@@ -1,13 +1,13 @@
 #metrics-main-box {
   font-weight: bold;
-  padding: 0 12px;
+  padding: 0 {{PADDING * 1.2}};
 }
 #metrics-main-box.vertical {
-  padding: 12px 4px;
+  padding: {{PADDING * 1.2}} 0;
 }
 
 #ram-label {
-  font-size: 14px;
+  font-size: {{FONT_SIZE * 0.9}};
 }
 .metrics-progress-bar {
   color: var(--surface-bright);

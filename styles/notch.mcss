@@ -1,13 +1,13 @@
 .notch-widget-selector-button {
-  padding: 8px 16px;
-  border-radius: 20px;
-  margin-bottom: 8px;
+  padding: {{PADDING}} {{PADDING * 2}};
+  border-radius: {{BORDER_RADIUS * 2}};
+  margin-bottom: {{PADDING}};
   transition: all 0.25s ease;
 }
 
 .notch-widget-selector-button label {
   color: var(--foreground);
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.2}};
   transition: all 0.25s ease;
 }
 
@@ -34,7 +34,8 @@
 }
 
 #notch-widget-default {
-  padding: 5px 10px;
+  padding: {{PADDING * 0.8}}
+    {{PADDING * 1.2}};
   font-weight: 500;
 }
 #notch-widget-picker-grid {

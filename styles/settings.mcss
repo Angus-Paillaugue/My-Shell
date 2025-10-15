@@ -4,7 +4,7 @@
   padding: 0;
 }
 #settings-menu-main-button label {
-  font-size: 24px;
+  font-size: {{FONT_SIZE * 1.5}};
 }
 
 .settings-action-button {
@@ -15,12 +15,12 @@
   background-color: var(--surface);
 }
 .settings-action-button label {
-  font-size: 24px;
+  font-size: {{FONT_SIZE * 1.5}};
   color: var(--foreground);
 }
 .settings-action-button:hover,
 .settings-action-button:focus {
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 2}};
   background-color: var(--surface-bright);
 }
 .settings-action-button:hover label,
@@ -42,21 +42,27 @@
 
 /* See more buttons with caret */
 .expand-button-caret {
-  border-radius: 2px 12px 12px 2px;
+  border-radius: {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS}}
+    {{BORDER_RADIUS}}
+    {{BORDER_RADIUS * 0.2}};
   background-color: var(--surface);
   transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .expand-button-caret label {
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.2}};
   color: var(--foreground);
   transition: all 0.1s ease;
 }
 .expand-button-caret:hover {
   background-color: var(--primary);
-  padding: 0 4px;
+  padding: 0 {{PADDING/2}};
 }
 .expand-button-caret:active {
-  border-radius: 2px 20px 20px 2px;
+  border-radius: {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS * 2}}
+    {{BORDER_RADIUS * 2}}
+    {{BORDER_RADIUS * 0.2}};
 }
 .expand-button-caret:hover label {
   color: var(--shadow);
@@ -67,34 +73,34 @@
 #wired-left-button,
 #power-profile,
 #bluetooth-left-button {
-  padding: 8px;
+  padding: {{PADDING}};
   background-color: var(--primary);
 }
 #wifi-icon,
 #wired-icon,
 #power-profile-icon,
 #bluetooth-icon {
-  font-size: 25px;
+  font-size: {{FONT_SIZE * 1.6}};
   color: var(--shadow);
 }
 #wifi-status,
 #wired-status,
 #power-profile-name,
 #bluetooth-status {
-  font-size: 14px;
+  font-size: {{FONT_SIZE * 0.9}};
   color: var(--shadow);
 }
 
 /* Brightness and Volume */
 #brightness-icon,
 #volume-icon {
-  font-size: 24px;
+  font-size: {{FONT_SIZE * 1.5}};
   color: var(--foreground);
 }
 #brightness-row,
 #volume-row,
 #mic-row {
-  margin-top: 20px;
+  margin-top: {{PADDING * 2.5}};
 }
 
 /* Reusable */
@@ -102,8 +108,8 @@
 /* Slider */
 #control-slider {
   background-color: var(--surface);
-  margin: 0px 0px 0px 0px;
-  border-radius: 6px 6px 6px 6px;
+  margin: 0px;
+  border-radius: {{BORDER_RADIUS/2}};
 }
 #control-slider trough {
   min-height: 10px;
@@ -111,9 +117,9 @@
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 #control-slider trough highlight {
-  border-radius: 6px 6px 6px 6px;
+  border-radius: {{BORDER_RADIUS/2}};
   min-height: 10px;
-  margin-right: 8px;
+  margin-right: {{PADDING}};
   background-color: var(--primary);
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -123,11 +129,11 @@
 }
 /* Slider grab area */
 #control-slider slider {
-  border-radius: 2px;
+  border-radius: {{BORDER_RADIUS * 0.2}};
   background-color: var(--primary);
   min-width: 4px;
   min-height: 40px;
-  margin: -8px 0;
+  margin: -6px -3px;
   box-shadow:
     -4px 0 0px 2px var(--shadow),
     4px 0 0px 2px var(--shadow);

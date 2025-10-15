@@ -1,5 +1,5 @@
 #tailscale-icon {
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.2}};
 }
 #tailscale-icon.down {
   color: var(--red);

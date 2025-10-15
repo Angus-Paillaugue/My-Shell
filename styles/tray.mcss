@@ -1,17 +1,14 @@
-#systray {
-  padding: 0 12px;
-}
-
 /* Context menu */
 menu {
   background-color: var(--shadow);
   border: 2px solid var(--surface);
-  padding: 4px;
+  padding: {{PADDING/2}};
 }
 
 menu > menuitem {
-  border-radius: 10px;
-  padding: 6px 10px;
+  border-radius: {{BORDER_RADIUS}};
+  padding: {{PADDING * 0.8}}
+    {{PADDING * 1.2}};
 }
 
 menu > menuitem:hover {

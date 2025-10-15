@@ -1,6 +1,6 @@
 #bar-start-container,
 #bar-end-container {
-  padding: 8px;
+  padding: {{PADDING}};
 }
 #bar-start-container.top,
 #bar-end-container.top {
@@ -20,23 +20,28 @@
 }
 .bar-item {
   background-color: var(--shadow);
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 1.5}};
   font-weight: bold;
 }
 .bar-item.horizontal {
-  padding: 0 10px;
-  min-height: 46px;
+  padding: 0 {{PADDING * 2}};
+  min-height: {{BAR_SIZE}};
 }
 .bar-item.vertical {
-  padding: 10px 0;
-  min-width: 38px;
+  padding: {{PADDING * 2}} 0;
+  min-width: {{BAR_SIZE}};
+}
+.bar-item label {
+  color: var(--foreground);
+  font-size: {{FONT_SIZE}};
 }
 #bar-center-container.hovered #bar-center-container-inner {
-  padding: 5px 30px 30px 30px;
+  padding: {{PADDING}} {{PADDING * 3}} {{PADDING * 3}}
+    {{PADDING * 3}};
   min-width: 750px;
 }
 #bar-center-container {
-  margin-top: -47px;
+  margin-top: -{{NOTCH_HEIGHT}};
 }
 #bar-center-container.top,
 #bar-center-container.hovered {
@@ -44,19 +49,20 @@
 }
 #bar-center-container-inner {
   background-color: var(--shadow);
-  padding: 6px;
-  border-radius: 0 0 25px 25px;
+  padding: {{PADDING * 0.8}};
+  border-radius: 0 0 {{BORDER_RADIUS * 2}}
+    {{BORDER_RADIUS * 2}};
   transition: all 0.3s ease-in-out;
 }
 .bar-action-button {
-  padding: 0 12px;
+  padding: 0 {{PADDING}};
 }
 .bar-action-button.small {
-  padding: 6px;
+  padding: {{PADDING * 0.8}};
 }
 .bar-action-button {
-  min-width: 40px;
-  min-height: 40px;
+  min-width: {{BAR_SIZE}};
+  min-height: {{BAR_SIZE}};
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .bar-action-button.small {
@@ -70,7 +76,7 @@
 
 .bar-action-button:hover,
 .bar-action-button:focus {
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 2}};
   background-color: var(--surface-bright);
 }
 .bar-action-button.danger:hover,

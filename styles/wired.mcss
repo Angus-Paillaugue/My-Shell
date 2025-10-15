@@ -1,5 +1,8 @@
 #wired-left-button {
-  border-radius: 12px 2px 2px 12px;
+  border-radius: {{BORDER_RADIUS}}
+    {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS}};
 }
 
 #wired-left-button.disabled {
@@ -11,20 +14,23 @@
 }
 
 #wired-networks-expand-button {
-  border-radius: 2px 12px 12px 2px;
+  border-radius: {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS}}
+    {{BORDER_RADIUS}}
+    {{BORDER_RADIUS * 0.2}};
   background-color: var(--surface);
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #wired-networks-expand-button label {
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.2}};
   color: var(--foreground);
   transition: all 0.25s ease;
 }
 
 #wired-networks-expand-button:hover {
   background-color: var(--primary);
-  padding: 0 4px;
+  padding: 0 {{PADDING/2}};
 }
 
 #wired-networks-expand-button:hover label {
@@ -32,26 +38,26 @@
 }
 
 #wired-connections-box {
-  margin-top: 12px;
+  margin-top: {{PADDING * 1.5}};
   background-color: var(--surface);
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: {{BORDER_RADIUS * 0.8}};
+  padding: {{PADDING}};
 }
 
 #wired-networks-header {
-  font-size: 16px;
+  font-size: {{FONT_SIZE}};
   color: var(--foreground);
 }
 
 #wired-scan {
-  padding: 8px;
-  border-radius: 8px;
+  padding: {{PADDING}};
+  border-radius: {{BORDER_RADIUS * 0.8}};
   background-color: var(--surface-bright);
   transition: all 0.1s ease;
 }
 
 #wired-scan:hover {
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 2}};
   background-color: var(--primary);
 }
 
@@ -61,7 +67,7 @@
 
 #wired-scan label {
   color: var(--foreground);
-  font-size: 18px;
+  font-size: {{FONT_SIZE * 1.1}};
   transition: all 0.1s ease;
 }
 
@@ -81,8 +87,8 @@
   background-color: var(--primary);
 }
 #wired-connect-button label {
-  font-size: 14px;
+  font-size: {{FONT_SIZE * 0.8}};
 }
 .wired-connection-label {
-  font-size: 14px;
+  font-size: {{FONT_SIZE * 0.8}};
 }

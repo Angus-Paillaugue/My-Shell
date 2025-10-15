@@ -21,7 +21,7 @@ import modules.icons as icons
 from services.config import config
 from services.logger import logger
 
-PERSISTENT_DIR = f"/tmp/{config.APP_NAME}/notifications"
+PERSISTENT_DIR = f"/tmp/{config['APP_NAME']}/notifications"
 PERSISTENT_HISTORY_FILE = os.path.join(PERSISTENT_DIR,
                                        "notification_history.json")
 MAX_VISIBLE_NOTIFICATIONS = 3
@@ -1176,7 +1176,7 @@ class NotificationHistoryIndicator(Button):
 
     def update_counter(self) -> None:
         """Update notification counter display with proper state management."""
-        if config.BAR_POSITION != "top":
+        if config['POSITIONS']['BAR'] != "top":
             self.remove_style_class("active")
             self.add_style_class("hidden")
             return
@@ -1491,7 +1491,7 @@ class NotificationPopup(WaylandWindow):
 
     def __init__(self, notification_server: Notifications,
                  notification_history: NotificationHistory, **kwargs):
-        pos = config.NOTIFICATION_POSITION
+        pos = config['POSITIONS']['NOTIFICATION']
         y_pos = pos.split("-")[0]
         x_pos = pos.split("-")[1]
 

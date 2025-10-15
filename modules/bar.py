@@ -3,7 +3,6 @@ import os
 from fabric.widgets.box import Box
 from fabric.widgets.centerbox import CenterBox
 from fabric.widgets.wayland import WaylandWindow
-from gi.repository import Gtk  # type: ignore
 
 from modules.language import Language
 from modules.metrics import Metrics
@@ -26,12 +25,12 @@ class Bar(WaylandWindow):
             "left": "top left bottom",
             "right": "top right bottom",
         }
-        orientation = ("horizontal" if config.BAR_POSITION in ["top", "bottom"]
-                       else "vertical")
+        orientation = ("horizontal" if config['POSITIONS']['BAR']
+                       in ["top", "bottom"] else "vertical")
         super().__init__(
             name="bar",
             layer="top",
-            anchor=anchors[config.BAR_POSITION],
+            anchor=anchors[config['POSITIONS']['BAR']],
             exclusivity="auto",
             visible=True,
             all_visible=True,
@@ -50,7 +49,7 @@ class Bar(WaylandWindow):
 
         self.start_box = Box(
             name="bar-start-container",
-            style_classes=[config.BAR_POSITION],
+            style_classes=[config['POSITIONS']['BAR']],
             spacing=8,
             orientation=orientation,
             children=[
@@ -61,11 +60,12 @@ class Bar(WaylandWindow):
         )
         self.end_box = Box(
             name="bar-end-container",
-            style_classes=[config.BAR_POSITION],
+            style_classes=[config['POSITIONS']['BAR']],
             spacing=8,
             orientation=orientation,
             children=[
-                self.system_tray, self.tailscale, self.language, self.time, self.power_button
+                self.system_tray, self.tailscale, self.language, self.time,
+                self.power_button
             ],
         )
 

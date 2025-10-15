@@ -1,14 +1,14 @@
 .clipboard-item-button {
-  padding: 8px;
-  border-radius: 8px;
+  padding: {{PADDING}};
+  border-radius: {{BORDER_RADIUS}};
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .clipboard-item-button label {
-  font-size: 16px;
+  font-size: {{FONT_SIZE}};
   color: var(--foreground);
 }
 .clipboard-item-button:hover {
-  padding-left: 12px;
+  padding-left: {{PADDING * 1.5}};
   background-color: var(--surface);
 }
 .clipboard-item-button:hover label {

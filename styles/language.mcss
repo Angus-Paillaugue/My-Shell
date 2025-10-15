@@ -1,0 +1,7 @@
+#lang-label {
+  color: var(--foreground);
+  font-size: {{FONT_SIZE}};
+}
+#keyboard-lang-icon {
+  font-size: {{FONT_SIZE * 1.2}};
+}

@@ -1,0 +1,9 @@
+STYLES:
+  MONOSPACE_FONT_FAMILY: "JetBrainsMono Nerd Font" # Use a font that is installed on your system
+  BORDER_RADIUS: 12
+  FONT_SIZE: 16
+  BAR_SIZE: 47
+  PADDING: 8
+
+POSITIONS:
+  BAR: "top"

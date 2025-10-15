@@ -1,7 +1,7 @@
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
-from fabric.widgets.wayland import WaylandWindow
 from fabric.widgets.revealer import Revealer
+from fabric.widgets.wayland import WaylandWindow
 from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons

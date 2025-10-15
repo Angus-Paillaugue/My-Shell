@@ -23,7 +23,6 @@ from modules.brightness import BrightnessRow
 from modules.clipboard import ClipboardManager
 from modules.color_picker import ColorPickerButton
 from modules.corners import CornerContainer
-from modules.dock import DockSettings
 from modules.launcher import AppLauncher
 from modules.notification import (NotificationHistory,
                                   NotificationHistoryIndicator)
@@ -455,7 +454,6 @@ class NotchInner(CornerContainer):
         self.notch_widget_wallpaper = WallpaperManager()
         self.power = PowerMenuActions()
         self.clipboard = ClipboardManager(notch_inner=self)
-        self.dock_settings = DockSettings(notch=self.notch)
 
         self._contents = Stack(
             transition_type="slide-up-down",
@@ -467,7 +465,6 @@ class NotchInner(CornerContainer):
                 self.notch_widget_wallpaper,
                 self.power,
                 self.clipboard,
-                self.dock_settings,
             ],
             interpolate_size=True,
             h_expand=False,
@@ -478,7 +475,7 @@ class NotchInner(CornerContainer):
             [0])  # Show the default widget initially
         super().__init__(
             name="bar-center-container",
-            style_classes=[config.BAR_POSITION],
+            style_classes=[config['POSITIONS']['BAR']],
             corners=(True, True),
             height=30,
             v_align="center",
@@ -542,7 +539,7 @@ class Notch(EventBox):
             self.inner.add_style_class("hovered")
             if self.show_picker:
                 self.notch_widget_picker.show()
-            if config.BAR_POSITION == "top":
+            if config['POSITIONS']['BAR'] == "top":
                 self.notification_history_indicator.add_style_class("hidden")
                 self.notification_history_indicator.add_style_class("hovered")
             if self.inner._contents.get_visible_child(
@@ -564,10 +561,10 @@ class Notch(EventBox):
             self.show_picker = True
             self.inner.remove_style_class("hovered")
             self.notch_widget_picker.hide()
-            if config.BAR_POSITION != "top":
+            if config['POSITIONS']['BAR'] != "top":
                 self.notification_history_indicator.remove_style_class("hovered")
             # Show notification bell if has pending notifications to read
-            if config.BAR_POSITION == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
+            if config['POSITIONS']['BAR'] == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
                 GLib.timeout_add(
                     500,
                     lambda *_: self.notification_history_indicator.
@@ -595,7 +592,8 @@ class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
 
     def __init__(self, notification_history: NotificationHistory):
-        margin = f"{"-54px" if config.BAR_POSITION == "top" else 0} 0 0 0"
+        margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['POSITIONS']['BAR'] == "top" else 0} 0 0 0"
+        print(margin)
         super().__init__(
             anchor="top center",
             layer="top",

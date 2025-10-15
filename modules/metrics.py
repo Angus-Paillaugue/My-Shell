@@ -14,7 +14,7 @@ class Metrics(Box):
 
     def __init__(self, **kwargs):
         orientation = (
-            "horizontal" if config.BAR_POSITION in ["top", "bottom"] else "vertical"
+            "horizontal" if config['POSITIONS']['BAR'] in ["top", "bottom"] else "vertical"
         )
         super().__init__(
             visible=True,

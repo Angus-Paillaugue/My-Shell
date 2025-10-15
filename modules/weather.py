@@ -59,6 +59,7 @@ class WeatherWorker(Service):
                 self.update_thread_active = False
                 return
             elements_list = [el for el in res.text.split(" ") if el != ""]
+            print(res.text)
             if (not all(isinstance(item, str) for item in elements_list) or
                     len(elements_list) != 2):
                 logger.error("Weather data format is incorrect.")
@@ -85,7 +86,7 @@ class WeatherButton(Button):
                 "bar-item",
                 (
                     "horizontal"
-                    if config.BAR_POSITION in ["top", "bottom"]
+                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
                     else "vertical"
                 ),
             ],
@@ -93,7 +94,7 @@ class WeatherButton(Button):
         )
         self.weather_worker = WeatherWorker()
         self.main_container = Box(
-            orientation="h" if config.BAR_POSITION in ["top", "bottom"] else "v",
+            orientation="h" if config['POSITIONS']['BAR'] in ["top", "bottom"] else "v",
             spacing=8,
         )
         self.loading_icon = Label(

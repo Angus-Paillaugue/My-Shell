@@ -8,7 +8,7 @@
 #workspaces > button {
   min-width: 8px;
   min-height: 8px;
-  border-radius: 16px;
+  border-radius: {{BORDER_RADIUS * 1.5}};
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   background-color: var(--foreground);
 }
@@ -46,11 +46,11 @@
 }
 
 #workspaces-num {
-  padding: 8px;
+  padding: {{PADDING}};
 }
 
 #workspaces-num > button {
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 2}};
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -59,7 +59,7 @@
   font-weight: bold;
   min-width: 20px;
   min-height: 20px;
-  font-size: 10pt;
+  font-size: {{FONT_SIZE}};
 }
 
 #workspaces-num > button:hover {
@@ -68,7 +68,7 @@
 
 #workspaces-num > button.active {
   background-color: var(--primary);
-  border-radius: 8px;
+  border-radius: {{BORDER_RADIUS * 0.8}};
 }
 
 #workspaces-num > button.active > label {

@@ -1,5 +1,8 @@
 #bluetooth-left-button {
-  border-radius: 12px 2px 2px 12px;
+  border-radius: {{BORDER_RADIUS}}
+    {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS}};
 }
 
 #bluetooth-left-button.disabled {
@@ -14,7 +17,7 @@
 #wifi-button-label,
 #wired-button-label,
 #pp-button-label {
-  font-size: 16px;
+  font-size: {{FONT_SIZE}};
   font-weight: bold;
   color: var(--surface);
 }
@@ -22,20 +25,23 @@
   color: var(--foreground);
 }
 #bluetooth-open-button {
-  border-radius: 2px 12px 12px 2px;
+  border-radius: {{BORDER_RADIUS * 0.2}}
+    {{BORDER_RADIUS}}
+    {{BORDER_RADIUS}}
+    {{BORDER_RADIUS * 0.2}};
   background-color: var(--surface);
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #bluetooth-open-button label {
-  font-size: 20px;
+  font-size: {{FONT_SIZE * 1.3}};
   color: var(--foreground);
   transition: all 0.25s ease;
 }
 
 #bluetooth-open-button:hover {
   background-color: var(--primary);
-  padding: 0 4px;
+  padding: 0 {{PADDING/2}};
 }
 
 #bluetooth-open-button:hover label {
@@ -43,26 +49,26 @@
 }
 
 #bluetooth-devices-title {
-  font-size: 16px;
+  font-size: {{FONT_SIZE}};
   color: var(--foreground);
 }
 
 #bluetooth-devices-container {
-  margin-top: 12px;
+  margin-top: {{PADDING * 1.5}};
   background-color: var(--surface);
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: {{BORDER_RADIUS * 0.8}};
+  padding: {{PADDING}};
 }
 
 #bluetooth-scan {
-  padding: 8px;
-  border-radius: 8px;
+  padding: {{PADDING}};
+  border-radius: {{BORDER_RADIUS * 0.8}};
   background-color: var(--surface-bright);
   transition: all 0.1s ease;
 }
 
 #bluetooth-scan:hover {
-  border-radius: 20px;
+  border-radius: {{BORDER_RADIUS * 2}};
   background-color: var(--primary);
 }
 
@@ -72,7 +78,7 @@
 
 #bluetooth-scan label {
   color: var(--foreground);
-  font-size: 18px;
+  font-size: {{FONT_SIZE * 1.1}};
   transition: all 0.1s ease;
 }
 

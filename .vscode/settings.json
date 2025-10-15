@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.mcss": "css"
+  },
+  "editor.formatOnSave": false,
+  "css.validate": false
+}

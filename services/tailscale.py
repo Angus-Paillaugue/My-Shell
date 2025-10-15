@@ -1,6 +1,7 @@
 import json
 import subprocess
 from typing import Literal
+
 from gi.repository import GLib
 
 status = Literal["down", "up"]

@@ -30,7 +30,7 @@ class ColorPickerButton(Button):
         self.hide_notch = hide_notch
         self.script_thread_active = False
         self.path = os.path.expanduser(
-            f"~/.config/{config.APP_NAME}/services/color-picker.sh")
+            f"~/.config/{config['APP_NAME']}/services/color-picker.sh")
 
     def _on_click(self, *_) -> None:
         if self.script_thread_active:
