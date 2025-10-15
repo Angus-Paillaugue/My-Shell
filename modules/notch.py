@@ -572,17 +572,6 @@ class Notch(EventBox):
                 )
         return False  # Allow event propagation
 
-    def start_drag(self):
-        """Called when a drag operation starts to prevent notch from hiding"""
-        self.drag_active = True
-
-    def end_drag(self):
-        """Called when a drag operation ends to restore normal notch behavior"""
-        # TODO: fix this sketchy race condition
-        def reset_drag_active():
-            self.drag_active = False
-        GLib.timeout_add(500, lambda: reset_drag_active())
-
     def show_widget(self, widget_name: str, show_picker: bool = True) -> bool:
         """Show a specific widget in the notch inner and update the widget picker state."""
         self.show_picker = show_picker
@@ -593,7 +582,6 @@ class NotchWindow(WaylandWindow):
 
     def __init__(self, notification_history: NotificationHistory):
         margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['POSITIONS']['BAR'] == "top" else 0} 0 0 0"
-        print(margin)
         super().__init__(
             anchor="top center",
             layer="top",

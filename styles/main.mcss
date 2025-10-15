@@ -2,7 +2,7 @@
   all: unset;
   color: var(--foreground);
   font-size: unset;
-  font-family: {{MONOSPACE_FONT_FAMILY}};
+  font-family: "JetBrainsMono Nerd Font", monospace;
   border-radius: {{BORDER_RADIUS}};
   font-size: {{FONT_SIZE}};
 }

@@ -206,9 +206,7 @@ def generate_hyprlock_config() -> None:
 
     with open(template_location, "r") as f:
         contents = f.read()
-        contents = contents.replace("{{APP_NAME}}", config['APP_NAME']).replace(
-            "{{MONOSPACE_FONT_FAMILY}}",
-            config['STYLES']['MONOSPACE_FONT_FAMILY'])
+        contents = contents.replace("{{APP_NAME}}", config['APP_NAME'])
     with open(location, "w") as f:
         f.write(contents)
     print(f"Hyprlock configuration updated")
@@ -259,8 +257,25 @@ def ensure_app_config() -> None:
         print(f"Default configuration copied to {config_path}")
 
 
+def install_fonts() -> None:
+    """
+    Install the required fonts if they are not already installed.
+    """
+    fonts_dir = os.path.join(app_location, "assets/fonts")
+    user_fonts_dir = os.path.expanduser("~/.local/share/fonts")
+    if not os.path.exists(user_fonts_dir):
+        os.makedirs(user_fonts_dir)
+    for font_file in os.listdir(fonts_dir):
+        src_path = os.path.join(fonts_dir, font_file)
+        dest_path = os.path.join(user_fonts_dir, font_file)
+        if not os.path.exists(dest_path):
+            shutil.copy(src_path, dest_path)
+            print(f"Installed font: {font_file}")
+
+
 if __name__ == "__main__":
     ensure_app_config()
+    install_fonts()
     ensure_matugen_config()
     generate_hypr_entrypoint()
     generate_hyprlock_config()

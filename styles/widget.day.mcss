@@ -1,0 +1,12 @@
+#desktop-widget-day-week-day {
+  font-family: "Anurati";
+  letter-spacing: {{FONT_SIZE * 1.2}};
+  font-size: {{FONT_SIZE * 7}};
+}
+#desktop-widget-day-day {
+  font-size: {{FONT_SIZE}};
+  font-weight: 700;
+}
+.desktop-widget-day {
+  padding: {{PADDING}};
+}

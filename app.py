@@ -13,6 +13,7 @@ from modules.corners import Corners
 from fabric.notifications.service import Notifications
 from modules.notification import NotificationHistory
 from modules.notch import NotchWindow
+from modules.desktop_widget.registry import DesktopWidgetRegistry
 from modules.osd import OSD
 
 if __name__ == "__main__":
@@ -28,6 +29,7 @@ if __name__ == "__main__":
     corners = Corners()
     notch = NotchWindow(notification_history=notification_history)
     osd = OSD()
+    widget_registry = DesktopWidgetRegistry()
     app = Application(
         config['APP_NAME'],
         bar,
@@ -35,6 +37,7 @@ if __name__ == "__main__":
         notification,
         corners,
         osd,
+        *widget_registry.all_widgets(),
     )
     input_styles_dir = get_relative_path("styles")
     styles_interpretor = StylesInterpreter(input_styles_dir, config['STYLES'])

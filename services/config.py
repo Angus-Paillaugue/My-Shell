@@ -11,7 +11,6 @@ default_config = {
         "NOTIFICATION": "top-right",
     },
     "STYLES": {
-        "MONOSPACE_FONT_FAMILY": "monospace",
         "BORDER_RADIUS": 12,
         "FONT_SIZE": 16,
         "BAR_SIZE": 40,
