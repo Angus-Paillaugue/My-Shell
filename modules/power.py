@@ -16,11 +16,8 @@ class PowerButton(Button):
             name="power-button",
             style_classes=[
                 "bar-item",
-                (
-                    "horizontal"
-                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
-                    else "vertical"
-                ),
+                ("horizontal" if config['POSITIONS']['BAR']
+                 in ["top", "bottom"] else "vertical"),
             ],
             child=Label(markup=icons.shutdown),
             on_clicked=lambda *args: self.on_clicked(*args),

@@ -18,11 +18,8 @@ class SystemTray(Box):
             orientation=Gtk.Orientation.HORIZONTAL,
             style_classes=[
                 "bar-item",
-                (
-                    "horizontal"
-                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
-                    else "vertical"
-                ),
+                ("horizontal" if config['POSITIONS']['BAR']
+                 in ["top", "bottom"] else "vertical"),
             ],
             spacing=8,
             **kwargs,

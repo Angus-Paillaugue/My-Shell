@@ -13,9 +13,8 @@ class Metrics(Box):
     """Widget that displays system metrics such as CPU, RAM, and temperature."""
 
     def __init__(self, **kwargs):
-        orientation = (
-            "horizontal" if config['POSITIONS']['BAR'] in ["top", "bottom"] else "vertical"
-        )
+        orientation = ("horizontal" if config['POSITIONS']['BAR']
+                       in ["top", "bottom"] else "vertical")
         super().__init__(
             visible=True,
             style_classes=[
@@ -61,10 +60,7 @@ class Metrics(Box):
             start_angle=150,
             end_angle=390,
             style_classes=['metrics-progress-bar'],
-            child=Label(
-                name="ram-label",
-                markup=icons.memory
-            ),
+            child=Label(name="ram-label", markup=icons.memory),
         )
         self.temp = CircularProgressBar(
             value=0,
@@ -89,7 +85,8 @@ class Metrics(Box):
         self.metrics_fabricator.connect("changed", self.update_metrics)
         GLib.idle_add(self.update_metrics, None, shared_provider.get_metrics())
 
-    def update_metrics(self, sender, metrics: tuple[float, float, float]) -> None:
+    def update_metrics(self, sender, metrics: tuple[float, float,
+                                                    float]) -> None:
         cpu, ram, temp = metrics
 
         self.cpu.set_value(cpu / 100)

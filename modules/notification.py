@@ -262,9 +262,9 @@ class NotificationBox(Box):
             icon_name="dialog-information-symbolic" or notification.app_icon,
             icon_size=24,
         ))
-        self.app_name_label_header = Label(
-            notification.app_name, name="notification-app-name", h_align="start"
-        )
+        self.app_name_label_header = Label(notification.app_name,
+                                           name="notification-app-name",
+                                           h_align="start")
         self.header_close_button = self.create_close_button()
 
         return CenterBox(
@@ -422,6 +422,7 @@ class NotificationBox(Box):
 
 
 class HistoricalNotification(object):
+
     def __init__(self,
                  id,
                  app_icon,
@@ -447,7 +448,7 @@ class NotificationHistory(Box):
 
     def __init__(self,
                  notification_server: Notifications,
-                 on_event:Callable | None = None,
+                 on_event: Callable | None = None,
                  **kwargs):
         super().__init__(name="notification-history",
                          orientation="v",
@@ -478,7 +479,7 @@ class NotificationHistory(Box):
             child=Label(name="nhh-button-label", markup=icons.trash),
             on_clicked=self.clear_history,
         )
-        self.on_event = on_event # type: ignore
+        self.on_event = on_event  # type: ignore
         self.do_not_disturb_enabled = False
 
         self.history_header = CenterBox(
@@ -524,7 +525,7 @@ class NotificationHistory(Box):
 
     def emit(self, signal_name: str, *args: object) -> None:
         """ Emit a signal to the event handler."""
-        self.on_event(signal_name, *args) # type: ignore
+        self.on_event(signal_name, *args)  # type: ignore
 
     def get_ordinal(self, n: int) -> str:
         """Return the ordinal suffix for a given integer."""
@@ -668,7 +669,8 @@ class NotificationHistory(Box):
             except Exception as e:
                 logger.error(f"Error loading persistent history: {e}")
 
-    def delete_historical_notification(self, note_id: int, container: Box) -> None:
+    def delete_historical_notification(self, note_id: int,
+                                       container: Box) -> None:
         """Delete a historical notification and remove it from persistent storage."""
         # Convert note_id to string for consistent comparison
         target_note_id_str = str(note_id)
@@ -746,7 +748,7 @@ class NotificationHistory(Box):
             cached_image_path=note.get("cached_image_path"),
         )
 
-        hist_box = NotificationBox(hist_notif, timeout_ms=0) # type: ignore
+        hist_box = NotificationBox(hist_notif, timeout_ms=0)  # type: ignore
         hist_box.uuid = hist_notif.id
         hist_box.cached_image_path = hist_notif.cached_image_path
         hist_box.set_is_history(True)
@@ -930,7 +932,7 @@ class NotificationHistory(Box):
             h_align="start",
             ellipsization="end",
         )
-        self.current_notif_app_name_label    = Label(
+        self.current_notif_app_name_label = Label(
             name="notification-app-name",
             markup=f"{notification_box.notification.app_name}",
             h_align="start",
@@ -957,7 +959,7 @@ class NotificationHistory(Box):
                     h_align="center",
                     v_align="center",
                 ),
-                self.current_notif_app_name_label   ,
+                self.current_notif_app_name_label,
                 Box(
                     name="notif-sep",
                     h_expand=False,
@@ -1130,7 +1132,7 @@ class NotificationHistoryIndicator(Button):
 
         # Create notification history component
         self.notification_history = notification_history
-        self.notification_history.on_event = self.on_notification_history_event # type: ignore
+        self.notification_history.on_event = self.on_notification_history_event  # type: ignore
         self.dnd = self.notification_history.do_not_disturb_enabled
 
         # Bell icon
@@ -1299,7 +1301,8 @@ class NotificationContainer(Box):
         self.main_revealer.show_all()
         self.main_revealer.set_reveal_child(True)
 
-    def _animate_notification_removal(self, notification_box: NotificationBox) -> None:
+    def _animate_notification_removal(
+            self, notification_box: NotificationBox) -> None:
         """Animate the removal of a notification box."""
         # Add exit animation class
         notification_box.remove_style_class("notification-visible")
@@ -1309,7 +1312,8 @@ class NotificationContainer(Box):
         GLib.timeout_add(
             250, lambda: self._complete_notification_removal(notification_box))
 
-    def _complete_notification_removal(self, notification_box: NotificationBox) -> bool:
+    def _complete_notification_removal(
+            self, notification_box: NotificationBox) -> bool:
         """Complete the removal of a notification box."""
         if notification_box.get_parent() == self.notifications_box:
             self.notifications_box.remove(notification_box)
@@ -1334,7 +1338,8 @@ class NotificationContainer(Box):
             return True
         return False
 
-    def on_notification_closed(self, notification: Notification, reason: str) -> None:
+    def on_notification_closed(self, notification: Notification,
+                               reason: str) -> None:
         """Handle notification close event."""
         if self._is_destroying:
             return

@@ -63,7 +63,7 @@ class WallpaperManager(Box, NotchWidgetInterface):
             notify_text=self.notify_text,
             name="search-entry",
         )
-        self.entry.props.xalign = 0.5 # type: ignore
+        self.entry.props.xalign = 0.5  # type: ignore
         self.add(self.entry)
         self.add(self.scrollable_area)
 
@@ -72,6 +72,7 @@ class WallpaperManager(Box, NotchWidgetInterface):
         self.connect("key-press-event", self.on_key_press)
 
     def on_show(self) -> None:
+
         def focus_search_entry():
             self.entry.grab_focus()
             self.entry.select_region(0, -1)
@@ -103,7 +104,7 @@ class WallpaperManager(Box, NotchWidgetInterface):
         self.file_monitor.connect("changed",
                                   lambda *_: self._refresh_wallpapers())
 
-    def _refresh_wallpapers(self, search: str="") -> None:
+    def _refresh_wallpapers(self, search: str = "") -> None:
         """
         Refresh the list of wallpapers and update the buttons.
         """
@@ -298,7 +299,6 @@ class WallpaperManager(Box, NotchWidgetInterface):
 
             os.symlink(path, current_wall)
 
-            exec_shell_command_async(
-                f'matugen image "{current_wall}"')
+            exec_shell_command_async(f'matugen image "{current_wall}"')
         except Exception as e:
             logger.error(f"Failed to set wallpaper: {e}")

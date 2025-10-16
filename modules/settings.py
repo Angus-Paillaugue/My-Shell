@@ -13,7 +13,7 @@ def singleton(class_: object) -> object:
 
     def getinstance(*args, **kwargs):
         if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs) # type: ignore
+            instances[class_] = class_(*args, **kwargs)  # type: ignore
         return instances[class_]
 
     return getinstance
@@ -29,7 +29,8 @@ class SettingsBroker():
             self._listeners = []
         self._listeners.append(listener)
 
-    def notify_listeners(self, event: str, *args: object, **kwargs: object) -> None:
+    def notify_listeners(self, event: str, *args: object,
+                         **kwargs: object) -> None:
         """Notify all registered listeners of an event."""
         for listener in getattr(self, '_listeners', []):
             listener(event, *args, **kwargs)

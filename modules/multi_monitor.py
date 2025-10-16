@@ -1,9 +1,13 @@
+import gi
+
+gi.require_version("Gtk", "3.0")
 import json
 import subprocess
-from typing import List, TypedDict
+from typing import Callable, List, TypedDict
 
 from fabric.hyprland.widgets import get_hyprland_connection
 from fabric.notifications.service import Notifications
+from gi.repository import Gtk  # type: ignore
 
 from modules.bar import Bar
 from modules.corners import Corners
@@ -138,6 +142,32 @@ class MultiMonitorManager:
     """Return the primary monitor information."""
     return next((m for m in self._monitors if m['primary']), None)
 
-  def get_components(self):
+  # ...existing code...
+
+  def exec_command(self, component_name: str, func_name: str, *args, **kwargs):
+    """
+    Execute a method on a specific component by name.
+
+    Args:
+        component_name (str): The name of the component to target.
+        func_name (str): The name of the method to call on the component.
+        *args: Positional arguments to pass to the method.
+        **kwargs: Keyword arguments to pass to the method.
+    """
+    for comp in self.get_components():
+      if hasattr(comp, "get_name") and component_name == comp.get_name():
+        if hasattr(comp, func_name):
+          func = getattr(comp, func_name)
+          if callable(func):
+            func(*args, **kwargs)
+          else:
+            raise ValueError(f"{func_name} is not callable on {component_name}")
+        else:
+          raise AttributeError(f"{component_name} does not have a method named {func_name}")
+        break
+    else:
+      raise ValueError(f"No component found with name {component_name}")
+
+  def get_components(self) -> Gtk.Window:
     """Return the list of bar and corner components."""
-    return [*self._multi_monitor_components, *self._single_monitor_components]
+    return [*self._single_monitor_components, *self._multi_monitor_components]

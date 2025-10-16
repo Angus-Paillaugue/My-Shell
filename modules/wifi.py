@@ -178,7 +178,8 @@ class WifiNetworksDropdown(Revealer):
 
     def toggle_visibility(self) -> None:
         """Toggle the visibility of the Wifi networks dropdown."""
-        if not self.network_client._client.wireless_get_enabled(): # type: ignore
+        if not self.network_client._client.wireless_get_enabled(
+        ):  # type: ignore
             return
         self.shown = not self.shown
         self.set_reveal_child(self.shown)
@@ -317,9 +318,10 @@ class WifiNetworksDropdown(Revealer):
         if not access_points:
             self.status_label.set_label("No Wi-Fi networks found.")
         else:
-            sorted_aps = sorted(access_points, # type: ignore
-                                key=lambda x: x.get("strength", 0), # type: ignore
-                                reverse=True) # type: ignore
+            sorted_aps = sorted(
+                access_points,  # type: ignore
+                key=lambda x: x.get("strength", 0),  # type: ignore
+                reverse=True)  # type: ignore
             self.status_label.set_label(
                 f"{len(sorted_aps)} Wi-Fi networks found:")
             for ap_data in sorted_aps:

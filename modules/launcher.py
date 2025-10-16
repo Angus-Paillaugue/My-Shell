@@ -46,7 +46,6 @@ class AppLauncher(Box, NotchWidgetInterface):
         else:
             self.calc_history = []
 
-
         self.viewport = Box(name="viewport", spacing=4, orientation="v")
         self.search_entry = Entry(
             name="search-entry",
@@ -58,7 +57,7 @@ class AppLauncher(Box, NotchWidgetInterface):
                 entry.get_text()),
             on_key_press_event=self.on_search_entry_key_press,
         )
-        self.search_entry.props.xalign = 0.5 # type: ignore
+        self.search_entry.props.xalign = 0.5  # type: ignore
         self.scrolled_window = ScrolledWindow(
             name="notch-scrolled-window",
             spacing=10,
@@ -255,13 +254,13 @@ class AppLauncher(Box, NotchWidgetInterface):
 
                     if text.strip() == "" and self.selected_index == -1:
                         return
-                    selected_index = (
-                        self.selected_index if self.selected_index != -1 else 0
-                    )
+                    selected_index = (self.selected_index
+                                      if self.selected_index != -1 else 0)
                     if 0 <= selected_index < len(children):
                         children[selected_index].get_children()[0].clicked()
 
-    def on_search_entry_key_press(self, widget: Entry, event: Gdk.EventKey) -> bool:
+    def on_search_entry_key_press(self, widget: Entry,
+                                  event: Gdk.EventKey) -> bool:
         """Handle key press events in the search entry"""
         text = widget.get_text()
 

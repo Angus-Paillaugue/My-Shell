@@ -83,17 +83,15 @@ class WeatherButton(Button):
             name="weather-button",
             style_classes=[
                 "bar-item",
-                (
-                    "horizontal"
-                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
-                    else "vertical"
-                ),
+                ("horizontal" if config['POSITIONS']['BAR']
+                 in ["top", "bottom"] else "vertical"),
             ],
             **kwargs,
         )
         self.weather_worker = WeatherWorker()
         self.main_container = Box(
-            orientation="h" if config['POSITIONS']['BAR'] in ["top", "bottom"] else "v",
+            orientation="h"
+            if config['POSITIONS']['BAR'] in ["top", "bottom"] else "v",
             spacing=8,
         )
         self.loading_icon = Label(

@@ -584,6 +584,7 @@ class NotchWindow(WaylandWindow):
         margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['POSITIONS']['BAR'] == "top" else 0} 0 0 0"
         super().__init__(
             anchor="top center",
+            name="notch",
             layer="top",
             margin=margin,
             keyboard_mode="on_demand",

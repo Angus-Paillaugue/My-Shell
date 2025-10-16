@@ -14,11 +14,11 @@ class Tailscale(Button):
     def __init__(self, **kwargs):
         super().__init__(
             name="tailscale",
-            style_classes=["bar-item", (
-                    "horizontal"
-                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
-                    else "vertical"
-                )],
+            style_classes=[
+                "bar-item",
+                ("horizontal" if config['POSITIONS']['BAR']
+                 in ["top", "bottom"] else "vertical")
+            ],
             h_align="center",
             v_align="center",
             spacing=4,

@@ -170,7 +170,7 @@ class Time(Button):
     """A button that displays the current time and date, updating at a set interval."""
 
     @Property(int, "read-write")
-    def interval(self): # type: ignore
+    def interval(self):  # type: ignore
         return self._interval
 
     @interval.setter
@@ -190,11 +190,8 @@ class Time(Button):
         super().__init__(
             style_classes=[
                 "bar-item",
-                (
-                    "horizontal"
-                    if config['POSITIONS']['BAR'] in ["top", "bottom"]
-                    else "vertical"
-                ),
+                ("horizontal" if config['POSITIONS']['BAR']
+                 in ["top", "bottom"] else "vertical"),
             ],
             v_expand=True,
             h_expand=True,
@@ -224,8 +221,7 @@ class Time(Button):
                 v_align="center",
                 h_align="center",
                 children=[self.date_label, self.time_label],
-            )
-        )
+            ))
 
         self.add_events(Gdk.EventMask.SCROLL_MASK)
         self._interval: int = interval

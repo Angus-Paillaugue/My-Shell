@@ -51,7 +51,7 @@ battery_eco: str = "&#xef3c;"
 battery_charging: str = "&#xea33;"
 # Metrics
 cpu: str = "&#xef8e;"
-memory: str = "&#xf384;" # TODO: find a better icon
+memory: str = "&#xf384;"  # TODO: find a better icon
 temperature: str = "&#xeb38;"
 disk: str = "&#xea88;"
 # Launcher
