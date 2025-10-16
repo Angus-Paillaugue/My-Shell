@@ -8,7 +8,7 @@ class Workspaces(BaseWorkspaces):
     """Widget that displays workspace buttons in the bar."""
 
     def __init__(self):
-        orientation = ("horizontal" if config['POSITIONS']['BAR']
+        orientation = ("horizontal" if config['BAR']['POSITION']
                        in ["top", "bottom"] else "vertical")
         super().__init__(
             name="workspaces",

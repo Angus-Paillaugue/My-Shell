@@ -11,7 +11,6 @@ class DayWidget(DesktopWidget):
         )
         week_day = strftime("%A").upper()
         day = strftime("%d %B %Y")
-        print(week_day, day)
         week_day_label = Label(label=week_day, name="desktop-widget-day-week-day")
         day_label = Label(label=day, name="desktop-widget-day-day")
         self.add(

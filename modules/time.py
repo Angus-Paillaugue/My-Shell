@@ -190,8 +190,8 @@ class Time(Button):
         super().__init__(
             style_classes=[
                 "bar-item",
-                ("horizontal" if config['POSITIONS']['BAR']
-                 in ["top", "bottom"] else "vertical"),
+                ("horizontal" if config['BAR']['POSITION'] in ["top", "bottom"]
+                 else "vertical"),
             ],
             v_expand=True,
             h_expand=True,
@@ -210,7 +210,7 @@ class Time(Button):
             label="",
             h_align="center",
             v_align="center",
-            visible=config['POSITIONS']['BAR'] in ["top", "bottom"],
+            visible=config['BAR']['POSITION'] in ["top", "bottom"],
         )
         self.add(
             Box(
@@ -230,7 +230,7 @@ class Time(Button):
 
     def set_button_label(self) -> None:
         """Set the button label to the current time and date."""
-        if config['POSITIONS']['BAR'] in ["left", "right"]:
+        if config['BAR']['POSITION'] in ["left", "right"]:
             current_time = time.strftime("%H\n%M", time.localtime())
         else:
             current_time = time.strftime("%H:%M:%S", time.localtime())

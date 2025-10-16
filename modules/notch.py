@@ -30,6 +30,8 @@ from modules.power import PowerMenuActions
 from modules.power_profile import PowerProfile
 from modules.screen_record import ScreenRecordButton
 from modules.screenshot import ScreenshotButton
+from modules.sunset import Sunset
+from modules.tailscale import Tailscale
 from modules.time import CalendarBox as Calendar
 from modules.volume import MicRow, VolumeRow
 from modules.wallpaper import WallpaperManager
@@ -152,6 +154,8 @@ class NotchWidgetDefaultExpanded(Box):
         self.screenshot_button = ScreenshotButton()
         self.screen_record_button = ScreenRecordButton()
         self.color_picker_button = ColorPickerButton(hide_notch=lambda: show_widget("default"))
+        self.tailscale = Tailscale()
+        self.sunset = Sunset()
 
         self.buttons_grid = Gtk.Grid(
             column_homogeneous=True,
@@ -161,11 +165,37 @@ class NotchWidgetDefaultExpanded(Box):
             row_spacing=12,
             visible=True,
         )
+        # Map available module names to their widget instances
+        available_modules = {
+            'WIFI': self.wifi_module,
+            'WIRED': self.network_module,
+            'BLUETOOTH': self.bluetooth,
+            'TAILSCALE': self.tailscale,
+            'POWER_PROFILE': self.power_profile,
+            'SUNSET': self.sunset,
+        }
 
-        self.buttons_grid.attach(self.wifi_module, 0, 0, 1, 1)
-        self.buttons_grid.attach(self.network_module, 1, 0, 1, 1)
-        self.buttons_grid.attach(self.bluetooth, 2, 0, 1, 1)
-        self.buttons_grid.attach(self.power_profile, 3, 0, 1, 1)
+        try:
+            config_order = list(config['NOTCH']['MODULES'].keys())
+        except Exception:
+            config_order = list(available_modules.keys())
+
+        modules = []
+        for name in config_order:
+            if name not in available_modules:
+                continue
+            try:
+                visible = config['NOTCH']['MODULES'][name]['VISIBLE']
+            except Exception:
+                visible = False
+            if visible:
+                modules.append((name, available_modules[name]))
+
+        for i, (name, module) in enumerate(modules):
+            col = i % 3
+            line = i // 3
+            self.buttons_grid.attach(module, col, line, 1, 1)
+
         self.sliders_grid = Gtk.Grid(
             column_homogeneous=True,
             row_homogeneous=False,
@@ -475,7 +505,7 @@ class NotchInner(CornerContainer):
             [0])  # Show the default widget initially
         super().__init__(
             name="bar-center-container",
-            style_classes=[config['POSITIONS']['BAR']],
+            style_classes=[config['BAR']['POSITION']],
             corners=(True, True),
             height=30,
             v_align="center",
@@ -502,7 +532,7 @@ class NotchInner(CornerContainer):
         return index == 0
 
 
-class Notch(EventBox):
+class  Notch(EventBox):
     """Main notch widget that contains the notch inner and the widget picker"""
 
     def __init__(self, notification_history: NotificationHistory, show_widget):
@@ -539,7 +569,7 @@ class Notch(EventBox):
             self.inner.add_style_class("hovered")
             if self.show_picker:
                 self.notch_widget_picker.show()
-            if config['POSITIONS']['BAR'] == "top":
+            if config['BAR']['POSITION'] == "top":
                 self.notification_history_indicator.add_style_class("hidden")
                 self.notification_history_indicator.add_style_class("hovered")
             if self.inner._contents.get_visible_child(
@@ -561,10 +591,10 @@ class Notch(EventBox):
             self.show_picker = True
             self.inner.remove_style_class("hovered")
             self.notch_widget_picker.hide()
-            if config['POSITIONS']['BAR'] != "top":
+            if config['BAR']['POSITION'] != "top":
                 self.notification_history_indicator.remove_style_class("hovered")
             # Show notification bell if has pending notifications to read
-            if config['POSITIONS']['BAR'] == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
+            if config['BAR']['POSITION'] == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
                 GLib.timeout_add(
                     500,
                     lambda *_: self.notification_history_indicator.
@@ -581,7 +611,7 @@ class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
 
     def __init__(self, notification_history: NotificationHistory, **kwargs):
-        margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['POSITIONS']['BAR'] == "top" else 0} 0 0 0"
+        margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['BAR']['POSITION'] == "top" else 0} 0 0 0"
         super().__init__(
             anchor="top center",
             name="notch",
