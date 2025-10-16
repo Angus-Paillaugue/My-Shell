@@ -28,7 +28,6 @@ class Bar(WaylandWindow):
         orientation = ("horizontal" if config['POSITIONS']['BAR']
                        in ["top", "bottom"] else "vertical")
         super().__init__(
-            name="bar",
             layer="top",
             anchor=anchors[config['POSITIONS']['BAR']],
             exclusivity="auto",

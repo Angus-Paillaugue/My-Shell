@@ -16,7 +16,8 @@ default_config = {
         "BAR_SIZE": 40,
         "PADDING": 8,
         "NOTCH_HEIGHT": 47,
-    }
+    },
+    "MULTI_MONITOR": True,
 }
 
 class Config:

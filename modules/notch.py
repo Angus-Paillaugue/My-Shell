@@ -580,13 +580,14 @@ class Notch(EventBox):
 class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
 
-    def __init__(self, notification_history: NotificationHistory):
+    def __init__(self, notification_history: NotificationHistory, **kwargs):
         margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['POSITIONS']['BAR'] == "top" else 0} 0 0 0"
         super().__init__(
             anchor="top center",
             layer="top",
             margin=margin,
             keyboard_mode="on_demand",
+            **kwargs,
         )
         self.notch = Notch(notification_history=notification_history, show_widget=self.show_widget)
         self.add(self.notch)

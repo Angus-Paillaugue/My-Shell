@@ -12,7 +12,7 @@ from services.logger import logger
 class OSD(WaylandWindow):
     """On-Screen Display (OSD) for volume, brightness, and microphone changes."""
 
-    def __init__(self):
+    def __init__(self, **kwargs) -> None:
         super().__init__(
             layer="top",
             anchor="bottom center",
@@ -21,6 +21,7 @@ class OSD(WaylandWindow):
             exclusivity="none",
             keyboard_mode="none",
             visible=True,
+            **kwargs,
         )
         self._broker = SettingsBroker() # type: ignore
         self._broker.register_listener(self.on_event)
