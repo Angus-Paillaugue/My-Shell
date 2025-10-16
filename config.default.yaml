@@ -9,3 +9,5 @@ POSITIONS:
 
 WIDGETS:
   DAY: false
+
+MULTI_MONITOR: true

@@ -137,7 +137,7 @@ class CornerContainer(Box):
 class Corners(Window):
     """Window that contains all four corners of the screen."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         offset = '-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING'])
         margin = f"{offset if config['POSITIONS']['BAR'] == "top" else "0"} {offset if config['POSITIONS']['BAR'] == "right" else "0"} {offset if config['POSITIONS']['BAR'] == "bottom" else "0"} {offset if config['POSITIONS']['BAR'] == "left" else "0"}"
         super().__init__(
@@ -149,6 +149,7 @@ class Corners(Window):
             pass_through=True,
             visible=False,
             all_visible=False,
+            **kwargs,
         )
 
         self.all_corners = Box(

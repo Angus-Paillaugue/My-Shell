@@ -3,7 +3,7 @@ import os
 from services.config import config
 
 class DesktopWidgetRegistry():
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.widgets = {}
         widgets_location = os.path.join(os.path.dirname(__file__), "widgets")
         for file in os.listdir(widgets_location):
@@ -13,7 +13,7 @@ class DesktopWidgetRegistry():
                 widget_class = getattr(module, ''.join([part.capitalize()+"Widget" for part in module_name.split('_')]))
                 if module_name.upper() in config['WIDGETS'] and not config['WIDGETS'][module_name.upper()]:
                     continue
-                instance = widget_class()
+                instance = widget_class(**kwargs)
                 self.widgets[module_name] = instance
 
     def all_widgets(self):
