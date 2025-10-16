@@ -13,7 +13,7 @@ class Metrics(Box):
     """Widget that displays system metrics such as CPU, RAM, and temperature."""
 
     def __init__(self, **kwargs):
-        orientation = ("horizontal" if config['POSITIONS']['BAR']
+        orientation = ("horizontal" if config['BAR']['POSITION']
                        in ["top", "bottom"] else "vertical")
         super().__init__(
             visible=True,

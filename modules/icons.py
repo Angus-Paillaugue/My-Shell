@@ -30,6 +30,9 @@ reload: str = "&#xf3ae;"
 bluetooth_off: str = "&#xf081;"
 bluetooth: str = "&#xea37;"
 radar: str = "&#xf017;"
+# Night mode
+night: str = "&#xeaf8;"
+night_off: str = "&#xf162;"
 # Brightness
 brightness_low: str = "&#xeb7e;"
 brightness_high: str = "&#xfb24;"

@@ -1,54 +1,71 @@
-from fabric import Fabricator
+from fabric.core.fabricator import Fabricator
+from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.label import Label
-from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
-from services.config import config
 from services.tailscale import TailscaleProvider
 
 
 class Tailscale(Button):
-    """Widget that is used to manage tailscale VPN status."""
+    """Widget to manage tailscale status"""
 
     def __init__(self, **kwargs):
         super().__init__(
-            name="tailscale",
-            style_classes=[
-                "bar-item",
-                ("horizontal" if config['POSITIONS']['BAR']
-                 in ["top", "bottom"] else "vertical")
-            ],
-            h_align="center",
-            v_align="center",
-            spacing=4,
-            v_expand=True,
-            h_expand=True,
-            on_clicked=lambda *_: self.on_click(),
-            **kwargs,
+            name="tailscale-button",
+            on_clicked=lambda b: self.on_click(),
         )
         self.status = "down"
-        self.lang_icon = Label(markup=icons.tailscale, name="tailscale-icon")
-        self.add(self.lang_icon)
+        self.tailscale_icon = Label(name="tailscale-icon",
+                                  markup=icons.tailscale)
+        self.tailscale_name = Label(
+            name="tailscale-status",
+            label=self.status,
+            h_align="start",
+        )
+
+        self.add(Box(
+                spacing=12,
+                children=[
+                    self.tailscale_icon,
+                    Box(
+                        orientation="v",
+                        h_align="start",
+                        v_align="center",
+                        children=[
+                            Label(
+                                label="Tailscale",
+                                name="tailscale-button-label",
+                                h_align="start",
+                            ),
+                            self.tailscale_name,
+                        ],
+                    ),
+                ],
+                orientation="h",
+            ))
         self.provider = TailscaleProvider()
-        self.metrics_fabricator = Fabricator(
+        self.tailscale_fabricator = Fabricator(
             poll_from=lambda v: self.provider.get_status(),
-            on_changed=lambda f, v: self.set_status,
+            on_changed=lambda f, v: self._update_ui,
             interval=1000,
             stream=False,
             default_value=0,
         )
-        self.metrics_fabricator.connect("changed", self.set_status)
-        GLib.idle_add(self.set_status, None, self.provider.get_status())
+        self.tailscale_fabricator.connect("changed", self._update_ui)
+        self._update_ui(self, self.status)
 
-    def set_status(self, sender, status: str):
-        """Set the icon color based on the VPN status."""
+    def _update_ui(self, sender, status: str) -> None:
+        """Update the UI to reflect the current power profile."""
         self.status = status
         if self.status == "down":
-            self.lang_icon.add_style_class("down")
+            self.add_style_class("down")
+            self.remove_style_class("up")
+            self.tailscale_name.set_label("Disabled")
         else:
-            self.lang_icon.remove_style_class("down")
+            self.remove_style_class("down")
+            self.add_style_class("up")
+            self.tailscale_name.set_label("Enabled")
 
     def on_click(self):
         self.status = self.provider.toggle()
-        self.set_status(None, self.status)

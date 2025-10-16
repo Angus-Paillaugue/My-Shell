@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from services.config import config
 import os
 from fabric.utils.helpers import exec_shell_command_async
@@ -5,6 +7,17 @@ import toml
 import shutil
 
 app_location = os.path.expanduser(f"~/.config/{config['APP_NAME']}")
+
+
+class MissingRequiredCommandException(Exception):
+    pass
+
+
+commands_needed = [
+    "hyprsunset", "fabric-cli", "matugen", "brightnessctl", "notify-send",
+    "tuned-adm", "hyprctl", "systemctl", "hyprshot", "pkill", "pgrep", "pactl",
+    "nmcli", "cliphist", "wl-copy", "tailscale", "whoami", "hostname"
+]
 
 
 def deep_update(target: dict, update: dict) -> dict:
@@ -19,6 +32,16 @@ def deep_update(target: dict, update: dict) -> dict:
         else:
             target[key] = value
     return target
+
+
+def ensure_system_commands() -> None:
+    for command in commands_needed:
+        try:
+            subprocess.check_output(["command", "-v", command, ">/dev/null"])
+        except Exception:
+            raise MissingRequiredCommandException(
+                f"In order to operate, {config['APP_NAME']} needs to access the {command} command. Please install it and try again"
+            )
 
 
 def ensure_matugen_config() -> None:
@@ -274,10 +297,15 @@ def install_fonts() -> None:
 
 
 if __name__ == "__main__":
-    ensure_app_config()
-    install_fonts()
-    ensure_matugen_config()
-    generate_hypr_entrypoint()
-    generate_hyprlock_config()
-    update_kitty_config()
-    wallpapers()
+    try:
+        ensure_system_commands()
+        ensure_app_config()
+        install_fonts()
+        ensure_matugen_config()
+        generate_hypr_entrypoint()
+        generate_hyprlock_config()
+        update_kitty_config()
+        wallpapers()
+    except Exception as e:
+        print(e.__class__.__name__, ": ", e)
+        sys.exit(1)

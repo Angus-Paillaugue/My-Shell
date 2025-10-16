@@ -16,8 +16,8 @@ class PowerButton(Button):
             name="power-button",
             style_classes=[
                 "bar-item",
-                ("horizontal" if config['POSITIONS']['BAR']
-                 in ["top", "bottom"] else "vertical"),
+                ("horizontal" if config['BAR']['POSITION'] in ["top", "bottom"]
+                 else "vertical"),
             ],
             child=Label(markup=icons.shutdown),
             on_clicked=lambda *args: self.on_clicked(*args),
@@ -27,7 +27,7 @@ class PowerButton(Button):
     def on_clicked(self, *args: object) -> None:
         """Handle the button click to show or hide the power menu."""
         exec_shell_command_async(
-            f"fabric-cli exec {config['APP_NAME']} 'notch.show_widget(\"power\", False)'"
+            f"fabric-cli exec {config['APP_NAME']} 'monitor_manager.exec_command(\"notch\", \"show_widget\", \"power\", False)'"
         )
 
 

@@ -6,6 +6,7 @@ from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
 from modules.settings import SettingsBroker
+from services.config import config
 from services.logger import logger
 
 
@@ -79,4 +80,4 @@ class OSD(WaylandWindow):
         if ok:
             self._set_visible(True)
             self._hide_timeout = GLib.timeout_add(
-                750, lambda *_: self._set_visible(False))
+                config['OSD']['TIMEOUT'] * 1000, lambda *_: self._set_visible(False))

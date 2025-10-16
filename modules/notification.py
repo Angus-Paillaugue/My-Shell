@@ -1178,7 +1178,7 @@ class NotificationHistoryIndicator(Button):
 
     def update_counter(self) -> None:
         """Update notification counter display with proper state management."""
-        if config['POSITIONS']['BAR'] != "top":
+        if config['BAR']['POSITION'] != "top":
             self.remove_style_class("active")
             self.add_style_class("hidden")
             return
@@ -1496,7 +1496,7 @@ class NotificationPopup(WaylandWindow):
 
     def __init__(self, notification_server: Notifications,
                  notification_history: NotificationHistory, **kwargs):
-        pos = config['POSITIONS']['NOTIFICATION']
+        pos = config['NOTIFICATION']['POSITION']
         y_pos = pos.split("-")[0]
         x_pos = pos.split("-")[1]
 

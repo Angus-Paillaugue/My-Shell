@@ -1,6 +1,45 @@
 #tailscale-icon {
-  font-size: {{FONT_SIZE * 1.2}};
+  font-size: {{FONT_SIZE * 1.6}};
 }
-#tailscale-icon.down {
-  color: var(--red);
+
+#tailscale-button {
+  padding: {{PADDING}};
+}
+#tailscale-button.up {
+  background-color: var(--primary);
+}
+#tailscale-button.down {
+  background-color: var(--surface);
+}
+#tailscale-button.up #tailscale-icon,
+#tailscale-button.up #tailscale-button-label,
+#tailscale-button.up #tailscale-status {
+  color: var(--shadow);
+}
+#tailscale-button-label {
+  font-size: {{FONT_SIZE}};
+  font-weight: bold;
+}
+
+#sunset-icon {
+  font-size: {{FONT_SIZE * 1.6}};
+}
+
+#sunset-button {
+  padding: {{PADDING}};
+}
+#sunset-button.up {
+  background-color: var(--primary);
+}
+#sunset-button.down {
+  background-color: var(--surface);
+}
+#sunset-button.up #sunset-icon,
+#sunset-button.up #sunset-button-label,
+#sunset-button.up #sunset-status {
+  color: var(--shadow);
+}
+#sunset-button-label {
+  font-size: {{FONT_SIZE}};
+  font-weight: bold;
 }

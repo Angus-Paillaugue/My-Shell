@@ -2,7 +2,7 @@ import json
 import subprocess
 from typing import Literal
 
-from gi.repository import GLib
+from gi.repository import GLib  # type: ignore
 
 status = Literal["down", "up"]
 

@@ -139,7 +139,7 @@ class Corners(Window):
 
     def __init__(self, **kwargs):
         offset = '-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING'])
-        margin = f"{offset if config['POSITIONS']['BAR'] == "top" else "0"} {offset if config['POSITIONS']['BAR'] == "right" else "0"} {offset if config['POSITIONS']['BAR'] == "bottom" else "0"} {offset if config['POSITIONS']['BAR'] == "left" else "0"}"
+        margin = f"{offset if config['BAR']['POSITION'] == "top" else "0"} {offset if config['BAR']['POSITION'] == "right" else "0"} {offset if config['BAR']['POSITION'] == "bottom" else "0"} {offset if config['BAR']['POSITION'] == "left" else "0"}"
         super().__init__(
             name="corners",
             layer="top",
@@ -165,7 +165,7 @@ class Corners(Window):
                     orientation="h",
                     h_align="fill",
                     children=[
-                        MyCorner("top-left"),
+                        MyCorner("top-left", size=config['CORNERS']['SIZE']),
                         Box(h_expand=True),
                         MyCorner("top-right"),
                     ],
@@ -176,9 +176,9 @@ class Corners(Window):
                     orientation="h",
                     h_align="fill",
                     children=[
-                        MyCorner("bottom-left"),
+                        MyCorner("bottom-left", size=config['CORNERS']['SIZE']),
                         Box(h_expand=True),
-                        MyCorner("bottom-right"),
+                        MyCorner("bottom-right", size=config['CORNERS']['SIZE']),
                     ],
                 ),
             ],

@@ -4,10 +4,50 @@ STYLES:
   BAR_SIZE: 47
   PADDING: 8
 
-POSITIONS:
-  BAR: "top"
-
-WIDGETS:
-  DAY: false
-
 MULTI_MONITOR: true
+
+NOTCH:
+  VISIBLE: true
+  MODULES:
+    WIFI:
+      VISIBLE: true
+    WIRED:
+      VISIBLE: true
+    BLUETOOTH:
+      VISIBLE: true
+    TAILSCALE:
+      VISIBLE: true
+    POWER_PROFILE:
+      VISIBLE: true
+    SUNSET:
+      VISIBLE: true
+      TEMPERATURE: 3500
+      GAMMA: 80
+NOTIFICATION:
+  VISIBLE: true
+  TIMEOUT: 5  # in seconds
+  POSITION: "top-right"  # options: top-left, top-right, bottom-left, bottom-right, top-center, bottom-center, center-center, center-left, center-right
+OSD:
+  VISIBLE: true
+  TIMEOUT: 2  # in seconds
+DESKTOP_WIDGETS:
+  VISIBLE: true
+  WIDGETS:
+    - 'DAY'
+BAR:
+  POSITION: top # options: top, bottom, left, right
+  VISIBLE: true
+  MODULES:
+    WORKSPACES: true
+    WEATHER:
+      VISIBLE: true
+      REFRESH_INTERVAL: 10  # in minutes
+    PERFORMANCE: true
+    TRAY: true
+    CLOCK: true
+    KEYBOARD_LAYOUT: true
+    TIME: true
+    POWER: true
+CORNERS:
+  VISIBLE: true
+  SIZE: 24
