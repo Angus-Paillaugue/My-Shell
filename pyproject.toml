@@ -1,5 +1,6 @@
 [tool.poetry]
 package-mode = false
+version = "0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 yapf = "^0.43.0"
