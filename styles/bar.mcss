@@ -103,3 +103,6 @@
 .bar-action-button.danger:active label {
   color: var(--foreground);
 }
+#bar-shadow {
+  margin: 10px;
+}
