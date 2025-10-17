@@ -58,7 +58,8 @@ class MultiMonitorManager:
     """Set single monitor components to primary monitor."""
     primary_monitor = self.get_primary_monitor()
     primary_monitor_id = primary_monitor['id'] if primary_monitor else 0
-    self._single_monitor_components = []
+    self._single_monitor_components = [
+    ]
     if config['NOTIFICATION']['VISIBLE']:
       notification = NotificationPopup(
           notification_server=self.notification_server,
@@ -112,7 +113,8 @@ class MultiMonitorManager:
   def _clear_single_monitor_components(self) -> None:
     """Destroy and clear existing single monitor components."""
     for comp in self._single_monitor_components:
-      comp.destroy()
+      if hasattr(comp, 'destroy'):
+        comp.destroy()
     self._single_monitor_components.clear()
     self._single_monitor_components = []
 
@@ -148,8 +150,6 @@ class MultiMonitorManager:
   def get_primary_monitor(self) -> MonitorType | None:
     """Return the primary monitor information."""
     return next((m for m in self._monitors if m['primary']), None)
-
-  # ...existing code...
 
   def exec_command(self, component_name: str, func_name: str, *args, **kwargs):
     """

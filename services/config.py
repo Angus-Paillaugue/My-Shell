@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import warnings
@@ -78,7 +79,7 @@ default_config = {
 
 class Config:
     def __init__(self, path: str = "config.yaml") -> None:
-        self._path = path
+        self._path = os.path.join(os.path.dirname(__file__), "..", path)
         self._user_config = {}
         self._config = {}
         self.init()
@@ -87,10 +88,10 @@ class Config:
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).upper()
 
-    def _read_yaml(self, path: str) -> dict:
-        if not os.path.exists(path):
+    def _read_yaml(self) -> dict:
+        if not os.path.exists(self._path):
             return {}
-        with open(path, "r") as f:
+        with open(self._path, "r") as f:
             return yaml.safe_load(f)
 
     def _build(self, user_config: dict) -> dict:
@@ -105,9 +106,12 @@ class Config:
                 return [walk(i) for i in d]
             else:
                 return d
-        self._user_config = walk(self._read_yaml(self._path) if self._path else {})
+        self._user_config = walk(self._read_yaml())
+        if self._user_config is None:
+            self._user_config = {}
         self._user_config['APP_NAME'] = self._user_config.get('APP_NAME', default_config['APP_NAME'])
-        self._user_config['STYLES']['NOTCH_HEIGHT'] = self._user_config['STYLES'].get('STYLES', default_config['STYLES']['NOTCH_HEIGHT'])
+        self._user_config['STYLES'] = self._user_config.get('STYLES', default_config['STYLES'])
+        self._user_config['STYLES']['NOTCH_HEIGHT'] = self._user_config['STYLES'].get('NOTCH_HEIGHT', default_config['STYLES']['NOTCH_HEIGHT'])
 
         # Validate the user configuration
         self._validate(self._user_config, default_config) # type: ignore
@@ -115,7 +119,42 @@ class Config:
         self._config = self._user_config # type: ignore
 
     def __getitem__(self, key: str):
-        return self._config[key]
+        return self._config[key] # type: ignore
+
+    def __setitem__(self, key: str, value):
+        """
+        Allows setting configuration values at runtime.
+        """
+        keys = key.split(".")
+        config = self._config
+        for k in keys[:-1]:
+            if k not in config or not isinstance(config[k], dict):
+                config[k] = {}
+            config = config[k]
+        config[keys[-1]] = value # type: ignore
+
+    def get(self, key: str) -> str | int | float | bool | dict | list:
+        """
+        Retrieves a configuration value by key, with support for nested keys.
+        """
+        keys = key.split(".")
+        config = self._config
+        for k in keys:
+            config = config[k] # type: ignore
+        return config
+
+    def set(self, key: str, value):
+        """
+        Sets a configuration value by key, with support for nested keys.
+        """
+        self.__setitem__(key, value)
+
+    def save(self):
+        """
+        Saves the current configuration to the YAML file.
+        """
+        with open(self._path, "w") as f:
+            yaml.dump(self._config, f, sort_keys=False)
 
     def _validate(self, config: dict, reference: dict, path: str = "") -> None:
         """

@@ -1,0 +1,51 @@
+#settings-ui-window {
+  background-color: var(--background);
+  border-radius: {{BORDER_RADIUS}};
+}
+
+/* Sidebar */
+#settings-gui-sidebar {
+  padding: {{PADDING}};
+  color: var(--foreground);
+}
+.sidebar-tab-button {
+  border-radius: {{BORDER_RADIUS}};
+  padding: {{PADDING/2}} {{PADDING}};
+}
+.sidebar-tab-button.active {
+  background-color: var(--primary);
+}
+.sidebar-tab-button.active label {
+  color: var(--on-primary);
+}
+
+/* Main stack */
+#settings-ui-tab-stack {
+  padding: {{PADDING}};
+}
+.settings-ui-tab-label {
+  font-size: {{FONT_SIZE*1.5}};
+  font-weight: bold;
+  margin-bottom: {{PADDING}};
+}
+
+/* Footer */
+.settings-ui-save-button {
+  background-color: var(--primary);
+  border-radius: {{BORDER_RADIUS}};
+  padding: {{PADDING/2}} {{PADDING}};
+  font-size: {{FONT_SIZE}};
+}
+.settings-ui-save-button label {
+  color: var(--on-primary);
+}
+
+.settings-ui-reset-form-button {
+  background-color: var(--secondary);
+  border-radius: {{BORDER_RADIUS}};
+  padding: {{PADDING/2}} {{PADDING}};
+  font-size: {{FONT_SIZE}};
+}
+.settings-ui-reset-form-button label {
+  color: var(--on-secondary);
+}

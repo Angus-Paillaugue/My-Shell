@@ -5,7 +5,7 @@ from fabric.widgets.wayland import WaylandWindow
 from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
-from modules.settings import SettingsBroker
+from modules.bluetooth import SettingsBroker
 from services.config import config
 from services.logger import logger
 

@@ -4,7 +4,7 @@ font_weight: str = "normal"
 
 span: str = f"<span font-family='{font_family}' font-weight='{font_weight}'>"
 
-settings: str = "&#xf1f6;"
+settings: str = "&#xeb20;"
 keyboard: str = "&#xebd6;"
 # Chevrons
 chevron_up: str = "&#xea62;"

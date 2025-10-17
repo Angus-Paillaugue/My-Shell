@@ -30,6 +30,7 @@ from modules.power import PowerMenuActions
 from modules.power_profile import PowerProfile
 from modules.screen_record import ScreenRecordButton
 from modules.screenshot import ScreenshotButton
+from modules.settings import SettingsButton
 from modules.sunset import Sunset
 from modules.tailscale import Tailscale
 from modules.time import CalendarBox as Calendar
@@ -153,6 +154,7 @@ class NotchWidgetDefaultExpanded(Box):
         self.network_module = Wired(slot=self.wired_networks_dropdown_slot)
         self.screenshot_button = ScreenshotButton()
         self.screen_record_button = ScreenRecordButton()
+        self.settings_button = SettingsButton()
         self.color_picker_button = ColorPickerButton(hide_notch=lambda: show_widget("default"))
         self.tailscale = Tailscale()
         self.sunset = Sunset()
@@ -211,6 +213,7 @@ class NotchWidgetDefaultExpanded(Box):
 
         self.end_children = Box(
             children=[
+                self.settings_button,
                 self.color_picker_button,
                 self.screen_record_button,
                 self.screenshot_button,
@@ -606,6 +609,7 @@ class  Notch(EventBox):
         """Show a specific widget in the notch inner and update the widget picker state."""
         self.show_picker = show_picker
         return self.inner.show_widget(widget_name)
+
 
 class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""

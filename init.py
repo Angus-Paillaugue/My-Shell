@@ -8,7 +8,6 @@ import shutil
 
 app_location = os.path.expanduser(f"~/.config/{config['APP_NAME']}")
 
-
 class MissingRequiredCommandException(Exception):
     pass
 
@@ -42,7 +41,6 @@ def ensure_system_commands() -> None:
             raise MissingRequiredCommandException(
                 f"In order to operate, {config['APP_NAME']} needs to access the {command} command. Please install it and try again"
             )
-
 
 def ensure_matugen_config() -> None:
     """
@@ -221,6 +219,9 @@ def generate_hyprlock_config() -> None:
     location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf")
     template_location = os.path.join(app_location, "config/hypr/hyprlock.conf")
     backup_location = os.path.expanduser(f"~/.config/hypr/hyprlock.conf.bak")
+
+    if os.path.exists(backup_location):
+        return
 
     # Create a backup of the existing hyprlock configuration if it exists
     if os.path.exists(location) and not os.path.exists(backup_location):

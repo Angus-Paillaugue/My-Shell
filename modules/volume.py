@@ -12,7 +12,7 @@ from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import GLib  # type: ignore
 
 import modules.icons as icons
-from modules.settings import SettingsBroker
+from modules.bluetooth import SettingsBroker
 from services.logger import logger
 
 
