@@ -21,3 +21,5 @@ update:
 	./workflows/update.sh
 kill:
 	pkill my-shell
+api:
+	python -m mobile.server.app

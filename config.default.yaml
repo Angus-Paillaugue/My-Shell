@@ -51,3 +51,6 @@ BAR:
 CORNERS:
   VISIBLE: true
   SIZE: 24
+MOBILE:
+  SECRET_KEY: "<SUPER_SECRET_KEY>"
+  NAME: "my-username"

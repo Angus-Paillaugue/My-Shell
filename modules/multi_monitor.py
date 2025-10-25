@@ -149,8 +149,6 @@ class MultiMonitorManager:
     """Return the primary monitor information."""
     return next((m for m in self._monitors if m['primary']), None)
 
-  # ...existing code...
-
   def exec_command(self, component_name: str, func_name: str, *args, **kwargs):
     """
     Execute a method on a specific component by name.

@@ -6,3 +6,4 @@ styles/colors.mcss
 config/pinned_apps.json
 poetry.lock
 config.yaml
+config/mobile-app
