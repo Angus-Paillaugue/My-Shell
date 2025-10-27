@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-/// Simple Socket.IO client wrapper for the PhoneBridge protocol.
 class SocketManager {
   static final SocketManager _instance = SocketManager._internal();
   factory SocketManager() => _instance;
@@ -12,7 +11,6 @@ class SocketManager {
   String? _currentIp;
   String? _currentToken;
 
-  // NEW: exposes connection state to UI
   final ValueNotifier<bool> isConnected = ValueNotifier<bool>(false);
 
   Future<void> connect(
