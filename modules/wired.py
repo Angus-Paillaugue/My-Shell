@@ -1,7 +1,8 @@
 import gi
 
-gi.require_version("Gtk", "3.0")
 gi.require_version("NM", "1.0")
+gi.require_version("GLib", "2.0")
+
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
 from fabric.widgets.centerbox import CenterBox

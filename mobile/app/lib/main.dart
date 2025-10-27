@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'pairing_page.dart';
+import 'server/database_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('api_token');
-  final ip = prefs.getString('device_ip');
-  runApp(MyApp(isPaired: token != null && ip != null));
+  await DatabaseProvider.init();
+  final first = await DatabaseProvider.getFirstPairedDevice();
+  final isPaired = first != null;
+  runApp(MyApp(isPaired: isPaired));
 }
 
 class MyApp extends StatelessWidget {

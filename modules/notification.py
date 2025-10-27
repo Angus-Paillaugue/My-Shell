@@ -1,3 +1,9 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+gi.require_version("GdkPixbuf", "2.0")
+gi.require_version("Gtk", "3.0")
+
 import json
 import locale
 import os
@@ -24,7 +30,6 @@ from services.logger import logger
 PERSISTENT_DIR = f"/tmp/{config['APP_NAME']}/notifications"
 PERSISTENT_HISTORY_FILE = os.path.join(PERSISTENT_DIR,
                                        "notification_history.json")
-MAX_VISIBLE_NOTIFICATIONS = 3
 
 
 def cache_notification_pixbuf(notification_box):
@@ -1291,8 +1296,8 @@ class NotificationContainer(Box):
         # Add the new notification
         self.notifications.append(new_box)
 
-        # Display the notification if we haven't reached MAX_VISIBLE_NOTIFICATIONS
-        if len(self.visible_notifications) < MAX_VISIBLE_NOTIFICATIONS:
+        # Display the notification if we haven't reached config["NOTIFICATION"]["MAX_VISIBLE"]
+        if len(self.visible_notifications) < config["NOTIFICATION"]["MAX_VISIBLE"]:
             self.visible_notifications.append(new_box)
             self.notifications_box.add(new_box)
             new_box.show_all()
@@ -1330,7 +1335,7 @@ class NotificationContainer(Box):
             n for n in self.notifications if n not in self.visible_notifications
         ]
         if (hidden_notifications and
-                len(self.visible_notifications) < MAX_VISIBLE_NOTIFICATIONS):
+                len(self.visible_notifications) < config["NOTIFICATION"]["MAX_VISIBLE"]):
             next_to_show = hidden_notifications[0]
             self.visible_notifications.append(next_to_show)
             self.notifications_box.add(next_to_show)

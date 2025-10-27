@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("Gtk", "3.0")
+
 from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button

@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../components/IconsHelper.dart';
+import '../components/action_card.dart';
+
 class SocketManager {
   static final SocketManager _instance = SocketManager._internal();
   factory SocketManager() => _instance;
@@ -12,6 +15,38 @@ class SocketManager {
   String? _currentToken;
 
   final ValueNotifier<bool> isConnected = ValueNotifier<bool>(false);
+
+  // Notifier that publishes action list updates pushed by the server.
+  final ValueNotifier<List<CardAction>> actionsNotifier =
+      ValueNotifier<List<CardAction>>([]);
+
+  void _registerActionsUpdatedListener() {
+    if (_socket == null) return;
+    // Clear any existing handlers for this event to avoid duplicates.
+    try {
+      _socket!.off('actions_updated');
+    } catch (_) {}
+
+    _socket!.on('actions_updated', (data) {
+      debugPrint('[+] Received actions_updated event from server: $data');
+      try {
+        final actions = (data as Map<String, dynamic>)['actions'] as List<dynamic>? ?? [];
+        final cardActions = actions.map((action) {
+          final actionMap = action as Map<String, dynamic>;
+          return CardAction(
+            id: actionMap['id'] as String,
+            title: actionMap['title'] as String,
+            icon: Icon(
+              IconsHelper.iconMap[actionMap['icon']] ?? Icons.help_outline,
+            ).icon ?? Icons.help_outline,
+          );
+        }).toList();
+        actionsNotifier.value = cardActions;
+      } catch (e) {
+        debugPrint('Failed to parse actions_updated: $e');
+      }
+    });
+  }
 
   Future<void> connect(
     String ip, {
@@ -41,17 +76,15 @@ class SocketManager {
     final completer = Completer<void>();
     _socket!.on('connect', (_) {
       if (!completer.isCompleted) completer.complete();
-      // update connection state
       isConnected.value = true;
+      _registerActionsUpdatedListener();
     });
     _socket!.on('disconnect', (_) {
-      // update connection state
       isConnected.value = false;
     });
     _socket!.on('connect_error', (err) {
       if (!completer.isCompleted)
         completer.completeError(err ?? 'connect_error');
-      // ensure state updated
       isConnected.value = false;
     });
     _socket!.connect();
@@ -69,8 +102,8 @@ class SocketManager {
     _socket = null;
     _currentIp = null;
     _currentToken = null;
-    // update connection state
     isConnected.value = false;
+    actionsNotifier.value = [];
   }
 
   Future<String> pair() async {
@@ -136,7 +169,9 @@ class SocketManager {
 
     final completer = Completer<void>();
 
-    void onStatus(data) {
+    void onResult(data) {
+      final success = (data['returncode'] as int) == 0;
+      debugPrint('[+] Action "$action" completed with success: $success');
       if (!completer.isCompleted) completer.complete();
     }
 
@@ -144,11 +179,12 @@ class SocketManager {
       if (!completer.isCompleted) completer.completeError(data ?? 'error');
     }
 
-    _socket!.once('status', onStatus);
+    _socket!.once('command_result', onResult);
     _socket!.once('error', onError);
 
     _socket!.emit('message', {
-      'action': action,
+      'action': 'command',
+      'command': action,
       'api_key': token ?? _currentToken,
       'payload': payload ?? {},
     });

@@ -1,10 +1,13 @@
+import gi
+
+gi.require_version("Gio", "2.0")
+
 from typing import Any, List, Literal
 
-import gi
 from fabric.core.service import Property, Service, Signal
 from fabric.utils import (bulk_connect, exec_shell_command,
                           exec_shell_command_async)
-from gi.repository import Gio
+from gi.repository import Gio  # type: ignore
 
 from services.logger import logger
 

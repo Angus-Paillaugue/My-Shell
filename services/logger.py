@@ -108,7 +108,7 @@ class Logger:
           level (string): the log level
         """
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")
-        frame = inspect.stack()[3]
+        frame = inspect.stack()[3] if len(inspect.stack()) > 3 else inspect.stack()[1]
         return f"{timestamp} {str(level).upper()} [{self.process}] [{frame.filename}:{frame.lineno}] {text}\n"
 
     def _create_file_name(self):

@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 import subprocess
 
 from fabric.utils.helpers import exec_shell_command_async

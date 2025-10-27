@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("Gdk", "3.0")
+
 import subprocess
 
 from fabric.utils import exec_shell_command_async

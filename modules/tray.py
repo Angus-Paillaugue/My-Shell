@@ -1,11 +1,15 @@
 import gi
 
-from services.config import config
-
 gi.require_version("Gray", "0.1")
+gi.require_version("GdkPixbuf", "2.0")
+gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
+gi.require_version("GLib", "2.0")
+
 from fabric.widgets.box import Box
 from gi.repository import Gdk, GdkPixbuf, GLib, Gray, Gtk  # type: ignore
 
+from services.config import config
 from services.logger import logger
 
 

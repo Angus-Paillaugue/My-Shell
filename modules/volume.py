@@ -1,6 +1,7 @@
 import gi
 
-gi.require_version("Gtk", "3.0")
+gi.require_version("GLib", "2.0")
+
 from fabric.audio.service import Audio
 from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box

@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 from fabric.core.fabricator import Fabricator
 from fabric.utils import exec_shell_command, exec_shell_command_async
 from fabric.widgets.box import Box

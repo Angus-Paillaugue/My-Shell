@@ -1,5 +1,8 @@
+import gi
+
+gi.require_version("GLib", "2.0")
 import psutil
-from gi.repository import GLib
+from gi.repository import GLib  # type: ignore
 
 
 class MetricsProvider:

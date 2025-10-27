@@ -25,6 +25,7 @@ NOTCH:
       GAMMA: 80
 NOTIFICATION:
   VISIBLE: true
+  MAX_VISIBLE: 3
   TIMEOUT: 5  # in seconds
   POSITION: "top-right"  # options: top-left, top-right, bottom-left, bottom-right, top-center, bottom-center, center-center, center-left, center-right
 OSD:
@@ -51,6 +52,3 @@ BAR:
 CORNERS:
   VISIBLE: true
   SIZE: 24
-MOBILE:
-  SECRET_KEY: "<SUPER_SECRET_KEY>"
-  NAME: "my-username"

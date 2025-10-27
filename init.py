@@ -7,6 +7,7 @@ import toml
 import shutil
 
 app_location = os.path.expanduser(f"~/.config/{config['APP_NAME']}")
+print(f"App location determined as: {app_location}")
 
 
 class MissingRequiredCommandException(Exception):

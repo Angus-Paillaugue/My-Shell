@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:multicast_dns/multicast_dns.dart';
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'server/socket_manager.dart';
+import 'server/database_provider.dart';
 
 class PairingPage extends StatefulWidget {
   const PairingPage({super.key});
@@ -16,7 +16,7 @@ class _PairingPageState extends State<PairingPage> {
   List<_DiscoveredDevice> devices = [];
   bool scanning = false;
   late MDnsClient _mdns;
-  Map<String, _DiscoveredDevice> pairedDevices = {}; // device_id → device
+  Map<String, _DiscoveredDevice> pairedDevices = {};
 
   @override
   void initState() {
@@ -26,21 +26,18 @@ class _PairingPageState extends State<PairingPage> {
   }
 
   Future<void> _loadPairedDevices() async {
-    final prefs = await SharedPreferences.getInstance();
-    final keys = prefs.getKeys();
-    for (var key in keys) {
-      if (key.startsWith('api_token_')) {
-        final deviceId = key.replaceFirst('api_token_', '');
-        final ip = prefs.getString('last_ip_$deviceId');
-        final name = prefs.getString('device_name_$deviceId') ?? deviceId;
-        if (ip != null) {
-          pairedDevices[deviceId] = _DiscoveredDevice(
-            name: name,
-            ip: ip,
-            port: 5000,
-            deviceId: deviceId,
-          );
-        }
+    final rows = await DatabaseProvider.getAllPairedDevices();
+    for (var row in rows) {
+      final deviceId = row['device_id'] as String;
+      final ip = row['last_ip'] as String?;
+      final name = (row['name'] as String?) ?? deviceId;
+      if (ip != null) {
+        pairedDevices[deviceId] = _DiscoveredDevice(
+          name: name,
+          ip: ip,
+          port: 5000,
+          deviceId: deviceId,
+        );
       }
     }
   }
@@ -68,7 +65,6 @@ class _PairingPageState extends State<PairingPage> {
               in _mdns.lookup<TxtResourceRecord>(
                 ResourceRecordQuery.text(ptr.domainName),
               )) {
-
             List<String> entries = txt.text.split('\n');
 
             for (var item in entries) {
@@ -101,34 +97,35 @@ class _PairingPageState extends State<PairingPage> {
 
   Future<void> _pairDevice(_DiscoveredDevice device) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.containsKey('api_token_${device.deviceId}')) {
-        await prefs.setString('last_ip_${device.deviceId}', device.ip);
-        await prefs.setString('device_name_${device.deviceId}', device.name);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
-        );
+      final existing = await DatabaseProvider.getDevice(device.deviceId);
+      if (existing != null && existing['api_token'] != null) {
+        await DatabaseProvider.updateLastIp(device.deviceId, device.ip);
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
+        }
         return;
       }
 
       final socket = SocketManager();
       await socket.connect(device.ip);
 
-      // Ask server to create a pairing session
       final sessionId = await socket.pair();
 
       final code = await _showCodeDialog(context, device, sessionId);
       if (code == null) return;
 
-      // Verify
       final apiToken = await socket.verifyPair(sessionId, code);
 
-      // Persist token and device info
       final deviceId = device.deviceId;
-      await prefs.setString('api_token_$deviceId', apiToken);
-      await prefs.setString('device_name_$deviceId', device.name);
-      await prefs.setString('last_ip_$deviceId', device.ip);
+      await DatabaseProvider.savePairing(
+        deviceId: deviceId,
+        name: device.name,
+        ip: device.ip,
+        token: apiToken,
+      );
 
       if (context.mounted) {
         Navigator.pushReplacement(

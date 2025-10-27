@@ -1,6 +1,7 @@
 import gi
 
 gi.require_version("Gtk", "3.0")
+
 import json
 import subprocess
 from typing import List, TypedDict

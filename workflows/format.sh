@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-requiredCommands=("yapf" "prettier" "shfmt" "isort")
+requiredCommands=("yapf" "prettier" "shfmt" "isort" "dart")
 
-projectRoot="$HOME/.config/my-shell"
+projectRoot="$HOME/.config/vellum-shell"
 cd "$projectRoot" || exit 1
 
 checkCommands() {
@@ -18,6 +18,11 @@ formatPython() {
   echo "Formatting Python files..."
   yapf -r --style google --verbose -i .
   isort **/*.py
+}
+
+formatDart() {
+  echo "Formatting Dart files..."
+  dart format .
 }
 
 formatCSS() {
@@ -49,6 +54,7 @@ formatAll() {
   formatPython
   formatCSS
   formatShell
+  formatDart
 }
 
 main() {

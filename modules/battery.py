@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 from fabric.core.fabricator import Fabricator
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button

@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 import os
 
 from fabric import Property, Service, Signal

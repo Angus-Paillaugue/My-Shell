@@ -1,10 +1,12 @@
 import gi
+
+gi.require_version("GLib", "2.0")
+
 import setproctitle
 
 from modules.multi_monitor import MultiMonitorManager
 from styles.interpreter.main import StylesInterpreter
 
-gi.require_version("GLib", "2.0")
 from fabric.utils import get_relative_path, monitor_file
 from fabric import Application
 from services.config import config
