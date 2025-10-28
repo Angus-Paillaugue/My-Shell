@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("Gtk", "3.0")
+
 from fabric.utils import exec_shell_command_async
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
@@ -16,7 +20,7 @@ class PowerButton(Button):
             name="power-button",
             style_classes=[
                 "bar-item",
-                ("horizontal" if config['BAR']['POSITION'] in ["top", "bottom"]
+                ("horizontal" if config.get('BAR.POSITION') in ["top", "bottom"]
                  else "vertical"),
             ],
             child=Label(markup=icons.shutdown),
@@ -27,7 +31,7 @@ class PowerButton(Button):
     def on_clicked(self, *args: object) -> None:
         """Handle the button click to show or hide the power menu."""
         exec_shell_command_async(
-            f"fabric-cli exec {config['APP_NAME']} 'monitor_manager.exec_command(\"notch\", \"show_widget\", \"power\", False)'"
+            f"fabric-cli exec {config.get('APP_NAME')} 'monitor_manager.exec_command(\"notch\", \"show_widget\", \"power\", False)'"
         )
 
 

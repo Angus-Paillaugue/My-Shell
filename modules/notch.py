@@ -1,3 +1,9 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+gi.require_version("Gdk", "3.0")
+gi.require_version("Gtk", "3.0")
+
 import json
 import subprocess
 from typing import Callable
@@ -176,7 +182,7 @@ class NotchWidgetDefaultExpanded(Box):
         }
 
         try:
-            config_order = list(config['NOTCH']['MODULES'].keys())
+            config_order = list(config.get('NOTCH.MODULES').keys())
         except Exception:
             config_order = list(available_modules.keys())
 
@@ -185,7 +191,7 @@ class NotchWidgetDefaultExpanded(Box):
             if name not in available_modules:
                 continue
             try:
-                visible = config['NOTCH']['MODULES'][name]['VISIBLE']
+                visible = config.get(f'NOTCH.MODULES.{name}.VISIBLE')
             except Exception:
                 visible = False
             if visible:
@@ -505,7 +511,7 @@ class NotchInner(CornerContainer):
             [0])  # Show the default widget initially
         super().__init__(
             name="bar-center-container",
-            style_classes=[config['BAR']['POSITION']],
+            style_classes=[config.get('BAR.POSITION')],
             corners=(True, True),
             height=30,
             v_align="center",
@@ -569,7 +575,7 @@ class  Notch(EventBox):
             self.inner.add_style_class("hovered")
             if self.show_picker:
                 self.notch_widget_picker.show()
-            if config['BAR']['POSITION'] == "top":
+            if config.get('BAR.POSITION') == "top":
                 self.notification_history_indicator.add_style_class("hidden")
                 self.notification_history_indicator.add_style_class("hovered")
             if self.inner._contents.get_visible_child(
@@ -591,10 +597,10 @@ class  Notch(EventBox):
             self.show_picker = True
             self.inner.remove_style_class("hovered")
             self.notch_widget_picker.hide()
-            if config['BAR']['POSITION'] != "top":
+            if config.get('BAR.POSITION') != "top":
                 self.notification_history_indicator.remove_style_class("hovered")
             # Show notification bell if has pending notifications to read
-            if config['BAR']['POSITION'] == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
+            if config.get('BAR.POSITION') == "top" and (self.notification_history_indicator.notification_count > 0 or self.notification_history_indicator.dnd) :
                 GLib.timeout_add(
                     500,
                     lambda *_: self.notification_history_indicator.
@@ -611,7 +617,7 @@ class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
 
     def __init__(self, notification_history: NotificationHistory, **kwargs):
-        margin = f"{'-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING']) if config['BAR']['POSITION'] == "top" else 0} 0 0 0"
+        margin = f"{'-'+str(config.get('STYLES.BAR_SIZE') + config.get('STYLES.PADDING')) if config.get('BAR.POSITION') == "top" else 0} 0 0 0"
         super().__init__(
             anchor="top center",
             name="notch",

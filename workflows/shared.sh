@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # Variables
-app_name="My-Shell"
+app_name="Vellum-Shell"
 app_name_lower=$(echo "$app_name" | tr '[:upper:]' '[:lower:]')
-project_dir="$HOME/.config/my-shell"
+project_dir="$HOME/.config/vellum-shell"
 release_branch="main"
 
 get_latest_version() {

@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 import json
 import math
 import os
@@ -16,7 +20,6 @@ from fabric.widgets.label import Label
 from fabric.widgets.scrolledwindow import ScrolledWindow
 from gi.repository import Gdk, GLib  # type: ignore
 
-import modules.icons as icons
 from services.config import config
 from services.interfaces import NotchWidgetInterface
 from services.logger import logger
@@ -36,7 +39,7 @@ class AppLauncher(Box, NotchWidgetInterface):
         self._arranger_handler: int = 0
         self._all_apps = get_desktop_applications()
 
-        CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config['APP_NAME']}"
+        CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config.get('APP_NAME')}"
         self.calc_history_path = f"{CACHE_DIR}/calc.json"
         if not os.path.exists(CACHE_DIR):
             os.makedirs(CACHE_DIR)
@@ -82,19 +85,11 @@ class AppLauncher(Box, NotchWidgetInterface):
         self._all_apps = get_desktop_applications()
         self.arrange_viewport()
 
-        def clear_selection():
-            entry = self.search_entry
-            if entry.get_text():
-                pos = len(entry.get_text())
-                entry.set_position(pos)
-                entry.select_region(pos, pos)
-            return False
-
         def focus_search_entry():
             self.search_entry.grab_focus()
             self.search_entry.select_region(0, -1)
 
-        GLib.idle_add(clear_selection)
+        self.search_entry.set_text("")
         GLib.timeout_add(250, focus_search_entry)
         # self.show()
 

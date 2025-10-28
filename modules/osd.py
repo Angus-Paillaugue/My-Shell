@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 from fabric.widgets.box import Box
 from fabric.widgets.label import Label
 from fabric.widgets.revealer import Revealer
@@ -80,4 +84,4 @@ class OSD(WaylandWindow):
         if ok:
             self._set_visible(True)
             self._hide_timeout = GLib.timeout_add(
-                config['OSD']['TIMEOUT'] * 1000, lambda *_: self._set_visible(False))
+                config.get('OSD.TIMEOUT') * 1000, lambda *_: self._set_visible(False))

@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 from fabric.core.fabricator import Fabricator
 from fabric.widgets.box import Box
 from fabric.widgets.circularprogressbar import CircularProgressBar
@@ -13,7 +17,7 @@ class Metrics(Box):
     """Widget that displays system metrics such as CPU, RAM, and temperature."""
 
     def __init__(self, **kwargs):
-        orientation = ("horizontal" if config['BAR']['POSITION']
+        orientation = ("horizontal" if config.get('BAR.POSITION')
                        in ["top", "bottom"] else "vertical")
         super().__init__(
             visible=True,

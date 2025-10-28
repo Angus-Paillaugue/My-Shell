@@ -13,7 +13,7 @@ class Language(Button):
     """Widget that displays the current keyboard layout language in the bar."""
 
     def __init__(self, **kwargs):
-        orientation = ("horizontal" if config['BAR']['POSITION']
+        orientation = ("horizontal" if config.get('BAR.POSITION')
                        in ["top", "bottom"] else "vertical")
         super().__init__(
             name="language",
@@ -33,7 +33,7 @@ class Language(Button):
         self.add(
             Box(
                 name="icon-container",
-                spacing=config['STYLES']['PADDING'],
+                spacing=config.get('STYLES.PADDING'),
                 orientation=orientation,
                 children=[self.lang_icon, self.lang_label],
                 h_align="center",

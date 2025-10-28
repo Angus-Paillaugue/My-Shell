@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 import threading
 
 import requests
@@ -83,7 +87,7 @@ class WeatherButton(Button):
             name="weather-button",
             style_classes=[
                 "bar-item",
-                ("horizontal" if config['BAR']['POSITION'] in ["top", "bottom"]
+                ("horizontal" if config.get('BAR.POSITION') in ["top", "bottom"]
                  else "vertical"),
             ],
             **kwargs,
@@ -91,7 +95,7 @@ class WeatherButton(Button):
         self.weather_worker = WeatherWorker()
         self.main_container = Box(
             orientation="h"
-            if config['BAR']['POSITION'] in ["top", "bottom"] else "v",
+            if config.get('BAR.POSITION') in ["top", "bottom"] else "v",
             spacing=8,
         )
         self.loading_icon = Label(
@@ -115,7 +119,7 @@ class WeatherButton(Button):
             poll_from=lambda v: self.weather_worker.update_weather(),
             on_changed=lambda f, v: self._build(),
             interval=1000 * 60 *
-            config['BAR']['MODULES']['WEATHER']['REFRESH_INTERVAL'],
+            config.get('BAR.MODULES.WEATHER.REFRESH_INTERVAL'),
             stream=False,
             default_value=0,
         )

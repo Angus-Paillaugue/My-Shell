@@ -1,3 +1,7 @@
+import gi
+
+gi.require_version("GLib", "2.0")
+
 import subprocess
 
 from fabric.utils.helpers import exec_shell_command_async
@@ -64,7 +68,7 @@ class Sunset(Button):
             exec_shell_command_async("pkill hyprsunset")
             self.enabled = False
         except subprocess.CalledProcessError:
-            exec_shell_command_async(f"hyprsunset -t {config['NOTCH']['MODULES']['SUNSET']['TEMPERATURE']} -g {config['NOTCH']['MODULES']['SUNSET']['GAMMA']}")
+            exec_shell_command_async(f"hyprsunset -t {config.get('NOTCH.MODULES.SUNSET.TEMPERATURE')} -g {config.get('NOTCH.MODULES.SUNSET.GAMMA')}")
             self.enabled = True
         GLib.idle_add(self._set_status)
 

@@ -1,6 +1,6 @@
 
 
-# My-Shell
+# Vellum-Shell
 
 This project is my implementation of a all-in-one wayland shell. It is pretty and works (most of the time).
 
@@ -17,10 +17,10 @@ This project is my implementation of a all-in-one wayland shell. It is pretty an
 
 # Installation
 
-To install my-shell, first clone the repository:
+To install vellum-shell, first clone the repository:
 
 ```bash
-git clone https://github.com/Angus-Paillaugue/My-Shell.git ~/.config/my-shell && cd ~/.config/my-shell
+git clone https://github.com/Angus-Paillaugue/Vellum-Shell.git ~/.config/vellum-shell && cd ~/.config/vellum-shell
 ```
 
 Then, create a virtual environment and install the dependencies:

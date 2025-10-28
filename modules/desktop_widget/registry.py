@@ -11,7 +11,7 @@ class DesktopWidgetRegistry():
                 module_name = file[:-3]
                 module = __import__(f"modules.desktop_widget.widgets.{module_name}", fromlist=[module_name])
                 widget_class = getattr(module, ''.join([part.capitalize()+"Widget" for part in module_name.split('_')]))
-                if module_name.upper() in config['DESKTOP_WIDGETS']['WIDGETS']:
+                if module_name.upper() in config.get('DESKTOP_WIDGETS.WIDGETS'):
                     instance = widget_class(**kwargs)
                     self.widgets[module_name] = instance
 

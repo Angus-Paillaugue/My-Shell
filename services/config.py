@@ -1,12 +1,11 @@
 import os
 import re
-import warnings
 
 import yaml
 from mergedeep import merge
 
 default_config = {
-    "APP_NAME": "my-shell",
+    "APP_NAME": "vellum-shell",
     "STYLES": {
         "BORDER_RADIUS": 12,
         "FONT_SIZE": 16,
@@ -44,6 +43,7 @@ default_config = {
         "VISIBLE": True,
         "TIMEOUT": 5,  # in seconds
         "POSITION": "top-right",
+        'MAX_VISIBLE': 3
     },
     "OSD": {
         "VISIBLE": True,
@@ -74,11 +74,14 @@ default_config = {
         "VISIBLE": True,
         "SIZE": 24,
     },
+    "SYNC":{
+        "ACTIONS": {}
+    }
 }
 
 class Config:
     def __init__(self, path: str = "config.yaml") -> None:
-        self._path = path
+        self._path = os.path.join(os.path.dirname(__file__), "..", path)
         self._user_config = {}
         self._config = {}
         self.init()
@@ -106,16 +109,24 @@ class Config:
             else:
                 return d
         self._user_config = walk(self._read_yaml(self._path) if self._path else {})
-        self._user_config['APP_NAME'] = self._user_config.get('APP_NAME', default_config['APP_NAME'])
-        self._user_config['STYLES']['NOTCH_HEIGHT'] = self._user_config['STYLES'].get('STYLES', default_config['STYLES']['NOTCH_HEIGHT'])
+        self._user_config['APP_NAME'] = self._user_config.get('APP_NAME', default_config['APP_NAME']) # type: ignore
+        self._user_config['STYLES']['NOTCH_HEIGHT'] = self._user_config['STYLES'].get('STYLES', default_config['STYLES']['NOTCH_HEIGHT']) # type: ignore
 
         # Validate the user configuration
         self._validate(self._user_config, default_config) # type: ignore
 
         self._config = self._user_config # type: ignore
 
+    def get(self, ket: str):
+        """Get a configuration value by key (can be nested)."""
+        keys = ket.split('.')
+        value = self._config
+        for key in keys:
+            value = value[key] # type: ignore
+        return value
+
     def __getitem__(self, key: str):
-        return self._config[key]
+        return self._config[key] # type: ignore
 
     def _validate(self, config: dict, reference: dict, path: str = "") -> None:
         """
@@ -130,11 +141,9 @@ class Config:
         for key in config:
             current_path = f"{path}.{key}" if path else key
 
-            if key not in reference:
-                warnings.warn(f"Warning: Unused key in configuration: '{current_path}'")
-                continue  # Skip validation for unused keys
-
-            ref_value = reference[key]
+            ref_value = reference.get(key)
+            if ref_value is None:
+                continue
             user_value = config[key]
 
             # Check type
@@ -152,5 +161,8 @@ class Config:
             else:
                 if not isinstance(user_value, type(ref_value)):
                     raise ValueError(f"Invalid type at '{current_path}': expected {type(ref_value).__name__}, got {type(user_value).__name__}")
+
+    def get_path(self) -> str:
+        return self._path
 
 config = Config()

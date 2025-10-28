@@ -25,6 +25,7 @@ NOTCH:
       GAMMA: 80
 NOTIFICATION:
   VISIBLE: true
+  MAX_VISIBLE: 3
   TIMEOUT: 5  # in seconds
   POSITION: "top-right"  # options: top-left, top-right, bottom-left, bottom-right, top-center, bottom-center, center-center, center-left, center-right
 OSD:
@@ -51,3 +52,22 @@ BAR:
 CORNERS:
   VISIBLE: true
   SIZE: 24
+SYNC:
+  ACTIONS:
+    # These are the actions available to trigger from the mobile app.
+    # Each one has a title, icon, and command to run.
+    # See https://fonts.google.com/icons?icon.platform=android&icon.style=Rounded&icon.set=Material+Icons for available icons.
+    # You can use any command that can be run from the terminal.
+    toggle-lock:
+      title: "Toggle Lock Screen"
+      icon: "lock"
+      command: |
+        if pgrep -x hyprlock >/dev/null; then
+          pkill -USR1 -f hyprlock
+        else
+          setsid hyprlock >/dev/null 2>&1 &
+        fi
+    notify:
+      title: "Notify"
+      icon: "notifications"
+      command: "notify-send -e -a 'Vellum Shell Sync' 'Hello from Sync!'"
