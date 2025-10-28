@@ -19,8 +19,12 @@ fi
 update_versions_in_files() {
   local new_version="$1"
 
+  # Update VERSION file
   echo "$new_version" >"$project_dir/VERSION"
+  # Update pyproject.toml
   poetry version "$new_version"
+  # Update mobile/app/pubspec.yaml
+  sed -i "s/^version: .*/version: $new_version/" "$project_dir/mobile/app/pubspec.yaml"
 }
 
 main() {
