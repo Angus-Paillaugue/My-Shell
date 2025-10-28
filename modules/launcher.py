@@ -39,7 +39,7 @@ class AppLauncher(Box, NotchWidgetInterface):
         self._arranger_handler: int = 0
         self._all_apps = get_desktop_applications()
 
-        CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config['APP_NAME']}"
+        CACHE_DIR = str(GLib.get_user_cache_dir()) + f"/{config.get('APP_NAME')}"
         self.calc_history_path = f"{CACHE_DIR}/calc.json"
         if not os.path.exists(CACHE_DIR):
             os.makedirs(CACHE_DIR)

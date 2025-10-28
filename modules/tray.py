@@ -22,7 +22,7 @@ class SystemTray(Box):
             orientation=Gtk.Orientation.HORIZONTAL,
             style_classes=[
                 "bar-item",
-                ("horizontal" if config['BAR']['POSITION'] in ["top", "bottom"]
+                ("horizontal" if config.get('BAR.POSITION') in ["top", "bottom"]
                  else "vertical"),
             ],
             spacing=8,

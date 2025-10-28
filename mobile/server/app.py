@@ -28,7 +28,7 @@ pairing_sessions = {}  # { "device_ip": { "code": "123456", "expires_at": 123456
 def on_connect():
     logger.debug("Socket connected: " + request.sid) # type: ignore
     actions = utils.get_actions(sanitized=True)
-    socketio.emit('actions_updated', {'actions': actions})
+    emit('actions_updated', {'actions': actions})
 
 @socketio.on('disconnect')
 def on_disconnect():
@@ -99,7 +99,7 @@ def monitor_config_changes(poll_interval=1):
             mtime = utils.get_config_mtime()
             if mtime is not None and mtime != last_mtime:
                 last_mtime = mtime
-                utils.config_changed()
+                utils.config_file_changed()
                 actions = utils.get_actions(sanitized=True)
                 logger.debug("Config changed — broadcasting actions_updated")
                 socketio.emit('actions_updated', {'actions': actions})

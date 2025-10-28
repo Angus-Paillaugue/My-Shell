@@ -9,9 +9,7 @@ class ActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () => {
-        if(action.onPressed != null) {
-          action.onPressed!(action.id)
-        }
+        if (action.onPressed != null) {action.onPressed!(action.id)},
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.all(16),

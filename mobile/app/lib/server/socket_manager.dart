@@ -30,15 +30,18 @@ class SocketManager {
     _socket!.on('actions_updated', (data) {
       debugPrint('[+] Received actions_updated event from server: $data');
       try {
-        final actions = (data as Map<String, dynamic>)['actions'] as List<dynamic>? ?? [];
+        final actions =
+            (data as Map<String, dynamic>)['actions'] as List<dynamic>? ?? [];
         final cardActions = actions.map((action) {
           final actionMap = action as Map<String, dynamic>;
           return CardAction(
             id: actionMap['id'] as String,
             title: actionMap['title'] as String,
-            icon: Icon(
-              IconsHelper.iconMap[actionMap['icon']] ?? Icons.help_outline,
-            ).icon ?? Icons.help_outline,
+            icon:
+                Icon(
+                  IconsHelper.iconMap[actionMap['icon']] ?? Icons.help_outline,
+                ).icon ??
+                Icons.help_outline,
           );
         }).toList();
         actionsNotifier.value = cardActions;
@@ -77,7 +80,6 @@ class SocketManager {
     _socket!.on('connect', (_) {
       if (!completer.isCompleted) completer.complete();
       isConnected.value = true;
-      _registerActionsUpdatedListener();
     });
     _socket!.on('disconnect', (_) {
       isConnected.value = false;
@@ -87,6 +89,7 @@ class SocketManager {
         completer.completeError(err ?? 'connect_error');
       isConnected.value = false;
     });
+    _registerActionsUpdatedListener();
     _socket!.connect();
 
     return completer.future.timeout(timeout);

@@ -124,19 +124,8 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Connected to $deviceName"),
+        title: Text("${_online ? "Connected" : "Connecting"} to $deviceName"),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Tooltip(
-              message: _online ? 'Online' : 'Offline',
-              child: Icon(
-                Icons.circle,
-                color: _online ? Colors.green : Colors.red,
-                size: 14,
-              ),
-            ),
-          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _disconnect,
@@ -144,18 +133,23 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1,
-          children: actions.map((action) => ActionCard(action)).toList(),
-        ),
-      ),
+      body: !_online
+          ? const Center(child: CircularProgressIndicator())
+          : GridView.builder(
+              padding: const EdgeInsets.all(12.0),
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12.0,
+                crossAxisSpacing: 12.0,
+                childAspectRatio: 1.0,
+              ),
+              itemCount: actions.length,
+              itemBuilder: (BuildContext context, int index) {
+                final action = actions[index];
+                return ActionCard(action);
+              },
+            ),
     );
   }
 }

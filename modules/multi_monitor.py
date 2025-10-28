@@ -42,7 +42,7 @@ class MultiMonitorManager:
     self._set_monitors_infos()
     self._spawn_single_monitor_components()
     self._spawn_multi_monitors_components()
-    if config['MULTI_MONITOR']:
+    if config.get('MULTI_MONITOR'):
       self._conn.connect("event::monitoradded", self._on_monitors_changed)
       self._conn.connect("event::monitorremoved", self._on_monitors_changed)
 
@@ -60,20 +60,20 @@ class MultiMonitorManager:
     primary_monitor = self.get_primary_monitor()
     primary_monitor_id = primary_monitor['id'] if primary_monitor else 0
     self._single_monitor_components = []
-    if config['NOTIFICATION']['VISIBLE']:
+    if config.get('NOTIFICATION.VISIBLE'):
       notification = NotificationPopup(
           notification_server=self.notification_server,
           notification_history=self.notification_history,
           monitor=primary_monitor_id
       )
       self._single_monitor_components.append(notification)
-    if config['NOTCH']['VISIBLE']:
+    if config.get('NOTCH.VISIBLE'):
       notch = NotchWindow(notification_history=self.notification_history, monitor=primary_monitor_id)
       self._single_monitor_components.append(notch)
-    if config['OSD']['VISIBLE']:
+    if config.get('OSD.VISIBLE'):
       osd = OSD(monitor=primary_monitor_id)
       self._single_monitor_components.append(osd)
-    if config['DESKTOP_WIDGETS']['VISIBLE']:
+    if config.get('DESKTOP_WIDGETS.VISIBLE'):
       widget_registry = DesktopWidgetRegistry(monitor=primary_monitor_id)
       self._single_monitor_components.extend(widget_registry.all_widgets())
 
@@ -85,21 +85,21 @@ class MultiMonitorManager:
   def _spawn_multi_monitors_components(self):
     """Spawn bars and corners for each monitor based on configuration."""
     self._clear_multi_monitor_components()
-    if not config['MULTI_MONITOR']:
+    if not config.get('MULTI_MONITOR'):
       primary_monitor = self.get_primary_monitor()
-      if config['BAR']['VISIBLE']:
+      if config.get('BAR.VISIBLE'):
         bar = Bar(monitor=primary_monitor['id'] if primary_monitor else 0)
         self._multi_monitor_components.append(bar)
-      if config['CORNERS']['VISIBLE']:
+      if config.get('CORNERS.VISIBLE'):
         corners = Corners(monitor=primary_monitor['id'] if primary_monitor else 0)
         self._multi_monitor_components.append(corners)
     else:
       for monitor in self._monitors:
         monitor_id = monitor['id']
-        if config['BAR']['VISIBLE']:
+        if config.get('BAR.VISIBLE'):
           bar = Bar(monitor=monitor_id)
           self._multi_monitor_components.append(bar)
-        if config['CORNERS']['VISIBLE']:
+        if config.get('CORNERS.VISIBLE'):
           corners = Corners(monitor=monitor_id)
           self._multi_monitor_components.append(corners)
 

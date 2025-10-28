@@ -1,6 +1,5 @@
 import os
 import re
-import warnings
 
 import yaml
 from mergedeep import merge
@@ -44,6 +43,7 @@ default_config = {
         "VISIBLE": True,
         "TIMEOUT": 5,  # in seconds
         "POSITION": "top-right",
+        'MAX_VISIBLE': 3
     },
     "OSD": {
         "VISIBLE": True,
@@ -74,6 +74,9 @@ default_config = {
         "VISIBLE": True,
         "SIZE": 24,
     },
+    "SYNC":{
+        "ACTIONS": {}
+    }
 }
 
 class Config:
@@ -114,6 +117,14 @@ class Config:
 
         self._config = self._user_config # type: ignore
 
+    def get(self, ket: str):
+        """Get a configuration value by key (can be nested)."""
+        keys = ket.split('.')
+        value = self._config
+        for key in keys:
+            value = value[key] # type: ignore
+        return value
+
     def __getitem__(self, key: str):
         return self._config[key] # type: ignore
 
@@ -130,11 +141,9 @@ class Config:
         for key in config:
             current_path = f"{path}.{key}" if path else key
 
-            if key not in reference:
-                warnings.warn(f"Warning: Unused key in configuration: '{current_path}'")
-                continue  # Skip validation for unused keys
-
-            ref_value = reference[key]
+            ref_value = reference.get(key)
+            if ref_value is None:
+                continue
             user_value = config[key]
 
             # Check type
@@ -152,5 +161,8 @@ class Config:
             else:
                 if not isinstance(user_value, type(ref_value)):
                     raise ValueError(f"Invalid type at '{current_path}': expected {type(ref_value).__name__}, got {type(user_value).__name__}")
+
+    def get_path(self) -> str:
+        return self._path
 
 config = Config()

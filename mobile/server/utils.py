@@ -2,35 +2,12 @@ import os
 import json
 import uuid
 import netifaces as ni
+from services.config import config
 
 CONFIG_PATH = os.path.expanduser("~/.config/vellum-shell/config/sync-app/config.json")
 
-default_actions = [
-    {
-      "id": "lock",
-      "title": "Lock Screen",
-      "icon": "lock",
-      "command": "setsid hyprlock >/dev/null 2>&1 &"
-    },
-    {
-      "id": "unlock",
-      "title": "Unlock Screen",
-      "icon": "lock_open",
-      "command": "pkill -USR1 -f hyprlock"
-    },
-    {
-      "id": "notify",
-      "title": "Notify",
-      "icon": "notifications",
-      "command": "notify-send -e -a 'Vellum Shell PhoneBridge' 'Hello from PhoneBridge!'"
-    }
-  ]
-cached_config = None
-
 def init_config():
-    global cached_config
     base_config = {
-        "actions": default_actions,
         "device_id": str(uuid.uuid4()),
         "api_key": str(uuid.uuid4())
     }
@@ -38,46 +15,14 @@ def init_config():
         os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
         with open(CONFIG_PATH, "w") as f:
             json.dump(base_config, f, indent=2)
-        cached_config = base_config
         return base_config
-    with open(CONFIG_PATH, "r") as f:
-        try:
-            data = json.load(f)
-            updated = False
-            for key, value in base_config.items():
-                if key not in data:
-                    data[key] = value
-                    updated = True
-            if updated:
-                with open(CONFIG_PATH, "w") as fw:
-                    json.dump(data, fw, indent=2)
-            cached_config = data
-            return data
-        except json.JSONDecodeError:
-            with open(CONFIG_PATH, "w") as f:
-                json.dump(base_config, f, indent=2)
-            cached_config = base_config
-            return base_config
-
-def config_changed():
-    global cached_config
-    if not os.path.exists(CONFIG_PATH):
-        return False
-    with open(CONFIG_PATH, "r") as f:
-        try:
-            data = json.load(f)
-            if data != cached_config:
-                cached_config = data
-                return True
-            return False
-        except json.JSONDecodeError:
-            return False
 
 def get_config():
-    global cached_config
-    if cached_config is None:
-        init_config()
-    return cached_config
+    if not os.path.exists(CONFIG_PATH):
+        return init_config()
+    with open(CONFIG_PATH, "r") as f:
+        data = json.load(f)
+        return data
 
 def get_lan_ip():
     for iface in ni.interfaces():
@@ -87,21 +32,39 @@ def get_lan_ip():
                 return addrs[0]["addr"]
     return "127.0.0.1"
 
+def _upper_snake_object_to_lower_camel_case(obj):
+    if isinstance(obj, list):
+        return [_upper_snake_object_to_lower_camel_case(item) for item in obj]
+    elif isinstance(obj, dict):
+        new_obj = {}
+        for key, value in obj.items():
+            components = key.lower().split('_')
+            camel_case_key = components[0] + ''.join(x.title() for x in components[1:])
+            new_obj[camel_case_key] = _upper_snake_object_to_lower_camel_case(value)
+        return new_obj
+    else:
+        return obj
+
+def config_file_changed():
+    config.init()
+
 def get_actions(sanitized=False):
-    config = get_config()
+    actions = config.get('SYNC.ACTIONS')
+    for key in actions:
+        actions[key]['id'] = key
+    actions = list(actions.values())
     if sanitized:
-        # Remove the command field for sanitized output
-        actions = config.get("actions", default_actions)
         sanitized_actions = []
         for action in actions:
             sanitized_action = action.copy()
             if "command" in sanitized_action:
                 del sanitized_action["command"]
             sanitized_actions.append(sanitized_action)
-        return sanitized_actions
-    return config.get("actions", default_actions)
+        return _upper_snake_object_to_lower_camel_case(sanitized_actions)
+    return _upper_snake_object_to_lower_camel_case(actions)
 
 def get_config_mtime():
-    if os.path.exists(CONFIG_PATH):
-        return os.path.getmtime(CONFIG_PATH)
+    path = config.get_path()
+    if os.path.exists(path):
+        return os.path.getmtime(path)
     return None

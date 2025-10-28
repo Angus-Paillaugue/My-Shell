@@ -6,7 +6,7 @@ from fabric.utils.helpers import exec_shell_command_async
 import toml
 import shutil
 
-app_location = os.path.expanduser(f"~/.config/{config['APP_NAME']}")
+app_location = os.path.expanduser(f"~/.config/{config.get('APP_NAME')}")
 print(f"App location determined as: {app_location}")
 
 
@@ -17,7 +17,8 @@ class MissingRequiredCommandException(Exception):
 commands_needed = [
     "hyprsunset", "fabric-cli", "matugen", "brightnessctl", "notify-send",
     "tuned-adm", "hyprctl", "systemctl", "hyprshot", "pkill", "pgrep", "pactl",
-    "nmcli", "cliphist", "wl-copy", "tailscale", "whoami", "hostname"
+    "nmcli", "cliphist", "wl-copy", "tailscale", "whoami", "hostname",
+    "hyprlock"
 ]
 
 
@@ -41,7 +42,7 @@ def ensure_system_commands() -> None:
             subprocess.check_output(["command", "-v", command, ">/dev/null"])
         except Exception:
             raise MissingRequiredCommandException(
-                f"In order to operate, {config['APP_NAME']} needs to access the {command} command. Please install it and try again"
+                f"In order to operate, {config.get('APP_NAME')} needs to access the {command} command. Please install it and try again"
             )
 
 
@@ -110,15 +111,16 @@ def ensure_matugen_config() -> None:
                 "output_path":
                     os.path.join(app_location, "config/hypr/colors.conf"),
             },
-            f"{config['APP_NAME']}": {
+            f"{config.get('APP_NAME')}": {
                 "input_path":
                     os.path.join(
                         app_location,
-                        f"config/matugen/templates/{config['APP_NAME']}.css"),
+                        f"config/matugen/templates/{config.get('APP_NAME')}.css"
+                    ),
                 "output_path":
                     os.path.join(app_location, "styles/colors.mcss"),
                 "post_hook":
-                    f"fabric-cli exec {config['APP_NAME']} 'app.apply_stylesheet()' &",
+                    f"fabric-cli exec {config.get('APP_NAME')} 'app.apply_stylesheet()' &",
             },
             "kitty": {
                 "input_path":
@@ -202,7 +204,7 @@ def ensure_matugen_config() -> None:
 
 
 def generate_hypr_entrypoint() -> None:
-    contents = f"""source = ~/.config/{config['APP_NAME']}/config/hypr/overrides.conf"""
+    contents = f"""source = ~/.config/{config.get('APP_NAME')}/config/hypr/overrides.conf"""
     location = os.path.expanduser(f"~/.config/hypr/hyprland.conf")
     if not os.path.exists(location):
         raise FileNotFoundError(
@@ -230,7 +232,7 @@ def generate_hyprlock_config() -> None:
 
     with open(template_location, "r") as f:
         contents = f.read()
-        contents = contents.replace("{{APP_NAME}}", config['APP_NAME'])
+        contents = contents.replace("{{APP_NAME}}", config.get('APP_NAME'))
     with open(location, "w") as f:
         f.write(contents)
     print(f"Hyprlock configuration updated")

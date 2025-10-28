@@ -18,8 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PhoneBridge',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'Vellum Shell Sync',
       home: isPaired ? const HomePage() : const PairingPage(),
     );
   }

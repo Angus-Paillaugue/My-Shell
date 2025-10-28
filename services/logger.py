@@ -14,7 +14,7 @@ class Logger:
     def __init__(
         self,
         log_file_location="logs",
-        process=config['APP_NAME'],
+        process=config.get('APP_NAME'),
         log_rotate_retention=10000,
         log_file_ext="log",
         max_log_files_retention=20,

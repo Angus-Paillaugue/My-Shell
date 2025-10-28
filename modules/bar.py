@@ -25,12 +25,12 @@ class Bar(WaylandWindow):
             "left": "top left bottom",
             "right": "top right bottom",
         }
-        orientation = ("horizontal" if config['BAR']['POSITION']
+        orientation = ("horizontal" if config.get('BAR.POSITION')
                        in ["top", "bottom"] else "vertical")
         super().__init__(
             name="bar",
             layer="bottom",
-            anchor=anchors[config['BAR']['POSITION']],
+            anchor=anchors[config.get('BAR.POSITION')],
             exclusivity="auto",
             visible=True,
             all_visible=True,
@@ -49,34 +49,34 @@ class Bar(WaylandWindow):
 
         self.start_box = Box(
             name="bar-start-container",
-            style_classes=[config['BAR']['POSITION']],
+            style_classes=[config.get('BAR.POSITION')],
             spacing=8,
             orientation=orientation,
         )
         self.end_box = Box(
             name="bar-end-container",
-            style_classes=[config['BAR']['POSITION']],
+            style_classes=[config.get('BAR.POSITION')],
             spacing=8,
             orientation=orientation,
         )
 
         # Adding the chosen modules to the bar based on the configuration
-        if config['BAR']['MODULES']['WORKSPACES']:
+        if config.get('BAR.MODULES.WORKSPACES'):
             self.start_box.add(self.workspaces)
-        if config['BAR']['MODULES']['WEATHER']['VISIBLE']:
+        if config.get('BAR.MODULES.WEATHER.VISIBLE'):
             self.start_box.add(self.weather_button)
-        if config['BAR']['MODULES']['PERFORMANCE']:
+        if config.get('BAR.MODULES.PERFORMANCE'):
             self.start_box.add(self.metrics)
 
-        if config['BAR']['MODULES']['TRAY']:
+        if config.get('BAR.MODULES.TRAY'):
             self.end_box.add(self.system_tray)
-        # if config['BAR']['MODULES']['TAILSCALE']:
+        # if config.get('BAR.MODULES.TAILSCALE'):
         #     self.end_box.add(self.tailscale)
-        if config['BAR']['MODULES']['KEYBOARD_LAYOUT']:
+        if config.get('BAR.MODULES.KEYBOARD_LAYOUT'):
             self.end_box.add(self.language)
-        if config['BAR']['MODULES']['TIME']:
+        if config.get('BAR.MODULES.TIME'):
             self.end_box.add(self.time)
-        if config['BAR']['MODULES']['POWER']:
+        if config.get('BAR.MODULES.POWER'):
             self.end_box.add(self.power_button)
 
         self.bar_inner = CenterBox(

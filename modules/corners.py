@@ -138,8 +138,8 @@ class Corners(Window):
     """Window that contains all four corners of the screen."""
 
     def __init__(self, **kwargs):
-        offset = '-'+str(config['STYLES']['BAR_SIZE'] + config['STYLES']['PADDING'])
-        margin = f"{offset if config['BAR']['POSITION'] == "top" else "0"} {offset if config['BAR']['POSITION'] == "right" else "0"} {offset if config['BAR']['POSITION'] == "bottom" else "0"} {offset if config['BAR']['POSITION'] == "left" else "0"}"
+        offset = '-'+str(config.get('STYLES.BAR_SIZE') + config.get('STYLES.PADDING'))
+        margin = f"{offset if config.get('BAR.POSITION') == "top" else "0"} {offset if config.get('BAR.POSITION') == "right" else "0"} {offset if config.get('BAR.POSITION') == "bottom" else "0"} {offset if config.get('BAR.POSITION') == "left" else "0"}"
         super().__init__(
             name="corners",
             layer="top",
@@ -165,7 +165,7 @@ class Corners(Window):
                     orientation="h",
                     h_align="fill",
                     children=[
-                        MyCorner("top-left", size=config['CORNERS']['SIZE']),
+                        MyCorner("top-left", size=config.get('CORNERS.SIZE')),
                         Box(h_expand=True),
                         MyCorner("top-right"),
                     ],
@@ -176,9 +176,9 @@ class Corners(Window):
                     orientation="h",
                     h_align="fill",
                     children=[
-                        MyCorner("bottom-left", size=config['CORNERS']['SIZE']),
+                        MyCorner("bottom-left", size=config.get('CORNERS.SIZE')),
                         Box(h_expand=True),
-                        MyCorner("bottom-right", size=config['CORNERS']['SIZE']),
+                        MyCorner("bottom-right", size=config.get('CORNERS.SIZE')),
                     ],
                 ),
             ],
