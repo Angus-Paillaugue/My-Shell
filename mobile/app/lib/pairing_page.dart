@@ -43,56 +43,82 @@ class _PairingPageState extends State<PairingPage> {
   }
 
   Future<void> _startDiscovery() async {
+    debugPrint('[mDNS] Starting mDNS discovery...');
     setState(() => scanning = true);
     devices.clear();
 
-    _mdns = MDnsClient();
-    await _mdns.start();
+    try {
+      _mdns = MDnsClient();
+      await _mdns.start(
+        onError: (e) {
+          debugPrint('[mDNS] mDNS Error: $e');
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('mDNS Error: $e')));
+          }
+        },
+      );
+      debugPrint('[mDNS] mDNS started successfully.');
 
-    await for (final PtrResourceRecord ptr in _mdns.lookup<PtrResourceRecord>(
-      ResourceRecordQuery.serverPointer('_phonebridge._tcp.local'),
-    )) {
-      await for (final SrvResourceRecord srv in _mdns.lookup<SrvResourceRecord>(
-        ResourceRecordQuery.service(ptr.domainName),
+      await for (final PtrResourceRecord ptr in _mdns.lookup<PtrResourceRecord>(
+        ResourceRecordQuery.serverPointer('_phonebridge._tcp.local'),
       )) {
-        await for (final IPAddressResourceRecord ip
-            in _mdns.lookup<IPAddressResourceRecord>(
-              ResourceRecordQuery.addressIPv4(srv.target),
+        debugPrint('[mDNS] Discovered PTR: ${ptr.domainName}');
+        await for (final SrvResourceRecord srv
+            in _mdns.lookup<SrvResourceRecord>(
+              ResourceRecordQuery.service(ptr.domainName),
             )) {
-          String deviceId = '';
-          String name = ptr.domainName.split('._').first;
-          await for (final TxtResourceRecord txt
-              in _mdns.lookup<TxtResourceRecord>(
-                ResourceRecordQuery.text(ptr.domainName),
+          debugPrint('[mDNS] Discovered SRV: ${srv.target}:${srv.port}');
+          await for (final IPAddressResourceRecord ip
+              in _mdns.lookup<IPAddressResourceRecord>(
+                ResourceRecordQuery.addressIPv4(srv.target),
               )) {
-            List<String> entries = txt.text.split('\n');
+            debugPrint('[mDNS] Discovered IP: ${ip.address.address}');
+            String deviceId = '';
+            String name = ptr.domainName.split('._').first;
+            await for (final TxtResourceRecord txt
+                in _mdns.lookup<TxtResourceRecord>(
+                  ResourceRecordQuery.text(ptr.domainName),
+                )) {
+              debugPrint('[mDNS] Discovered TXT: ${txt.text}');
+              List<String> entries = txt.text.split('\n');
 
-            for (var item in entries) {
-              if (item.startsWith('device_id=')) {
-                deviceId = item.replaceFirst('device_id=', '');
-              }
-              if (item.startsWith('name=')) {
-                name = item.replaceFirst('name=', '');
+              for (var item in entries) {
+                if (item.startsWith('device_id=')) {
+                  deviceId = item.replaceFirst('device_id=', '');
+                }
+                if (item.startsWith('name=')) {
+                  name = item.replaceFirst('name=', '');
+                }
               }
             }
-          }
 
-          final device = _DiscoveredDevice(
-            name: name,
-            ip: ip.address.address,
-            port: srv.port,
-            deviceId: deviceId,
-          );
+            final device = _DiscoveredDevice(
+              name: name,
+              ip: ip.address.address,
+              port: srv.port,
+              deviceId: deviceId,
+            );
 
-          if (!devices.any((d) => d.deviceId == device.deviceId)) {
-            setState(() => devices.add(device));
+            if (!devices.any((d) => d.deviceId == device.deviceId)) {
+              setState(() => devices.add(device));
+            }
           }
         }
       }
+    } catch (e) {
+      debugPrint('[mDNS] Discovery error: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Discovery error: $e')));
+      }
+    } finally {
+      _mdns.stop();
+      debugPrint('[mDNS] mDNS stopped.');
+      setState(() => scanning = false);
     }
-
-    _mdns.stop();
-    setState(() => scanning = false);
   }
 
   Future<void> _pairDevice(_DiscoveredDevice device) async {
@@ -119,9 +145,8 @@ class _PairingPageState extends State<PairingPage> {
 
       final apiToken = await socket.verifyPair(sessionId, code);
 
-      final deviceId = device.deviceId;
       await DatabaseProvider.savePairing(
-        deviceId: deviceId,
+        deviceId: device.deviceId,
         name: device.name,
         ip: device.ip,
         token: apiToken,
@@ -177,7 +202,9 @@ class _PairingPageState extends State<PairingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pair a Laptop'),
-        actions: [
+        actions: scanning
+            ? null
+            : [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _startDiscovery,

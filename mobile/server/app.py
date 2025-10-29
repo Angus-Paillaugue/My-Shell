@@ -36,10 +36,14 @@ def on_disconnect():
 
 @socketio.on('message')
 def handle_message(data):
+    def respond(event: str, payload: dict):
+        emit('message', {
+            'payload': payload,
+            'event': event,
+        })
     action = data.get("action")
     api_key = data.get("api_key")
     payload = data.get("payload", {})
-    actions = utils.get_actions()
     # Handle pairing actions
     if api_key != API_KEY:
         match action:
@@ -61,15 +65,49 @@ def handle_message(data):
                 emit('error', {'error': 'Unauthorized'})
         return
 
+    logger.debug(f'Received event {action} from {request.sid}')  # type: ignore
     # Authenticated actions
     match action:
         case "get_actions":
-            emit('actions', {'actions': actions})
+            print(f"Sending actions to {request.sid}")
+            respond('actions_updated', {'actions': utils.get_actions(sanitized=True)})
+            return
+        case "file_system":
+            path = os.path.expanduser(payload.get("path", "~/"))
+            action = payload.get("action", "list")
+            try:
+                if action == "list":
+                    # List directory contents
+                    items = os.listdir(path)
+                    files = []
+                    for item in items:
+                        item_path = os.path.join(path, item)
+                        files.append({
+                            "name": item,
+                            "is_dir": os.path.isdir(item_path),
+                            "size": os.path.getsize(item_path),
+                            "modified": os.path.getmtime(item_path)
+                        })
+                    logger.debug(f"Listing directory: {path} with {len(files)} items")
+                    respond('file_system_result', {'items': files})
+                    return
+                elif action == "send":
+                    # Send the file contents
+                    with open(path, "rb") as f:
+                        content = f.read()
+                    respond('file_system_result', {'path': payload.get("path", "~/"), 'content': content})
+                    return
+            except Exception as e:
+                logger.error(f"File read error: {str(e)}")
+                respond('file_system_result', {'error': str(e)})
+                return
         case "command":
-            command_id = data.get("command")
+            actions = utils.get_actions()
+            command_id = payload.get("command")
+            logger.debug(f"Running command {command_id}")
             if command_id not in [a["id"] for a in actions]:
                 logger.error(f"Invalid action requested: {command_id}")
-                emit('error', {'error': 'Invalid action'})
+                respond('command_result', {'action_id': command_id, 'error': 'Invalid action'})
                 return
             command = [a for a in actions if a["id"] == command_id][0]
             logger.debug(f"Executing command: {command_id}")
@@ -79,17 +117,17 @@ def handle_message(data):
                 if result.returncode != 0:
                     logger.error(f"[!] Command returned non-zero exit code: {result.returncode}")
                     logger.debug(json.dumps(result.__dict__, indent=2))
-                emit('command_result', {
-                    'stdout': result.stdout,
-                    'stderr': result.stderr,
-                    'returncode': result.returncode
+                respond('command_result', {
+                    'action_id': command_id
                 })
+                return
             except subprocess.TimeoutExpired:
                 emit('error', {'error': 'Command timed out'})
         case _:
             emit('error', {'error': 'Unknown action'})
             return
-    emit('status', {'status': 'ok'})
+    respond('status', {'status': 'ok'})
+    return
 
 def monitor_config_changes(poll_interval=1):
     last_mtime = utils.get_config_mtime()

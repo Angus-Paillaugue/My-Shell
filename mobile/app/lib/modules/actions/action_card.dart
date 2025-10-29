@@ -48,4 +48,18 @@ class CardAction {
     required this.icon,
     this.onPressed,
   });
+
+  CardAction copyWith({
+    String? id,
+    String? title,
+    Function(String)? onPressed,
+    IconData? icon,
+  }) {
+    return CardAction(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      onPressed: onPressed ?? this.onPressed,
+      icon: icon ?? this.icon,
+    );
+  }
 }
