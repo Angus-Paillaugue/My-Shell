@@ -13,7 +13,7 @@ init:
 	python init.py
 dev: init dev-launch
 dev-launch:
-	GTK_DEBUG=interactive DEV_MODE=true python app.py
+	DEV_MODE=true python app.py
 run:
 	./run.sh
 phonebridge:

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vellum_shell_sync/modules/clipboard/clipboard_module.dart';
 import 'package:vellum_shell_sync/modules/module_interface.dart';
 import 'package:vellum_shell_sync/server/socket_manager.dart';
 // Modules
@@ -18,6 +19,7 @@ class ModuleManager {
     _allModules = [
       ActionsModule(),
       FileSystemModule(),
+      ClipboardModule(),
       // Future modules will be added here
     ];
   }

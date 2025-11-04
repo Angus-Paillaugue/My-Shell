@@ -139,7 +139,13 @@ class Corners(Window):
 
     def __init__(self, **kwargs):
         offset = '-'+str(config.get('STYLES.BAR_SIZE') + config.get('STYLES.PADDING'))
-        margin = f"{offset if config.get('BAR.POSITION') == "top" else "0"} {offset if config.get('BAR.POSITION') == "right" else "0"} {offset if config.get('BAR.POSITION') == "bottom" else "0"} {offset if config.get('BAR.POSITION') == "left" else "0"}"
+        offsets = [
+            offset if config.get('BAR.POSITION') == "top" else "0",
+            offset if config.get('BAR.POSITION') == "right" else "0",
+            offset if config.get('BAR.POSITION') == "bottom" else "0",
+            offset if config.get('BAR.POSITION') == "left" else "0",
+        ]
+        margin = " ".join(offsets)
         super().__init__(
             name="corners",
             layer="top",

@@ -3,7 +3,7 @@ import gi
 gi.require_version("GLib", "2.0")
 
 import setproctitle
-
+import os
 from modules.multi_monitor import MultiMonitorManager
 from styles.interpreter.main import StylesInterpreter
 
@@ -14,7 +14,7 @@ from services.config import config
 if __name__ == "__main__":
     setproctitle.setproctitle(config.get('APP_NAME'))
     monitor_manager = MultiMonitorManager()
-    app = Application(config.get('APP_NAME'), *monitor_manager.get_components())
+    app = Application(config.get('APP_NAME'), *monitor_manager.get_components(), open_inspector=True if os.environ.get("DEV_MODE") else False)
 
     input_styles_dir = get_relative_path("styles")
     styles_interpretor = StylesInterpreter(input_styles_dir,

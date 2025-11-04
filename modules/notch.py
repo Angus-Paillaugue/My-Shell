@@ -1,5 +1,7 @@
 import gi
 
+from modules.phone_bridge import SyncApp
+
 gi.require_version("GLib", "2.0")
 gi.require_version("Gdk", "3.0")
 gi.require_version("Gtk", "3.0")
@@ -80,6 +82,11 @@ class NotchWidgetPicker(Revealer):
                 "label": "Home",
                 "on_click": lambda *_: notch.show_widget("default-expanded"),
                 "name": "notch-widget-button-default",
+            },
+            {
+                "label": "Sync app",
+                "on_click": lambda *_: notch.show_widget("sync-app"),
+                "name": "notch-widget-button-sync-app",
             },
             {
                 "label": "Launcher",
@@ -478,7 +485,7 @@ class NotchInner(CornerContainer):
     ):
         self.notch = notch
         self.widgets_labels = [
-            'default', 'default-expanded', 'launcher', 'wallpaper', 'power',
+            'default', 'default-expanded', 'sync-app', 'launcher', 'wallpaper', 'power',
             'clipboard', 'dock-settings'
         ]
         self.notch_widget_picker = notch_widget_picker
@@ -486,6 +493,7 @@ class NotchInner(CornerContainer):
         self.notch_widget_default_expanded = NotchWidgetDefaultExpanded(
             notification_history=notification_history, show_widget=show_widget
         )
+        self.sync_app = SyncApp()
         self.launcher = AppLauncher()
         self.notch_widget_wallpaper = WallpaperManager()
         self.power = PowerMenuActions()
@@ -497,6 +505,7 @@ class NotchInner(CornerContainer):
             children=[
                 self.notch_widget_default,
                 self.notch_widget_default_expanded,
+                self.sync_app,
                 self.launcher,
                 self.notch_widget_wallpaper,
                 self.power,
@@ -538,7 +547,7 @@ class NotchInner(CornerContainer):
         return index == 0
 
 
-class  Notch(EventBox):
+class Notch(EventBox):
     """Main notch widget that contains the notch inner and the widget picker"""
 
     def __init__(self, notification_history: NotificationHistory, show_widget):
@@ -617,7 +626,7 @@ class NotchWindow(WaylandWindow):
     """Window that contains the notch, used to display it on top of the screen"""
 
     def __init__(self, notification_history: NotificationHistory, **kwargs):
-        margin = f"{'-'+str(config.get('STYLES.BAR_SIZE') + config.get('STYLES.PADDING')) if config.get('BAR.POSITION') == "top" else 0} 0 0 0"
+        margin = f"{'-'+str(config.get('STYLES.BAR_SIZE') + config.get('STYLES.PADDING')) if config.get('BAR.POSITION') == 'top' else 0} 0 0 0"
         super().__init__(
             anchor="top center",
             name="notch",

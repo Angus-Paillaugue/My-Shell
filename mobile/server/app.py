@@ -26,7 +26,7 @@ pairing_sessions = {}  # { "device_ip": { "code": "123456", "expires_at": 123456
 
 @socketio.on('connect')
 def on_connect():
-    logger.debug("Socket connected: " + request.sid) # type: ignore
+    logger.debug("Socket connected: " + request.sid)
     actions = utils.get_actions(sanitized=True)
     emit('actions_updated', {'actions': actions})
 
@@ -72,6 +72,27 @@ def handle_message(data):
             print(f"Sending actions to {request.sid}")
             respond('actions_updated', {'actions': utils.get_actions(sanitized=True)})
             return
+        case "clipboard":
+            action = payload.get("action", "get")
+            match action:
+                case "get":
+                    try:
+                        clipboard_content = subprocess.check_output(["cliphist", "list"]).decode("utf-8")
+                        items = ["\t".join(i.split("\t")[1:]) for i in clipboard_content.strip().split("\n")][0:50]
+                        respond('clipboard_result', {'content': items})
+                    except subprocess.CalledProcessError as e:
+                        logger.error(f"Clipboard get error: {str(e)}")
+                        respond('clipboard_result', {'error': str(e)})
+                    return
+                case "set":
+                    content = payload.get("content", "")
+                    try:
+                        subprocess.Popen(["wl-copy", content.encode("utf-8")])
+                        respond('clipboard_result', {'status': 'ok'})
+                    except Exception as e:
+                        logger.error(f"Clipboard set error: {str(e)}")
+                        respond('clipboard_result', {'error': str(e)})
+                    return
         case "file_system":
             path = os.path.expanduser(payload.get("path", "~/"))
             action = payload.get("action", "list")

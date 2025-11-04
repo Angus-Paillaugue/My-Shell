@@ -106,6 +106,11 @@ class SocketManager {
   void disconnect() {
     if (_socket != null) {
       try {
+        _socket!.off('connect');
+        _socket!.off('disconnect');
+        _socket!.off('connect_error');
+        _socket!.off('message');
+        _socket!.clearListeners(); // Clear all listeners
         _socket!.disconnect();
         _socket!.destroy();
       } catch (_) {}
@@ -122,12 +127,16 @@ class SocketManager {
 
     void onPaired(data) {
       _socket!.off('paired', onPaired);
-      completer.complete(data['session_id'] as String);
+      if (!completer.isCompleted) {
+        completer.complete(data['session_id'] as String);
+      }
     }
 
     void onError(data) {
       _socket!.off('error', onError);
-      if (!completer.isCompleted) completer.completeError(data ?? 'error');
+      if (!completer.isCompleted) {
+        completer.completeError(data ?? 'error');
+      }
     }
 
     _socket!.on('paired', onPaired);

@@ -64,6 +64,7 @@ class ActionsModule extends VellumModule {
       debugPrint('[ActionsModule] Failed to parse actions_updated: $e');
     }
   }
+
   void _onActionResult(dynamic data) {
     final actionId = data['action_id'] as String?;
     final error = data['error'] as String?;
@@ -82,13 +83,33 @@ class ActionsModule extends VellumModule {
     final completer = Completer<void>();
     _actionCompleters[actionId] = completer;
 
+    // Update the action to set isRunning to true
+    final currentActions = actionsNotifier.value;
+    final updatedActions = currentActions.map((action) {
+      if (action.id == actionId) {
+        return action.copyWith(isRunning: true);
+      }
+      return action;
+    }).toList();
+    actionsNotifier.value = updatedActions;
+
     _socketManager?.emit('command', {'command': actionId});
 
     try {
       await completer.future.timeout(const Duration(seconds: 10));
     } catch (e) {
-      _actionCompleters.remove(actionId); // Clean up on timeout
       rethrow; // Rethrow to be caught by the UI
+    } finally {
+      // Update the action to set isRunning to false
+      final resetActions = actionsNotifier.value.map((action) {
+        if (action.id == actionId) {
+          return action.copyWith(isRunning: false);
+        }
+        return action;
+      }).toList();
+      actionsNotifier.value = resetActions;
+
+      _actionCompleters.remove(actionId); // Clean up on timeout
     }
   }
 

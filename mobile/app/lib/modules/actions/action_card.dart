@@ -8,12 +8,14 @@ class ActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => {
-        if (action.onPressed != null) {action.onPressed!(action.id)},
-      },
+      onPressed: action.isRunning
+          ? null
+          : () => action.onPressed?.call(action.id),
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.all(16),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: action.isRunning
+            ? Theme.of(context).colorScheme.onSurface
+            : Theme.of(context).colorScheme.primary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Column(
@@ -22,13 +24,19 @@ class ActionCard extends StatelessWidget {
           Icon(
             action.icon,
             size: 36,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: action.isRunning
+                ? Theme.of(context).colorScheme.onSurfaceVariant
+                : Theme.of(context).colorScheme.onPrimary,
           ),
           const SizedBox(height: 8),
           Text(
             action.title,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            style: TextStyle(
+              color: action.isRunning
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : Theme.of(context).colorScheme.onPrimary,
+            ),
           ),
         ],
       ),
@@ -41,12 +49,14 @@ class CardAction {
   final String title;
   final Function(String)? onPressed;
   final IconData icon;
+  final bool isRunning;
 
   CardAction({
     required this.id,
     required this.title,
     required this.icon,
     this.onPressed,
+    this.isRunning = false,
   });
 
   CardAction copyWith({
@@ -54,12 +64,14 @@ class CardAction {
     String? title,
     Function(String)? onPressed,
     IconData? icon,
+    bool? isRunning,
   }) {
     return CardAction(
       id: id ?? this.id,
       title: title ?? this.title,
       onPressed: onPressed ?? this.onPressed,
       icon: icon ?? this.icon,
+      isRunning: isRunning ?? this.isRunning,
     );
   }
 }

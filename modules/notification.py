@@ -456,7 +456,6 @@ class NotificationHistory(Box):
                  on_event: Callable | None = None,
                  **kwargs):
         super().__init__(name="notification-history",
-                         orientation="v",
                          h_expand=True,
                          **kwargs)
 

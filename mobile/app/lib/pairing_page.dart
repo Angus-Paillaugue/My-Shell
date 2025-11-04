@@ -27,18 +27,18 @@ class _PairingPageState extends State<PairingPage> {
 
   Future<void> _loadPairedDevices() async {
     final rows = await DatabaseProvider.getAllPairedDevices();
+    debugPrint('[mDNS] Loaded ${rows.length} paired devices from database.');
     for (var row in rows) {
       final deviceId = row['device_id'] as String;
-      final ip = row['last_ip'] as String?;
+      final ip = row['last_ip'] as String;
       final name = (row['name'] as String?) ?? deviceId;
-      if (ip != null) {
-        pairedDevices[deviceId] = _DiscoveredDevice(
-          name: name,
-          ip: ip,
-          port: 5000,
-          deviceId: deviceId,
-        );
-      }
+      pairedDevices[deviceId] = _DiscoveredDevice(
+        name: name,
+        ip: ip,
+        port: 5000,
+        deviceId: deviceId,
+        known: true,
+      );
     }
   }
 
@@ -94,11 +94,13 @@ class _PairingPageState extends State<PairingPage> {
               }
             }
 
+            final known = pairedDevices.containsKey(deviceId);
             final device = _DiscoveredDevice(
               name: name,
               ip: ip.address.address,
               port: srv.port,
               deviceId: deviceId,
+              known: known,
             );
 
             if (!devices.any((d) => d.deviceId == device.deviceId)) {
@@ -220,11 +222,23 @@ class _PairingPageState extends State<PairingPage> {
               itemBuilder: (context, index) {
                 final d = devices[index];
                 return ListTile(
-                  title: Text(d.name),
-                  subtitle: Text('${d.ip}:${d.port}'),
+                  dense: false,
+                    title: Text(
+                    d.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
+                  subtitle: Text(
+                    '${d.ip}:${d.port}',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  leading: const Icon(Icons.laptop, size: 32,),
                   trailing: ElevatedButton(
                     onPressed: () => _pairDevice(d),
-                    child: const Text('Pair'),
+                    child: Text(d.known ? 'Connect' : 'Pair'),
                   ),
                 );
               },
@@ -238,10 +252,12 @@ class _DiscoveredDevice {
   final String ip;
   final int port;
   final String deviceId;
+  final bool known;
   _DiscoveredDevice({
     required this.name,
     required this.ip,
     required this.port,
     required this.deviceId,
+    required this.known,
   });
 }

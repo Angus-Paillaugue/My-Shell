@@ -109,9 +109,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _disconnect() async {
-    if (deviceId != null) {
-      await DatabaseProvider.removeLastIp(deviceId!);
-    }
     _socket.isConnected.removeListener(_connListener);
     _socket.disconnect();
     Navigator.pushReplacement(
@@ -283,11 +280,12 @@ class _ExpandableFabState extends State<ExpandableFab>
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           elevation: 4,
+          color: Theme.of(context).colorScheme.inversePrimary,
           child: InkWell(
             onTap: _toggle,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSecondary),
+              child: Icon(Icons.close, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
             ),
           ),
         ),

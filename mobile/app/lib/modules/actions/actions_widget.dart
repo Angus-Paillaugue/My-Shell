@@ -64,8 +64,8 @@ class _ActionsWidgetState extends State<ActionsWidget> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(12.0),
             shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200.0,
               mainAxisSpacing: 12.0,
               crossAxisSpacing: 12.0,
               childAspectRatio: 1.0,

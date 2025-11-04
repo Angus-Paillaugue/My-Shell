@@ -163,7 +163,7 @@ class VolumeOutputsRevealer(Revealer):
 class VolumeRow(Box):
     """A horizontal row widget that contains the volume icon, slider, and output options."""
 
-    def __init__(self, slot: Box = Box(), **kwargs):
+    def __init__(self, slot: Box, **kwargs):
         super().__init__(
             name="volume-row",
             orientation="h",
@@ -524,7 +524,7 @@ class MicInputsRevealer(Revealer):
 class MicRow(Box):
     """A horizontal row widget that contains the microphone icon, slider, and input options."""
 
-    def __init__(self, slot: Box = Box(), **kwargs):
+    def __init__(self, slot: Box, **kwargs):
         super().__init__(
             name="mic-row",
             orientation="h",

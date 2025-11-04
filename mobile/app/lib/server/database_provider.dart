@@ -76,16 +76,6 @@ class DatabaseProvider {
     );
   }
 
-  static Future<void> removeLastIp(String deviceId) async {
-    await init();
-    await _db!.update(
-      'paired_devices',
-      {'last_ip': null},
-      where: 'device_id = ?',
-      whereArgs: [deviceId],
-    );
-  }
-
   static Future<void> saveApiToken(String deviceId, String token) async {
     await init();
     await _db!.update(
